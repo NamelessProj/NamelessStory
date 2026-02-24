@@ -1,0 +1,8 @@
+.vn-spinner {
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    border-radius: 100%;
+    border: 10px solid var(--spinner-color);
+    border-top-color: var(--spinner-top-color);
+    animation: spin var(--spinner-speed) infinite cubic-bezier(0.4,-0.25, 0.5, 1.4);
+}
