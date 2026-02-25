@@ -1,3 +1,5 @@
+export type Page = "title" | "credits" | "game";
+
 type NameDisplay = "short"|"full";
 
 export interface SpritePosition {
@@ -73,7 +75,6 @@ export interface CreditsPage {
 export interface Settings {
     startingScene: string,
     textSpeed?: number,
-    webpImages?: boolean,
     defaultNameColor?: string,
     defaultNameDisplay?: NameDisplay,
     historyLimit?: number,
@@ -93,7 +94,6 @@ export interface State {
     currentScene: string,
     currentDialogueIndex: number,
     currentDialogueIndexMax: number,
-    webImages: boolean,
     textSpeed: number,
     waitingOnUserInput: boolean,
     waitingOnOptionSelection: boolean,
