@@ -3,6 +3,7 @@ import type {Page, State, VNStory} from "../../interfaces/interfaces.ts";
 import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import TitleScreen from "../TitleScreen";
+import CreditsPage from "../CreditsComponents/CreditsPage";
 
 const state: State = {
     currentScene: "start",
@@ -86,7 +87,10 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                     ) : null}
 
                     {currentPage === "credits" ? (
-                        <div>Credits</div>
+                        <CreditsPage
+                            script={script}
+                            handleChangeRoom={handleChangePage}
+                        />
                     ) : null}
                 </div>
             )}
