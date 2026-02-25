@@ -4,7 +4,10 @@
     "textSpeed": 50,
     "titlePage": {
       "title": "My Visual Novel",
-      "background": "title_bg.png"
+      "background": "title_bg.png",
+      "buttons": {
+        "start": "Start Game"
+      }
     },
     "creditsPage": {
       "title": "Credits",
