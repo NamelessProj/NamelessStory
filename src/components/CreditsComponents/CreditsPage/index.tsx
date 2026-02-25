@@ -6,7 +6,7 @@ const Index: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void 
     const handleBackToTitle = () => handleChangeRoom("title");
 
     return (
-        <div>
+        <div className="h-100 centered column">
             <h2>{script.settings.creditsPage.title}</h2>
             <PrimaryButton
                 text="Back to Title"
