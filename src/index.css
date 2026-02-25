@@ -90,6 +90,27 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.sr-only {
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 1rem;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -117,4 +138,53 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+
+/* ======================= */
+/*         BG IMAG         */
+/* ======================= */
+
+*:has(> picture.bg-img) {
+  position: relative;
+  isolation: isolate;
+}
+picture.bg-img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+picture.bg-img > img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+
+/**/
+/**/
+/**/
+
+#vn-player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+
+/* ========================== */
+/*         TITLE PAGE         */
+/* ========================== */
+
+.vn-titlepage {
+  flex-direction: column;
+  gap: 2rem;
+}
+.vn-titlepage h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  color: red;
 }
