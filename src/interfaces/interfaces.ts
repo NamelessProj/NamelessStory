@@ -1,3 +1,5 @@
+type NameDisplay = "short"|"full";
+
 export interface SpritePosition {
     name?: "right"|"left"|"center",
     x?: number,
@@ -18,6 +20,7 @@ export interface Option {
 
 export interface Dialogue {
     name: string,
+    nameDisplay?: NameDisplay,
     text: string,
     background?: string,
     input?: string,
@@ -33,6 +36,8 @@ export interface Scene {
 }
 
 export interface CharacterType {
+    name: string,
+    nameFull?: string,
     color: string,
     sprite?: Record<string, string>
 }
@@ -70,13 +75,16 @@ export interface Settings {
     textSpeed?: number,
     webpImages?: boolean,
     defaultNameColor?: string,
+    defaultNameDisplay?: NameDisplay,
     titlePage: TitlePage,
     creditsPage: CreditsPage
 }
 
+type CharacterId = string;
+
 export interface VNStory {
     settings: Settings,
-    characters: Record<string, CharacterType>,
+    characters: Record<CharacterId, CharacterType>,
     story: Record<string, Scene>
 }
 
