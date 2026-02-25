@@ -32,6 +32,7 @@ const App = () => {
         },
         characters: {
             "Alice": {
+                name: "Alice",
                 color: "red",
                 sprite: {
                     "wave": "alice_right.png",
@@ -39,6 +40,7 @@ const App = () => {
                 }
             },
             "Bob": {
+                name: "Bob",
                 color: "blue",
                 sprite: {
                     "wave": "bob_right.png",
@@ -72,6 +74,8 @@ const App = () => {
             }
         }
     };
+
+    console.log("Log loaded story:", story);
 
     return (
         <div id="app">
