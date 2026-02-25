@@ -76,6 +76,7 @@ export interface Settings {
     webpImages?: boolean,
     defaultNameColor?: string,
     defaultNameDisplay?: NameDisplay,
+    historyLimit?: number,
     titlePage: TitlePage,
     creditsPage: CreditsPage
 }
@@ -102,5 +103,6 @@ export interface State {
     currentMusic: HTMLAudioElement|null,
     musicVolume: number,
     isMusicMuted: boolean,
-    variables: Record<string, string>
+    variables: Record<string, string>,
+    history: string[]
 }
