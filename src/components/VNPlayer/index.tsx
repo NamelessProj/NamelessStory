@@ -1,13 +1,13 @@
 import * as React from "react";
-import type {State, VNStory} from "../../interfaces/interfaces.ts";
+import type {Page, State, VNStory} from "../../interfaces/interfaces.ts";
 import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
+import TitleScreen from "../TitleScreen";
 
 const state: State = {
     currentScene: "start",
     currentDialogueIndex: 0,
     currentDialogueIndexMax: 1,
-    webImages: false,
     textSpeed: 50,
     waitingOnUserInput: false,
     waitingOnOptionSelection: false,
@@ -23,6 +23,7 @@ const state: State = {
 
 const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
     const [script, setScript] = useState<VNStory|null>(null);
+    const [currentPage, setCurrentPage] = useState<Page>("title");
 
     useEffect(() => {
         const loadStory = async () => {
@@ -41,13 +42,12 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             }
 
             // TODO: Remove this delay after testing
-            await new Promise(resolve => setTimeout(resolve, 20000));
+            //await new Promise(resolve => setTimeout(resolve, 20000));
 
             const data: VNStory = await res.json();
             state.currentScene = data.settings.startingScene;
             state.currentDialogueIndexMax = data.story[data.settings.startingScene].dialogues.length - 1;
             state.textSpeed = data.settings.textSpeed || 50;
-            state.webImages = data.settings.webpImages || false;
             state.defaultNameColor = data.settings.defaultNameColor || "#000000";
             setScript(data);
         }
@@ -63,15 +63,31 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
         console.log("Loaded script:", script);
     }, [script]);
 
+    const handleChangePage = (newPage: Page): void => setCurrentPage(newPage);
+
     return (
         <>
             {!script ? (
-                <div id="vn-player" className="vn-body vn-is-loading">
+                <div id="vn-player" className="vn-body h-100 centered">
                     <Spinner />
                 </div>
             ) : (
                 <div id="vn-player" className="vn-body">
-                    <h1>{script.settings.titlePage?.title || "Untitled Visual Novel"}</h1>
+                    {currentPage === "title" ? (
+                        <TitleScreen
+                            script={script}
+                            handleStart={() => handleChangePage("game")}
+                            handleCredits={() => handleChangePage("credits")}
+                        />
+                    ) : null}
+
+                    {currentPage === "game" ? (
+                        <div>Game</div>
+                    ) : null}
+
+                    {currentPage === "credits" ? (
+                        <div>Credits</div>
+                    ) : null}
                 </div>
             )}
         </>
