@@ -6,12 +6,13 @@ const Index: React.FC<{ script: VNStory, handleStart: () => void, handleCredits:
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
 
     return (
-        <div className="h-100">
-            <img
-                src={`../assets/${script.settings.titlePage.background}`}
-                alt="Title Background"
-                className="title-background"
-            />
+        <div className="vn-titlepage h-100 centered">
+            <picture className="bg-img">
+                <img
+                    src={`../assets/${script.settings.titlePage.background}`}
+                    alt="Title Background"
+                />
+            </picture>
 
             <h1>{script.settings.titlePage.title}</h1>
 
