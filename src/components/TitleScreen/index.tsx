@@ -2,7 +2,7 @@ import * as React from "react";
 import type {TitleButtons, VNStory} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
 
-const Index: React.FC<{ script: VNStory, handleStart: () => void, handleCredits: () => void }> = ({script, handleStart, handleCredits}) => {
+const TitleScreen: React.FC<{ script: VNStory, handleStart: () => void, handleCredits: () => void }> = ({script, handleStart, handleCredits}) => {
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
 
     return (
@@ -31,4 +31,4 @@ const Index: React.FC<{ script: VNStory, handleStart: () => void, handleCredits:
     );
 };
 
-export default Index;
+export default TitleScreen;
