@@ -140,6 +140,11 @@ body {
   align-items: center;
 }
 
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
 
 /* ======================= */
 /*         BG IMAG         */
@@ -181,7 +186,6 @@ picture.bg-img > img {
 /* ========================== */
 
 .vn-titlepage {
-  flex-direction: column;
   gap: 2rem;
 }
 .vn-titlepage h1 {
