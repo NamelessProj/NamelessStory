@@ -78,7 +78,7 @@ const App = () => {
     console.log("Log loaded story:", story);
 
     return (
-        <div id="app">
+        <div id="app" className="centered">
             <VNPlayer scriptFile="story.sample" />
         </div>
     );
