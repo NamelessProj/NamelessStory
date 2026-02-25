@@ -17,7 +17,8 @@ const state: State = {
     currentMusic: null,
     musicVolume: 1,
     isMusicMuted: false,
-    variables: {}
+    variables: {},
+    history: []
 };
 
 const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
