@@ -1,6 +1,7 @@
 import * as React from "react";
-import type {Page, VNStory} from "../../../interfaces/interfaces.ts";
+import type {CreditGroupType, Page, VNStory} from "../../../interfaces/interfaces.ts";
 import PrimaryButton from "../../PrimaryButton";
+import CreditGroup from "../CreditGroup";
 
 const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void }> = ({script, handleChangeRoom}) => {
     const handleBackToTitle = () => handleChangeRoom("title");
@@ -12,6 +13,10 @@ const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) =>
                 text="Back to Title"
                 onClick={handleBackToTitle}
             />
+
+            {script.settings.creditsPage.creditGroups.map((cg: CreditGroupType, i: number) => (
+                <CreditGroup creditGroup={cg} key={i} />
+            ))}
         </div>
     );
 };
