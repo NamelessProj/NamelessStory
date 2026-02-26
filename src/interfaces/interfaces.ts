@@ -61,7 +61,7 @@ export interface Credit {
     role?: string
 }
 
-export interface CreditGroup {
+export interface CreditGroupType {
     groupName: string,
     credits: Credit[]
 }
@@ -69,7 +69,7 @@ export interface CreditGroup {
 export interface CreditsPage {
     title: string,
     background: string,
-    creditGroups: CreditGroup[]
+    creditGroups: CreditGroupType[]
 }
 
 export interface Settings {
