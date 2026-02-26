@@ -2,13 +2,18 @@ import * as React from "react";
 import type {CreditGroupType, CreditsPage, Page, VNStory} from "../../../interfaces/interfaces.ts";
 import PrimaryButton from "../../PrimaryButton";
 import CreditGroup from "../CreditGroup";
+import './style.css';
+import type {CSSProperties} from "react";
 
 const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void }> = ({script, handleChangeRoom}) => {
     const creditsPage: CreditsPage = script.settings.creditsPage;
     const handleBackToTitle = (): void => handleChangeRoom("title");
 
+    const scrollDurationInSeconds: number = 10;
+    const style: CSSProperties = {"--credits-scroll-time": `${scrollDurationInSeconds}s`} as React.CSSProperties;
+
     return (
-        <div className="credits-page h-100 centered column">
+        <div className="credits-page h-100 centered column" style={style}>
             <h2>{creditsPage.title}</h2>
             <PrimaryButton
                 text="Back to Title"
