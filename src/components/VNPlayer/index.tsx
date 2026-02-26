@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import TitleScreen from "../TitleScreen";
 import CreditsPage from "../CreditsComponents/CreditsPage";
+import PageToDisplay from "../PageToDisplay";
 
 const state: State = {
     currentScene: "start",
@@ -74,24 +75,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                 </div>
             ) : (
                 <div id="vn-player" className="vn-body">
-                    {currentPage === "title" ? (
-                        <TitleScreen
-                            script={script}
-                            handleStart={() => handleChangePage("game")}
-                            handleCredits={() => handleChangePage("credits")}
-                        />
-                    ) : null}
-
-                    {currentPage === "game" ? (
-                        <div>Game</div>
-                    ) : null}
-
-                    {currentPage === "credits" ? (
-                        <CreditsPage
-                            script={script}
-                            handleChangeRoom={handleChangePage}
-                        />
-                    ) : null}
+                    <PageToDisplay page={currentPage} script={script} handleChangePage={handleChangePage} />
                 </div>
             )}
         </>
