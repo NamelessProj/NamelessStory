@@ -10,7 +10,7 @@ const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) =>
     const handleBackToTitle = (): void => handleChangeRoom("title");
 
     const scrollDurationInSeconds: number = 10;
-    const style: CSSProperties = {"--credits-scroll-time": `${scrollDurationInSeconds}s`} as React.CSSProperties;
+    const style: CSSProperties = {"--credits-scroll-time": `${scrollDurationInSeconds}s`} as CSSProperties;
 
     return (
         <div className="credits-page h-100 centered column" style={style}>
