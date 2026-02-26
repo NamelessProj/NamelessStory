@@ -2,8 +2,6 @@ import * as React from "react";
 import type {Page, State, VNStory} from "../../interfaces/interfaces.ts";
 import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
-import TitleScreen from "../TitleScreen";
-import CreditsPage from "../CreditsComponents/CreditsPage";
 import PageToDisplay from "../PageToDisplay";
 
 const state: State = {
@@ -42,9 +40,6 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                 const body = await res.text();
                 throw new Error(`Expected JSON response but got ${contentType}: ${body.slice(0, 80)}`);
             }
-
-            // TODO: Remove this delay after testing
-            //await new Promise(resolve => setTimeout(resolve, 20000));
 
             const data: VNStory = await res.json();
             state.currentScene = data.settings.startingScene;
