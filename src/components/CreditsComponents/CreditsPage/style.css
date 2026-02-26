@@ -1,0 +1,14 @@
+:has(> .credits-page) {
+    overflow: hidden;
+    position: relative;
+}
+
+.credits-page {
+    position: absolute;
+    inset-inline: 0;
+    height: fit-content;
+    min-height: 100%;
+    padding-block: 7rem;
+    animation: slide-bottom-to-top var(--credits-scroll-time) linear forwards;
+    justify-content: flex-start;
+}
