@@ -51,6 +51,15 @@
 }
 
 
+/* Credits */
+
+@property --credits-scroll-time {
+  syntax: '<time>';
+  inherits: false;
+  initial-value: 30s;
+}
+
+
 
 /* ================================================== */
 /*                     ANIMATIONS                     */
@@ -60,6 +69,15 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes slide-bottom-to-top {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(-100%);
   }
 }
 
