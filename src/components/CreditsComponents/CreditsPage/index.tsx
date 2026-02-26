@@ -3,6 +3,7 @@ import type {CreditGroupType, CreditsPage, Page, VNStory} from "../../../interfa
 import CreditGroup from "../CreditGroup";
 import './style.css';
 import {type CSSProperties, useEffect} from "react";
+import BackgroundImage from "../../BackgroundImage";
 
 const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void }> = ({script, handleChangeRoom}) => {
     const creditsPage: CreditsPage = script.settings.creditsPage;
@@ -18,12 +19,16 @@ const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) =>
     }, [handleChangeRoom, scrollDurationInSeconds]);
 
     return (
-        <div className="credits-page h-100 centered column" style={style}>
-            <h2>{creditsPage.title}</h2>
+        <div className="h-100">
+            <BackgroundImage fileName={creditsPage.background} />
 
-            {creditsPage.creditGroups.map((cg: CreditGroupType, i: number) => (
-                <CreditGroup creditGroup={cg} key={i} />
-            ))}
+            <div className="credits-page h-100 centered column" style={style}>
+                <h2>{creditsPage.title}</h2>
+
+                {creditsPage.creditGroups.map((cg: CreditGroupType, i: number) => (
+                    <CreditGroup creditGroup={cg} key={i} />
+                ))}
+            </div>
         </div>
     );
 };
