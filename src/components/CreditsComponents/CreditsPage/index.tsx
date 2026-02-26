@@ -1,6 +1,5 @@
 import * as React from "react";
 import type {CreditGroupType, CreditsPage, Page, VNStory} from "../../../interfaces/interfaces.ts";
-import PrimaryButton from "../../PrimaryButton";
 import CreditGroup from "../CreditGroup";
 import './style.css';
 import type {CSSProperties} from "react";
@@ -15,10 +14,6 @@ const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) =>
     return (
         <div className="credits-page h-100 centered column" style={style}>
             <h2>{creditsPage.title}</h2>
-            <PrimaryButton
-                text="Back to Title"
-                onClick={handleBackToTitle}
-            />
 
             {creditsPage.creditGroups.map((cg: CreditGroupType, i: number) => (
                 <CreditGroup creditGroup={cg} key={i} />
