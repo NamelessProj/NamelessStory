@@ -1,6 +1,7 @@
 import * as React from "react";
 import type {Credit, CreditGroupType} from "../../../interfaces/interfaces.ts";
 import CreditEl from "../CreditEl";
+import './style.css';
 
 const CreditGroup: React.FC<{ creditGroup: CreditGroupType }> = ({creditGroup}) => {
     return (
