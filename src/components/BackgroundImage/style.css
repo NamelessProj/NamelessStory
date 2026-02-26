@@ -1,0 +1,17 @@
+*:has(> picture.bg-img) {
+    position: relative;
+    isolation: isolate;
+}
+picture.bg-img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+}
+picture.bg-img > img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+    user-select: none;
+    pointer-events: none;
+}
