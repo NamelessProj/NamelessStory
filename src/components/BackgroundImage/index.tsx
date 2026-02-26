@@ -1,4 +1,5 @@
 import * as React from "react";
+import './style.css';
 
 const BackgroundImage: React.FC<{ fileName: string }> = ({fileName}) => {
     return (
