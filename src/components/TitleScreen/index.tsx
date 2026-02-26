@@ -1,18 +1,14 @@
 import * as React from "react";
 import type {TitleButtons, VNStory} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
+import BackgroundImage from "../BackgroundImage";
 
 const TitleScreen: React.FC<{ script: VNStory, handleStart: () => void, handleCredits: () => void }> = ({script, handleStart, handleCredits}) => {
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
 
     return (
         <div className="vn-titlepage h-100 centered column">
-            <picture className="bg-img">
-                <img
-                    src={`../assets/${script.settings.titlePage.background}`}
-                    alt="Title Background"
-                />
-            </picture>
+            <BackgroundImage fileName={script.settings.titlePage.background} />
 
             <h1>{script.settings.titlePage.title}</h1>
 
