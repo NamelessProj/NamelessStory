@@ -163,6 +163,22 @@ body {
   flex-direction: column;
 }
 
+h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+p {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+
 
 /* ======================= */
 /*         BG IMAG         */
@@ -205,8 +221,4 @@ picture.bg-img > img {
 
 .vn-titlepage {
   gap: 2rem;
-}
-.vn-titlepage h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
-  color: red;
 }
