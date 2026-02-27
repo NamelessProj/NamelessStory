@@ -3,7 +3,7 @@ import type {Page, VNStory} from "../../interfaces/interfaces.ts";
 import TitleScreen from "../TitleScreen";
 import CreditsPage from "../CreditsComponents/CreditsPage";
 
-const PageToDisplay: React.FC<{ page: Page, script: VNStory, handleChangePage: () => void }> = ({page, script, handleChangePage}) => {
+const PageToDisplay: React.FC<{ page: Page, script: VNStory, handleChangePage: (newPage: Page) => void }> = ({page, script, handleChangePage}) => {
     switch (page) {
         case "title":
             return <TitleScreen script={script} handleStart={() => handleChangePage("game")} handleCredits={() => handleChangePage("credits")} />
