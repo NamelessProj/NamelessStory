@@ -66,7 +66,7 @@ export interface CreditGroupType {
     credits: Credit[]
 }
 
-export interface CreditsPage {
+export interface CreditsPageType {
     title: string,
     background: string,
     scrollDurationInSeconds?: number,
@@ -80,7 +80,7 @@ export interface Settings {
     defaultNameDisplay?: NameDisplay,
     historyLimit?: number,
     titlePage: TitlePage,
-    creditsPage: CreditsPage
+    creditsPage: CreditsPageType
 }
 
 type CharacterId = string;
