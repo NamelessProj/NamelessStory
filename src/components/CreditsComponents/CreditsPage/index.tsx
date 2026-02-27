@@ -1,12 +1,12 @@
 import * as React from "react";
-import type {CreditGroupType, CreditsPage, Page, VNStory} from "../../../interfaces/interfaces.ts";
+import type {CreditGroupType, CreditsPageType, Page, VNStory} from "../../../interfaces/interfaces.ts";
 import CreditGroup from "../CreditGroup";
 import './style.css';
 import {type CSSProperties, useEffect} from "react";
 import BackgroundImage from "../../BackgroundImage";
 
 const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void }> = ({script, handleChangeRoom}) => {
-    const creditsPage: CreditsPage = script.settings.creditsPage;
+    const creditsPage: CreditsPageType = script.settings.creditsPage;
 
     const scrollDurationInSeconds: number = creditsPage.scrollDurationInSeconds || 30;
     const style: CSSProperties = {"--credits-scroll-time": `${scrollDurationInSeconds}s`} as CSSProperties;
