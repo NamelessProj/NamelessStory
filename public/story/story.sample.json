@@ -11,7 +11,7 @@
     },
     "creditsPage": {
       "title": "Credits",
-      "background": "credits_bg.png",
+      "background": "title_bg.png",
       "creditGroups": [
         {
           "groupName": "Development Team",
@@ -23,7 +23,7 @@
         {
           "groupName": "Special Thanks",
           "credits": [
-            { "name": "Charlie", "role": "Tester" }
+            { "name": "Charlie" }
           ]
         }
       ]
