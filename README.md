@@ -58,6 +58,13 @@ You can also create your own story from scratch by following the structure of th
 </div>
 ```
 
+Example:
+```tsx
+<div id="app" className="centered">
+    <VNPlayer scriptFile="my_story.json" />
+</div>
+```
+
 ## Writing Your First Story
 ### Creating a Scene
 ### Adding Characters
