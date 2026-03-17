@@ -107,3 +107,21 @@ export interface State {
     variables: Record<string, string>,
     history: string[]
 }
+
+
+export type PauseMap = Record<string, number>;
+
+export type TypewriterProps = {
+    text: string;
+    speed?: number;
+    pauseMap?: PauseMap;
+    className?: string;
+    onComplete?: () => void;
+};
+
+export type Token =
+    | { type: "openTag"; value: string }
+    | { type: "closeTag"; value: string }
+    | { type: "selfClosingTag"; value: string }
+    | { type: "text"; value: string }
+    | { type: "pause"; duration: number };
