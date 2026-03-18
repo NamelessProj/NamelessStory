@@ -1,4 +1,5 @@
 import type {CharacterType, NameDisplay, PauseMap, Token} from "../interfaces/interfaces.ts";
+import {PAUSE_SYMBOL} from "./constants.ts";
 
 export const splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] => {
     const tokens: Token[] = [];
@@ -8,7 +9,7 @@ export const splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] =
         const currentChar: string = text[i];
         const nextChar: string = text[i + 1] || "";
 
-        if (currentChar === "\\" && nextChar && pauseMap[nextChar] !== undefined) {
+        if (currentChar === PAUSE_SYMBOL && nextChar && pauseMap[nextChar] !== undefined) {
             if (buffer) {
                 tokens.push({ type: "text", value: buffer });
                 buffer = "";
@@ -23,9 +24,7 @@ export const splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] =
         buffer += currentChar;
     }
 
-    if (buffer) {
-        tokens.push({ type: "text", value: buffer });
-    }
+    if (buffer) tokens.push({ type: "text", value: buffer });
 
     return tokens;
 }
