@@ -1,6 +1,6 @@
 export type Page = "title" | "credits" | "game";
 
-type NameDisplay = "short"|"full";
+export type NameDisplay = "short"|"full";
 
 export interface SpritePosition {
     name?: "right"|"left"|"center",
@@ -39,7 +39,7 @@ export interface Scene {
 
 export interface CharacterType {
     name: string,
-    nameFull?: string,
+    fullName?: string,
     color: string,
     sprite?: Record<string, string>
 }
