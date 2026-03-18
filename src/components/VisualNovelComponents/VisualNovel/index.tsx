@@ -41,6 +41,8 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
         }
     }
 
+    const speed: number = script.story[state.currentScene].dialogues[state.currentDialogueIndex].textSpeed || script.settings.textSpeed || 50;
+
     return (
         <div id="vn-game-wrapper" className="h-100">
             <BackgroundImage
@@ -48,7 +50,10 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
                 id={backgroundId}
             />
 
-            <Typewriter text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, script.settings.defaultNameDisplay)} />
+            <Typewriter
+                text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, script.settings.defaultNameDisplay)}
+                speed={speed}
+            />
         </div>
     );
 };
