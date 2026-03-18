@@ -180,15 +180,23 @@ p {
 }
 
 
+#app {
+  min-height: 100svh;
+  position: relative;
+}
+
+
 /* ====================== */
 /*         PLAYER         */
 /* ====================== */
 
 #vn-player {
-  width: 100%;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
   aspect-ratio: 16 / 9;
-  max-height: 100vh;
-  overflow: hidden;
 }
 
 
