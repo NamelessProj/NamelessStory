@@ -1,6 +1,8 @@
 import * as React from "react";
 import type {State, VNStory} from "../../../interfaces/interfaces.ts";
 import BackgroundImage from "../../BackgroundImage";
+import Typewriter from "../../Typewriter";
+import {getTextWithCharacters} from "../../../utils/helpMethods.ts";
 
 const backgroundId: string = "vn-background";
 
@@ -45,6 +47,8 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
                 fileName={script.story[state.currentScene].background}
                 id={backgroundId}
             />
+
+            <Typewriter text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, script.settings.defaultNameDisplay)} />
         </div>
     );
 };
