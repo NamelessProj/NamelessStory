@@ -11,12 +11,13 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, className, 
 
     const totalSteps: number = useMemo(() => countSteps(tokens), [tokens]);
 
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentStep, setCurrentStep] = useState<number>(0);
     const completedRef = useRef(false);
 
     useEffect(() => {
-        setCurrentStep(0);
         completedRef.current = false;
+        const timeout: number = setTimeout(() => setCurrentStep(0), 0);
+        return () => clearTimeout(timeout);
     }, [text, pauseMap]);
 
     useEffect(() => {
