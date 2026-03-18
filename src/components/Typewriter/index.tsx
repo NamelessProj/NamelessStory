@@ -1,4 +1,4 @@
-import {DEFAULT_PAUSE_MAP} from "../../utils/pauseMap.ts";
+import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {buildHtmlUntilStep, countSteps, getDelayForStep, tokenizeHtmlWithPauses} from "../../utils/helpMethods.ts";
