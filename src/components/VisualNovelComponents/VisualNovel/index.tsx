@@ -10,7 +10,7 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
         if (newMusic === "Continue") return;
         if (state.currentMusic || newMusic === "Reset") {
             state.currentMusic?.pause();
-            state.currentMusic?.currentTime = 0;
+            //state.currentMusic?.currentTime = 0;
         }
 
         if (newMusic === "Reset") {
@@ -45,7 +45,6 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
                 fileName={script.story[state.currentScene].background}
                 id={backgroundId}
             />
-
         </div>
     );
 };
