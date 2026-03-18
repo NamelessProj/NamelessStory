@@ -70,7 +70,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                 </div>
             ) : (
                 <div id="vn-player" className="vn-body">
-                    <PageToDisplay page={currentPage} script={script} handleChangePage={handleChangePage} />
+                    <PageToDisplay page={currentPage} script={script} state={state} handleChangePage={handleChangePage} />
                 </div>
             )}
         </>
