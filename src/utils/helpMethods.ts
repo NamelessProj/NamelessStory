@@ -1,4 +1,4 @@
-import type {PauseMap, Token} from "../interfaces/interfaces.ts";
+import type {CharacterType, NameDisplay, PauseMap, Token} from "../interfaces/interfaces.ts";
 
 export const splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] => {
     const tokens: Token[] = [];
@@ -154,4 +154,31 @@ export const getDelayForStep = (tokens: Token[], currentStep: number, defaultSpe
     }
 
     return defaultSpeed;
+}
+
+export const getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
+    const regex: RegExp = /{{([cC]!)?([a-zA-Z0-9]+)}}/g;
+
+    return text.replace(regex, (match: string, prefix: string | undefined, characterId: string): string => {
+        const char: CharacterType | undefined = characters[characterId];
+        if (!char) return match;
+
+        let name: string | undefined;
+        switch (prefix) {
+            case "C!": {
+                name = char.fullName;
+                break;
+            }
+            case "c!": {
+                name = char.name;
+                break;
+            }
+            default: {
+                name = defaultNameDisplaySetting === "full" ? char.fullName : char.name;
+                break;
+            }
+        }
+
+        return name || match;
+    });
 }
