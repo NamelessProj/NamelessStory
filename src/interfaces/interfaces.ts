@@ -24,6 +24,7 @@ export interface Dialogue {
     name: string,
     nameDisplay?: NameDisplay,
     text: string,
+    textSpeed?: number,
     background?: string,
     input?: string,
     options?: Option[],
