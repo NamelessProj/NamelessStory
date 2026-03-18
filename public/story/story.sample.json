@@ -49,7 +49,7 @@
   },
   "story": {
     "start": {
-      "background": "bg_start.png",
+      "background": "title_bg.png",
       "bgmFile": "bgm_start.mp3",
       "dialogues": [
         {
