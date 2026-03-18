@@ -30,16 +30,18 @@
     }
   },
   "characters": {
-    "Alice": {
+    "Char1": {
       "name": "Alice",
+      "fullName": "Alice Smith",
       "color": "red",
       "sprite": {
         "wave": "alice_right.png",
         "idle": "alice_left.png"
       }
     },
-    "Bob": {
+    "Char2": {
       "name": "Bob",
+      "fullName": "Bob Johnson",
       "color": "blue",
       "sprite": {
         "wave": "bob_right.png",
@@ -54,7 +56,7 @@
       "dialogues": [
         {
           "name": "",
-          "text": "Welcome to our visual novel!"
+          "text": "Welcome to our visual novel! \\. I Love {{Char1}} \\. and {{C!Char2}}"
         }
       ]
     },
