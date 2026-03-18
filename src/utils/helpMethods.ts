@@ -179,6 +179,6 @@ export const getTextWithCharacters = (text: string, characters: Record<string, C
             }
         }
 
-        return name || match;
+        return name ? `<span class="character-name-${characterId}" style="color: ${char.color}">${name}</span>` : match;
     });
 }
