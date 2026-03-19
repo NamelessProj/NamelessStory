@@ -1,4 +1,4 @@
-import type {CharacterType, NameDisplay, PauseMap, Token} from "../interfaces/interfaces.ts";
+import type {CharacterType, NameDisplay, PauseMap, Token, VariableType} from "../interfaces/interfaces.ts";
 import {PAUSE_SYMBOL} from "./constants.ts";
 
 export const splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] => {
@@ -155,29 +155,42 @@ export const getDelayForStep = (tokens: Token[], currentStep: number, defaultSpe
     return defaultSpeed;
 }
 
-export const getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
-    const regex: RegExp = /{{([cC]!)?([a-zA-Z0-9]+)}}/g;
+export const getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, variables: Record<string, VariableType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
+    const regex: RegExp = /{{([vcC]!)?([a-zA-Z0-9]+)}}/g;
 
-    return text.replace(regex, (match: string, prefix: string | undefined, characterId: string): string => {
-        const char: CharacterType | undefined = characters[characterId];
-        if (!char) return match;
+    return text.replace(regex, (match: string, prefix: string | undefined, id: string): string => {
+        const char: CharacterType | undefined = characters[id];
+        const vars: VariableType | undefined = variables[id];
 
-        let name: string | undefined;
+        if (!char && !vars) return match;
+
+        let result: string | undefined;
+
         switch (prefix) {
             case "C!": {
-                name = char.fullName;
+                result = `<span class="character-name-${id}" style="color: ${char.color}">${char.fullName}</span>`;
                 break;
             }
             case "c!": {
-                name = char.name;
+                result = `<span class="character-name-${id}" style="color: ${char.color}">${char.name}</span>`;
+                break;
+            }
+            case "v!": {
+                if (char) {
+                    result = `<span class="character-name-${id}" style="color: ${char.color}">${vars.value}</span>`;
+                } else {
+                    result = vars.color ? `<span class="character-variable-${id}" style="color: ${vars.color}">${vars.value}</span>` : `${vars.value}`;
+                }
                 break;
             }
             default: {
-                name = defaultNameDisplaySetting === "full" ? char.fullName : char.name;
+                let name: string | undefined = defaultNameDisplaySetting === "full" ? char.fullName : char.name;
+                name = name || char.name;
+                result = `<span class="character-name-${id}" style="color: ${char.color}">${name}</span>`;
                 break;
             }
         }
 
-        return name ? `<span class="character-name-${characterId}" style="color: ${char.color}">${name}</span>` : match;
+        return result || match;
     });
 }
