@@ -51,7 +51,7 @@ const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state
             />
 
             <Typewriter
-                text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, script.settings.defaultNameDisplay)}
+                text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, state.variables, script.settings.defaultNameDisplay)}
                 speed={speed}
             />
         </div>
