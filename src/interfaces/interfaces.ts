@@ -92,6 +92,11 @@ export interface VNStory {
     story: Record<string, Scene>
 }
 
+export type VariableType = {
+    value: string,
+    color?: string
+}
+
 export interface State {
     currentScene: string,
     currentDialogueIndex: number,
@@ -105,7 +110,7 @@ export interface State {
     currentMusic: HTMLAudioElement|null,
     musicVolume: number,
     isMusicMuted: boolean,
-    variables: Record<string, string>,
+    variables: Record<string, VariableType>,
     history: string[]
 }
 
