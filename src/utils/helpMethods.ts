@@ -166,16 +166,16 @@ export const getTextWithCharacters = (text: string, characters: Record<string, C
 
         let result: string | undefined;
 
-        switch (prefix) {
-            case "C!": {
+        switch (prefix?.slice(0, -1)) {
+            case "C": {
                 result = `<span class="character-name-${id}" style="color: ${char.color}">${char.fullName}</span>`;
                 break;
             }
-            case "c!": {
+            case "c": {
                 result = `<span class="character-name-${id}" style="color: ${char.color}">${char.name}</span>`;
                 break;
             }
-            case "v!": {
+            case "v": {
                 if (char) {
                     result = `<span class="character-name-${id}" style="color: ${char.color}">${vars.value}</span>`;
                 } else {
