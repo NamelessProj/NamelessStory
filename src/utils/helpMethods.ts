@@ -179,7 +179,7 @@ export const getTextWithCharacters = (text: string, characters: Record<string, C
                 if (char) {
                     result = `<span class="character-name-${id}" style="color: ${char.color}">${vars.value}</span>`;
                 } else {
-                    result = vars.color ? `<span class="character-variable-${id}" style="color: ${vars.color}">${vars.value}</span>` : `${vars.value}`;
+                    result = vars.color ? `<span class="character-variable-${id}" style="color: ${vars.color}">${vars.value}</span>` : vars.value;
                 }
                 break;
             }
