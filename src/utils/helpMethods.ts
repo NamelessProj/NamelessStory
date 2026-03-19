@@ -66,7 +66,8 @@ export const tokenizeHtmlWithPauses = (html: string, pauseMap: PauseMap): Token[
 }
 
 export const getTagName = (tag: string): string | null => {
-    const match = tag.match(/^<\s*\/?\s*([a-zA-Z0-9-]+)/);
+    const tagRegex: RegExp = /^<\s*\/?\s*([a-zA-Z0-9-]+)/;
+    const match: RegExpMatchArray | null = tag.match(tagRegex);
     return match ? match[1] : null;
 }
 
