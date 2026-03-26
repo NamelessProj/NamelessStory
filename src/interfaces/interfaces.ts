@@ -26,7 +26,7 @@ export interface Dialogue {
     text: string,
     textSpeed?: number,
     background?: string,
-    input?: string,
+    input?: VariableType,
     options?: Option[],
     sprite?: Sprite,
     nextScene?: string
