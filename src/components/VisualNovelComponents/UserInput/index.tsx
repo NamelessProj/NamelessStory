@@ -5,6 +5,8 @@ const UserInput: React.FC<{ userInput: VariableType, input: string, setInput: (v
     return (
         <div className="user-input-wrapper">
             <input
+                className="user-input"
+                autoFocus={true}
                 value={input}
                 onChange={(e): void => setInput(e.target.value, userInput.value, userInput.color ?? undefined)}
             />
