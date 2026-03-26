@@ -1,13 +1,13 @@
 import * as React from "react";
 
-const UserOption: React.FC<{ text: string, onClick?: () => void, className?: string }> = ({text, onClick = null, className=""}) => {
+const UserOption: React.FC<{ text: string, onClick?: () => void }> = ({text, onClick = null}) => {
     const handleClick = (): void => {
         if (onClick) onClick();
     }
 
     return (
         <button
-            className={`user-option ${className}`}
+            className="user-option"
             onClick={handleClick}
         >
             <span>
