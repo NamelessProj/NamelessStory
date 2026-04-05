@@ -1,58 +1,83 @@
 import * as React from "react";
 import type {State, VNStory} from "../../../interfaces/interfaces.ts";
-import BackgroundImage from "../../BackgroundImage";
-import Typewriter from "../../Typewriter";
-import {getTextWithCharacters} from "../../../utils/helpMethods.ts";
+import Scene from "../Scene";
+import VNOverlay from "../VNOverlay";
 
-const backgroundId: string = "vn-background";
+interface VisualNovelProps {
+    script: VNStory;
+    state: State;
+    setState: (state: State) => void;
+}
 
-const VisualNovel: React.FC<{ script: VNStory, state: State }> = ({script, state}) => {
+const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
+    const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
 
-    const handleMusic = (newMusic: string, loop: boolean = true): void => {
-        if (newMusic === "Continue") return;
-        if (state.currentMusic || newMusic === "Reset") {
-            state.currentMusic?.pause();
-            //state.currentMusic?.currentTime = 0;
+    // Handle advancing to next dialogue
+    const handleAdvance = React.useCallback((): void => {
+        if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
+            setState({
+                ...state,
+                currentDialogueIndex: state.currentDialogueIndex + 1
+            });
+        } else {
+            // End of scene, go to next scene if specified
+            const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
+            if (currentDialogue.next) {
+                setState({
+                    ...state,
+                    currentScene: currentDialogue.next,
+                    currentDialogueIndex: 0
+                });
+            }
         }
+    }, [state, setState, script]);
 
-        if (newMusic === "Reset") {
-            state.currentMusic = null;
-            return;
-        }
+    // Handle option selection
+    const handleOptionSelect = React.useCallback((nextScene: string): void => {
+        setState({
+            ...state,
+            currentScene: nextScene,
+            currentDialogueIndex: 0,
+            waitingOnOptionSelection: false
+        });
+    }, [state, setState]);
 
-        state.currentMusic = new Audio(`../audio/${newMusic}`);
-        state.currentMusic.volume = state.isMusicMuted ? 0 : state.musicVolume;
-        state.currentMusic.loop = loop;
-        state.currentMusic.play().then();
-    }
+    // Handle user input
+    const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
+        const newVariable: Record<string, State["variables"][string]> = {
+            [variableName]: {
+                value: value,
+                color: color
+            }
+        };
 
-    const setNewScene = (index?: string = state.currentScene): void => {
-        const backgroundPicture: string = script.story[index].background;
-        const newBg: HTMLImageElement = new Image();
-        const src: string = `../assets/${backgroundPicture}`;
-        newBg.src = src;
-        newBg.onload = (): void => {
-            const bgElement: HTMLDivElement|null = document.getElementById(backgroundId) as HTMLDivElement|null;
-            if (bgElement) bgElement.style.backgroundImage = `url(${src})`;
-        }
+        setState({
+            ...state,
+            variables: {...state.variables, ...newVariable},
+            waitingOnUserInput: false
+        });
+    }, [state, setState]);
 
-        if (script.story[index].bgmFile && script.story[index].bgmFile !== "") {
-            handleMusic(script.story[index].bgmFile);
-        }
-    }
-
-    const speed: number = script.story[state.currentScene].dialogues[state.currentDialogueIndex].textSpeed || script.settings.textSpeed || 50;
+    // Check if user can advance (typing must be complete, no options or inputs pending)
+    const canAdvance = !state.isTyping && !state.waitingOnOptionSelection && !state.waitingOnUserInput;
 
     return (
         <div id="vn-game-wrapper" className="h-100">
-            <BackgroundImage
-                fileName={script.story[state.currentScene].background}
-                id={backgroundId}
+            <Scene
+                script={script}
+                state={state}
+                onAdvance={handleAdvance}
+                onHandleOptionSelect={handleOptionSelect}
+                onHandleInput={handleInput}
             />
 
-            <Typewriter
-                text={getTextWithCharacters(script.story[state.currentScene].dialogues[state.currentDialogueIndex].text, script.characters, state.variables, script.settings.defaultNameDisplay)}
-                speed={speed}
+            <VNOverlay
+                saveFunc={() => console.log("Save function not implemented")}
+                setPage={(page) => console.log(`Page change to ${page} not implemented`)}
+                onNextDialogue={handleAdvance}
+                canAdvance={canAdvance}
+                isOverlayHidden={isOverlayHidden}
+                setIsOverlayHidden={setIsOverlayHidden}
             />
         </div>
     );
