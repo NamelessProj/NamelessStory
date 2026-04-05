@@ -4,26 +4,25 @@ import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
 
-const state: State = {
-    currentScene: "start",
-    currentDialogueIndex: 0,
-    currentDialogueIndexMax: 1,
-    textSpeed: 50,
-    waitingOnUserInput: false,
-    waitingOnOptionSelection: false,
-    isTyping: false,
-    currentText: "",
-    defaultNameColor: "#000000",
-    currentMusic: null,
-    musicVolume: 1,
-    isMusicMuted: false,
-    variables: {},
-    history: []
-};
-
 const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
     const [script, setScript] = useState<VNStory|null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
+    const [state, setState] = useState<State>({
+        currentScene: "start",
+        currentDialogueIndex: 0,
+        currentDialogueIndexMax: 0,
+        textSpeed: 50,
+        waitingOnUserInput: false,
+        waitingOnOptionSelection: false,
+        isTyping: false,
+        currentText: "",
+        defaultNameColor: "#000000",
+        currentMusic: null,
+        musicVolume: 1,
+        isMusicMuted: false,
+        variables: {},
+        history: []
+    });
 
     useEffect(() => {
         const loadStory = async () => {
@@ -42,17 +41,20 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             }
 
             const data: VNStory = await res.json();
-            state.currentScene = data.settings.startingScene;
-            state.currentDialogueIndexMax = data.story[data.settings.startingScene].dialogues.length - 1;
-            state.textSpeed = data.settings.textSpeed || 50;
-            state.defaultNameColor = data.settings.defaultNameColor || "#000000";
+            setState(prev => ({
+                ...prev,
+                currentScene: data.settings.startingScene,
+                currentDialogueIndexMax: data.story[data.settings.startingScene].dialogues.length - 1,
+                textSpeed: data.settings.textSpeed || 50,
+                defaultNameColor: data.settings.defaultNameColor || "#000000"
+            }));
             setScript(data);
-        }
+        };
 
         loadStory().catch(err => {
             console.error("Error loading story script:", err);
         });
-    }, [scriptFile, setScript]);
+    }, [scriptFile]);
 
     // TODO: Remove this after testing
     useEffect(() => {
@@ -70,7 +72,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                 </div>
             ) : (
                 <div id="vn-player" className="vn-body">
-                    <PageToDisplay page={currentPage} script={script} state={state} handleChangePage={handleChangePage} />
+                    <PageToDisplay page={currentPage} script={script} state={state} setState={setState} handleChangePage={handleChangePage} />
                 </div>
             )}
         </>
