@@ -60,7 +60,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
     useEffect(() => {
         console.log("Current state:", state);
         console.log("Loaded script:", script);
-    }, [script]);
+    }, [script, state]);
 
     const handleChangePage = (newPage: Page): void => setCurrentPage(newPage);
 
