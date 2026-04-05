@@ -29,7 +29,7 @@ export interface Dialogue {
     input?: VariableType,
     options?: Option[],
     sprite?: Sprite,
-    nextScene?: string
+    next?: string
 }
 
 export interface Scene {
@@ -121,6 +121,8 @@ export type TypewriterProps = {
     text: string;
     speed?: number;
     pauseMap?: PauseMap;
+    script: VNStory;
+    state: State;
     className?: string;
     onComplete?: () => void;
 };
