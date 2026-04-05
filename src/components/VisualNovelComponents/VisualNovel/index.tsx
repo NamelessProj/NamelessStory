@@ -1,7 +1,10 @@
 import * as React from "react";
 import type {State, VNStory} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
-import VNOverlay from "../VNOverlay";
+import VNTopOverlay from "../VNTopOverlay";
+import VNBottomOverlay from "../VNBottomOverlay";
+
+import './style.css';
 
 interface VisualNovelProps {
     script: VNStory;
@@ -61,8 +64,37 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
     // Check if user can advance (typing must be complete, no options or inputs pending)
     const canAdvance = !state.isTyping && !state.waitingOnOptionSelection && !state.waitingOnUserInput;
 
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent): void => {
+            if (isOverlayHidden) return;
+
+            // Spacebar or Enter to advance
+            if (event.code === "Space" || event.code === "Enter") {
+                if (canAdvance) {
+                    handleAdvance();
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return (): void => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [isOverlayHidden, canAdvance, handleAdvance, setIsOverlayHidden]);
+
+    const handleClick = (): void => {
+        if (isOverlayHidden) setIsOverlayHidden(false);
+    }
+
     return (
-        <div id="vn-game-wrapper" className="h-100">
+        <div
+            id="vn-game-wrapper"
+            className="h-100"
+            onClick={handleClick}
+        >
+            <VNTopOverlay isOverlayHidden={isOverlayHidden} />
+
             <Scene
                 script={script}
                 state={state}
@@ -71,11 +103,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
                 onHandleInput={handleInput}
             />
 
-            <VNOverlay
+            <VNBottomOverlay
                 saveFunc={() => console.log("Save function not implemented")}
                 setPage={(page) => console.log(`Page change to ${page} not implemented`)}
-                onNextDialogue={handleAdvance}
-                canAdvance={canAdvance}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
             />
