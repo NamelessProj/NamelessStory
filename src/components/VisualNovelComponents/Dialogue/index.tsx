@@ -1,19 +1,62 @@
 import * as React from "react";
-import {useEffect} from "react";
+import Typewriter from "../../Typewriter";
+import type {CharacterType, NameDisplay, State, VNStory} from "../../../interfaces/interfaces.ts";
 
-const Dialogue: React.FC<{ text: string, textSpeed: number, setTyping: (val: boolean) => void }> = ({text, textSpeed, setTyping}) => {
-    useEffect(() => {
-        setTyping(true);
-        const timer = setTimeout(() => {setTyping(false);}, 2000);
+// Styles
+import "./style.css";
 
-        return () => clearTimeout(timer);
-    }, [setTyping]);
+interface DialogueProps {
+    text: string;
+    textSpeed: number;
+    name: string;
+    nameDisplay: NameDisplay;
+    characters: Record<string, CharacterType>;
+    script: VNStory;
+    state: State;
+    onTypingComplete?: () => void;
+}
+
+const DialogueBox: React.FC<DialogueProps> = ({
+    text,
+    textSpeed,
+    name,
+    nameDisplay,
+    characters,
+    script,
+    state,
+    onTypingComplete
+}) => {
+    // Find character by name or color to get character info
+    const characterID = script.story[state.currentScene].dialogues[state.currentDialogueIndex].name;
+    const character: CharacterType = characters[characterID];
+
+    const nameColor = character ? character.color : state.defaultNameColor;
 
     return (
-        <div className="vn-dialogue-box">
-            <p className="vn-dialogue-text">{text}</p>
+        <div className="vn-dialogue-container">
+            {/* Character Name */}
+            {name && name !== "" && (
+                <div
+                    className="vn-dialogue-name"
+                    style={{color: nameColor}}
+                >
+                    {nameDisplay === "full" && character ? character.fullName : name}
+                </div>
+            )}
+
+            {/* Dialogue Text - always show full text when not typing, use Typewriter when typing */}
+            <div className="vn-dialogue-box">
+                <Typewriter
+                    text={text}
+                    speed={textSpeed}
+                    onComplete={onTypingComplete}
+                    script={script}
+                    state={state}
+                    className="vn-dialogue-text"
+                />
+            </div>
         </div>
     );
 };
 
-export default Index;
+export default DialogueBox;
