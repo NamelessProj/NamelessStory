@@ -7,6 +7,18 @@
     isolation: isolate;
 }
 
+.vn-overlay {
+    opacity: 1;
+    visibility: visible;
+    transition-property: opacity, visibility;
+    transition-duration: 1s, 0s;
+    transition-timing-function: ease;
+}
 .vn-overlay.hidden {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition-property: opacity, visibility;
+    transition-duration: 0.5s, 0s;
+    transition-delay: 0s, 0.5s;
+    transition-timing-function: ease;
 }
