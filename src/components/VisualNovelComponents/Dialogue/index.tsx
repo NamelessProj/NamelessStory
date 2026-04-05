@@ -27,20 +27,27 @@ const DialogueBox: React.FC<DialogueProps> = ({
     onTypingComplete
 }) => {
     // Find character by name or color to get character info
-    const characterID = script.story[state.currentScene].dialogues[state.currentDialogueIndex].name;
+    const characterID: string = script.story[state.currentScene].dialogues[state.currentDialogueIndex].name;
     const character: CharacterType = characters[characterID];
 
     const nameColor = character ? character.color : state.defaultNameColor;
 
+    let nameToDisplay: string = "";
+
+    if (name && name !== "") {
+        nameToDisplay = (nameDisplay === "full" && character) ? character.fullName : character.name;
+        if (name && !nameToDisplay) nameToDisplay = name;
+    }
+
     return (
         <div className="vn-dialogue-container">
             {/* Character Name */}
-            {name && name !== "" && (
+            {nameToDisplay !== "" && (
                 <div
                     className="vn-dialogue-name"
                     style={{color: nameColor}}
                 >
-                    {nameDisplay === "full" && character ? character.fullName : character.name}
+                    {nameToDisplay}
                 </div>
             )}
 
