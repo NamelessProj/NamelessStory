@@ -1,10 +1,15 @@
 import * as React from "react";
-import type {Option} from "../../../interfaces/interfaces.ts";
 import UserOption from "../UserOption";
+import type {Option} from "../../../interfaces/interfaces.ts";
 
-const OptionsGroup: React.FC<{ options: Option[], handleClick: (value: string) => void }> = ({options, handleClick}) => {
+interface OptionsGroupProps {
+    options: Option[];
+    handleClick: (value: string) => void;
+}
+
+const OptionsGroup: React.FC<OptionsGroupProps> = ({options, handleClick}) => {
     return (
-        <div className="options-group">
+        <div className="vn-options-container">
             {options.map((option: Option, i: number) => (
                 <UserOption
                     text={option.text}
