@@ -35,8 +35,10 @@ const DialogueBox: React.FC<DialogueProps> = ({
     let nameToDisplay: string = "";
 
     if (name && name !== "") {
-        nameToDisplay = (nameDisplay === "full" && character) ? character.fullName : character.name;
-        if (name && !nameToDisplay) nameToDisplay = name;
+        nameToDisplay = name;
+        if (character) {
+            nameToDisplay = nameDisplay === "full" ? character.fullName : character.name;
+        }
     }
 
     return (
