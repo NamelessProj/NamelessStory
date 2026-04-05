@@ -1,11 +1,17 @@
 import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {useEffect, useMemo, useRef, useState} from "react";
-import {buildHtmlUntilStep, countSteps, getDelayForStep, tokenizeHtmlWithPauses} from "../../utils/helpMethods.ts";
+import {
+    buildHtmlUntilStep,
+    countSteps,
+    getDelayForStep,
+    getTextWithCharacters,
+    tokenizeHtmlWithPauses
+} from "../../utils/helpMethods.ts";
 
-const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, className, onComplete}: TypewriterProps) => {
+const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, state, className, onComplete}: TypewriterProps) => {
     const tokens: Token[] = useMemo(
-        () => tokenizeHtmlWithPauses(text, pauseMap),
+        () => tokenizeHtmlWithPauses(getTextWithCharacters(text, script.characters, state.variables, script.settings.defaultNameDisplay), pauseMap),
         [text, pauseMap]
     );
 
