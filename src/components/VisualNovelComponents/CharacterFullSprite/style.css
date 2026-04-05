@@ -1,0 +1,25 @@
+/* Character Sprite Styles */
+.character-sprite {
+    position: absolute;
+    bottom: 10%;
+    transition: all 0.3s ease;
+}
+
+.character-sprite.sprite-left {
+    left: 10%;
+}
+
+.character-sprite.sprite-center {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.character-sprite.sprite-right {
+    right: 10%;
+}
+
+.character-sprite img {
+    max-height: 80%;
+    max-width: 30%;
+    object-fit: contain;
+}
