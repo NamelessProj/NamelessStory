@@ -1,12 +1,17 @@
 import * as React from "react";
-import './style.css';
+import "./style.css";
 
-const BackgroundImage: React.FC<{ fileName: string, id?: string }> = ({fileName, id}) => {
+interface BackgroundImageProps {
+    fileName: string;
+    id?: string;
+}
+
+const BackgroundImage: React.FC<BackgroundImageProps> = ({fileName, id}) => {
     return (
         <picture className="bg-img">
             <img
                 src={`../assets/${fileName}`}
-                alt="Credits Background"
+                alt="Background"
                 id={id}
             />
         </picture>
