@@ -1,5 +1,5 @@
 import * as React from "react";
-import type {State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {State, VariableType, VNStory} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
@@ -47,7 +47,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
 
     // Handle user input
     const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
-        const newVariable: Record<string, State["variables"][string]> = {
+        const newVariable: Record<string, VariableType> = {
             [variableName]: {
                 value: value,
                 color: color
