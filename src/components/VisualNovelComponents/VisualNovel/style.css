@@ -14,6 +14,7 @@
     transition-duration: 1s, 0s;
     transition-timing-function: ease;
 }
+
 .vn-overlay.hidden {
     opacity: 0;
     visibility: hidden;
