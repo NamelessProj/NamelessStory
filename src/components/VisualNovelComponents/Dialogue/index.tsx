@@ -40,11 +40,10 @@ const DialogueBox: React.FC<DialogueProps> = ({
                     className="vn-dialogue-name"
                     style={{color: nameColor}}
                 >
-                    {nameDisplay === "full" && character ? character.fullName : name}
+                    {nameDisplay === "full" && character ? character.fullName : character.name}
                 </div>
             )}
 
-            {/* Dialogue Text - always show full text when not typing, use Typewriter when typing */}
             <div className="vn-dialogue-box">
                 <Typewriter
                     text={text}
