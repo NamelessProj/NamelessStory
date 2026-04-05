@@ -12,7 +12,7 @@ import {
 const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, state, className, onComplete}: TypewriterProps) => {
     const tokens: Token[] = useMemo(
         () => tokenizeHtmlWithPauses(getTextWithCharacters(text, script.characters, state.variables, script.settings.defaultNameDisplay), pauseMap),
-        [text, pauseMap]
+        [text, script.characters, script.settings.defaultNameDisplay, state.variables, pauseMap]
     );
 
     const totalSteps: number = useMemo(() => countSteps(tokens), [tokens]);
