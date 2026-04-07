@@ -95,11 +95,10 @@ const Scene: React.FC<SceneProps> = ({
             )}
 
             {/* User Input */}
-            {shouldShowInput && currentDialogue.input && (
+            {(shouldShowInput && currentDialogue.input) && (
                 <UserInputBox
-                    userInput={currentDialogue.input}
-                    input={state.variables[currentDialogue.input.value]?.value || ""}
-                    setInput={onHandleInput}
+                    variable={currentDialogue.input}
+                    setVariable={onHandleInput}
                 />
             )}
         </div>
