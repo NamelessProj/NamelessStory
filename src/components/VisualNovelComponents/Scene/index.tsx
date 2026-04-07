@@ -7,7 +7,7 @@ import UserInputBox from "../UserInput";
 
 // Styles
 import './style.css';
-import type {State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Dialogue, Scene, State, VNStory} from "../../../interfaces/interfaces.ts";
 
 interface SceneProps {
     script: VNStory;
@@ -24,20 +24,20 @@ const Scene: React.FC<SceneProps> = ({
     onHandleOptionSelect,
     onHandleInput
 }) => {
-    const currentScene = script.story[state.currentScene];
-    const currentDialogue = currentScene.dialogues[state.currentDialogueIndex];
+    const currentScene: Scene = script.story[state.currentScene];
+    const currentDialogue: Dialogue = currentScene.dialogues[state.currentDialogueIndex];
 
     // Check if we should show dialogue box
-    const shouldShowDialogue = currentDialogue.name !== "" || currentDialogue.text !== "";
+    const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
 
     // Check if we should show options
-    const shouldShowOptions = currentDialogue.options && currentDialogue.options.length > 0;
+    const shouldShowOptions: boolean | undefined = currentDialogue.options && currentDialogue.options.length > 0;
 
     // Check if we should show user input
-    const shouldShowInput = currentDialogue.input !== undefined;
+    const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
     // Handle click to advance
-    const handleClick = () => {
+    const handleClick = (): void => {
         return;
 
         if (state.isTyping) {
