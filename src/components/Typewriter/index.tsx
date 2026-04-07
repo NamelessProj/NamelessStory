@@ -1,21 +1,21 @@
 import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {useEffect, useMemo, useRef, useState} from "react";
-import {
-    buildHtmlUntilStep,
-    countSteps,
-    getDelayForStep,
-    getTextWithCharacters,
-    tokenizeHtmlWithPauses
-} from "../../utils/helpMethods.ts";
+import TypewriterUtils from "../../utils/typewriterUtils.ts";
 
 const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, state, className, onComplete}: TypewriterProps) => {
     const tokens: Token[] = useMemo(
-        () => tokenizeHtmlWithPauses(getTextWithCharacters(text, script.characters, state.variables, script.settings.defaultNameDisplay), pauseMap),
+        () => TypewriterUtils.tokenizeHtmlWithPauses(
+            TypewriterUtils.getTextWithCharacters(
+                text,
+                script.characters,
+                state.variables,
+                script.settings.defaultNameDisplay),
+            pauseMap),
         [text, script.characters, script.settings.defaultNameDisplay, state.variables, pauseMap]
     );
 
-    const totalSteps: number = useMemo(() => countSteps(tokens), [tokens]);
+    const totalSteps: number = useMemo(() => TypewriterUtils.countSteps(tokens), [tokens]);
 
     const [currentStep, setCurrentStep] = useState<number>(0);
     const completedRef = useRef(false);
@@ -35,7 +35,7 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, sta
             return;
         }
 
-        const delay: number = getDelayForStep(tokens, currentStep, speed);
+        const delay: number = TypewriterUtils.getDelayForStep(tokens, currentStep, speed);
 
         const timeout: number = setTimeout(() => {
             setCurrentStep((prev) => prev + 1);
@@ -45,7 +45,7 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, sta
     }, [currentStep, totalSteps, tokens, speed, onComplete]);
 
     const renderedHtml: string = useMemo(() => {
-        return buildHtmlUntilStep(tokens, currentStep);
+        return TypewriterUtils.buildHtmlUntilStep(tokens, currentStep);
     }, [tokens, currentStep]);
 
     return (
