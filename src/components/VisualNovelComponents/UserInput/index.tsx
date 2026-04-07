@@ -2,31 +2,47 @@ import * as React from "react";
 import type {VariableType} from "../../../interfaces/interfaces.ts";
 
 interface UserInputBoxProps {
-    userInput: VariableType;
-    input: string;
-    setInput: (value: string, variableName: string, color?: string) => void;
+    variable: VariableType;
+    setVariable: (value: string, variableName: string, color?: string) => void;
 }
 
-const UserInputBox: React.FC<UserInputBoxProps> = ({userInput, input, setInput}) => {
+const UserInputBox: React.FC<UserInputBoxProps> = ({variable, setVariable}) => {
+    const [input, setInput] = React.useState<string>("");
+    const [isWrong, setIsWrong] = React.useState<boolean>(false);
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLElement>): void => {
+        e.preventDefault();
+
+        if (!input || input == "") {
+            setIsWrong(true);
+            setTimeout((): void => setIsWrong(false), 1000);
+            return;
+        }
+
+        setInput("");
+        setVariable(input, variable.value, variable.color);
+    }
+
     return (
-        <div className="vn-input-container">
+        <form className="vn-input-container" onSubmit={handleSubmit}>
             <div className="vn-input-wrapper">
-                <span className="vn-input-label" style={{color: userInput.color}}>
-                    {userInput.value}:
-                </span>
                 <input
-                    className="vn-input"
+                    className={`vn-input ${isWrong ? "vn-input-wrong" : ""}`}
                     type="text"
                     value={input}
-                    onChange={(e): void => setInput(e.target.value, userInput.value, userInput.color ?? undefined)}
+                    onChange={(e): void => setInput(e.target.value)}
                     autoFocus={true}
-                    placeholder={`Enter your ${userInput.value}...`}
+                    placeholder="Type your response here..."
                 />
             </div>
-            <button className="vn-input-submit">
+            <button
+                className="vn-input-submit"
+                type="submit"
+                onClick={handleSubmit}
+            >
                 Confirm
             </button>
-        </div>
+        </form>
     );
 };
 
