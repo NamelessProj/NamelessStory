@@ -7,7 +7,7 @@ import UserInputBox from "../UserInput";
 
 // Styles
 import './style.css';
-import type {Dialogue, Scene, State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Dialogue, SceneType, State, VNStory} from "../../../interfaces/interfaces.ts";
 
 interface SceneProps {
     script: VNStory;
@@ -24,7 +24,7 @@ const Scene: React.FC<SceneProps> = ({
     onHandleOptionSelect,
     onHandleInput
 }) => {
-    const currentScene: Scene = script.story[state.currentScene];
+    const currentScene: SceneType = script.story[state.currentScene];
     const currentDialogue: Dialogue = currentScene.dialogues[state.currentDialogueIndex];
 
     // Check if we should show dialogue box

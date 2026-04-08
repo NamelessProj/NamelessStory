@@ -32,7 +32,7 @@ export interface Dialogue {
     next?: string
 }
 
-export interface Scene {
+export interface SceneType {
     background: string,
     bgmFile: string,
     dialogues: Dialogue[]
@@ -89,7 +89,7 @@ type CharacterId = string;
 export interface VNStory {
     settings: Settings,
     characters: Record<CharacterId, CharacterType>,
-    story: Record<string, Scene>
+    story: Record<string, SceneType>
 }
 
 export type VariableType = {
