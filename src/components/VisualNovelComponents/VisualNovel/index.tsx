@@ -36,14 +36,43 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
     }, [state, setState, script]);
 
     // Handle option selection
-    const handleOptionSelect = React.useCallback((nextScene: string): void => {
+    const handleOptionSelect = React.useCallback((next: string): void => {
+        const currentScene: string = state.currentScene;
+        let newScene: string = state.currentScene;
+        let tempIndex: number = 0;
+        let newMaxIndex: number = state.currentDialogueIndexMax;
+        const radix: number = 10;
+
+        if (next === "") {
+            // Empty string: go to next index of current scene
+            tempIndex = state.currentDialogueIndex + 1;
+        } else if (!isNaN(Number(next))) {
+            // Numeric value: stay in current scene, change dialogue index
+            tempIndex = parseInt(next, radix);
+        } else if (next.includes(":")) {
+            // Scene:index format: change scene and dialogue index
+            const [sceneName, indexStr] = next.split(":");
+            newScene = sceneName;
+            tempIndex = parseInt(indexStr, radix);
+        } else {
+            // Scene name only: change scene and start from index 0
+            newScene = next;
+        }
+
+        if (currentScene !== newScene) {
+            newMaxIndex = script.story[state.currentScene].dialogues.length - 1;
+        }
+
+        const newDialogueIndex: number = state.currentDialogueIndexMax >= tempIndex ? tempIndex : state.currentDialogueIndex;
+
         setState({
             ...state,
-            currentScene: nextScene,
-            currentDialogueIndex: 0,
+            currentScene: newScene,
+            currentDialogueIndex: newDialogueIndex,
+            currentDialogueIndexMax: newMaxIndex,
             waitingOnOptionSelection: false
         });
-    }, [state, setState]);
+    }, [state, setState, script]);
 
     // Handle user input
     const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
