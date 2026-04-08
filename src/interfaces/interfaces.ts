@@ -35,6 +35,7 @@ export interface Dialogue {
 export interface SceneType {
     background: string,
     bgmFile: string,
+    bgmLoop?: boolean,
     dialogues: Dialogue[]
 }
 
