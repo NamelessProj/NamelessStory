@@ -3,6 +3,7 @@ import type {State, VariableType, VNStory} from "../../../interfaces/interfaces.
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
+import { useBGM } from "../../../hooks/useBGM";
 
 import './style.css';
 
@@ -14,6 +15,15 @@ interface VisualNovelProps {
 
 const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
+
+    // Handle background music
+    const currentSceneData = script.story[state.currentScene];
+    useBGM({
+        bgmFile: currentSceneData.bgmFile,
+        bgmLoop: currentSceneData.bgmLoop,
+        state,
+        setState
+    });
 
     // Handle advancing to next dialogue
     const handleAdvance = React.useCallback((): void => {
@@ -122,7 +132,11 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
             className="h-100"
             onClick={handleClick}
         >
-            <VNTopOverlay isOverlayHidden={isOverlayHidden} />
+            <VNTopOverlay
+                isOverlayHidden={isOverlayHidden}
+                state={state}
+                setState={setState}
+            />
 
             <Scene
                 script={script}
