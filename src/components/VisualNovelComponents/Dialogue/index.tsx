@@ -32,12 +32,15 @@ const DialogueBox: React.FC<DialogueProps> = ({
 
     const nameColor = character ? character.color : state.defaultNameColor;
 
-    let nameToDisplay: string = "";
+    let nameToDisplay: string | undefined = "";
 
     if (name && name !== "") {
         nameToDisplay = name;
         if (character) {
             nameToDisplay = nameDisplay === "full" ? character.fullName : character.name;
+            if (typeof nameToDisplay === "undefined") {
+                nameToDisplay = character.name || "";
+            }
         }
     }
 
