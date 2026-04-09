@@ -18,7 +18,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
         currentText: "",
         defaultNameColor: "#000000",
         currentMusic: null,
-        musicVolume: 1,
+        musicVolume: 0.5,
         isMusicMuted: false,
         variables: {},
         history: []
