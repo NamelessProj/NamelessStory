@@ -15,11 +15,16 @@ export type BGMAction = {
 
 /**
  * Parses the bgmFile directive and returns action details
- * @param bgmFile - The bgmFile value (e.g., "continue", "continue[song.mp3]", "reset", "song.mp3")
+ * @param bgmFile - The bgmFile value (e.g., "continue", "continue[song.mp3]", "reset", "song.mp3", or undefined/"none" for no music)
  * @param currentMusicName - The name of the currently playing music (optional)
  * @returns An object describing the action to take and the file to use (if applicable)
  */
-export const parseBGMFile = (bgmFile: string, currentMusicName?: string): BGMAction => {
+export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAction => {
+    // "none" or undefined - no music
+    if (!bgmFile || bgmFile === "none" || bgmFile === "") {
+        return { action: "none" };
+    }
+
     // "continue" - keep playing current music, no change
     if (bgmFile === "continue") {
         return { action: "continue" };
@@ -51,7 +56,7 @@ export const parseBGMFile = (bgmFile: string, currentMusicName?: string): BGMAct
  * @param loop - Whether to loop the audio
  * @returns A configured HTMLAudioElement
  */
-export const createBGMPlayer = (audioFile: string, volume: number = 1, loop: boolean = true): HTMLAudioElement => {
+export const createBGMPlayer = (audioFile: string, volume: number = 0.9, loop: boolean = true): HTMLAudioElement => {
     const audio = new Audio(audioFile);
     audio.loop = loop;
     audio.volume = volume;
