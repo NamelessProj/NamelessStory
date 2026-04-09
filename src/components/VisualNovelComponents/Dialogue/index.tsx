@@ -1,6 +1,7 @@
 import * as React from "react";
 import Typewriter from "../../Typewriter";
 import type {CharacterType, NameDisplay, State, VNStory} from "../../../interfaces/interfaces.ts";
+import TypewriterUtils from "../../../utils/typewriterUtils.ts";
 
 // Styles
 import "./style.css";
@@ -26,6 +27,16 @@ const DialogueBox: React.FC<DialogueProps> = ({
     state,
     onTypingComplete
 }) => {
+    // Process the name through the typewriter utils to resolve variables
+    const processedName = React.useMemo(() => {
+        return TypewriterUtils.getTextWithCharacters(
+            name,
+            characters,
+            state.variables,
+            nameDisplay
+        );
+    }, [name, characters, state.variables, nameDisplay]);
+
     // Find character by name or color to get character info
     const characterID: string = script.story[state.currentScene].dialogues[state.currentDialogueIndex].name;
     const character: CharacterType = characters[characterID];
@@ -47,12 +58,12 @@ const DialogueBox: React.FC<DialogueProps> = ({
     return (
         <div className="vn-dialogue-container">
             {/* Character Name */}
-            {nameToDisplay !== "" && (
+            {(processedName || nameToDisplay !== "") && (
                 <div
                     className="vn-dialogue-name"
                     style={{color: nameColor}}
                 >
-                    {nameToDisplay}
+                    {processedName ?? nameToDisplay}
                 </div>
             )}
 
