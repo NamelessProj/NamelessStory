@@ -3,7 +3,7 @@ import type { State } from "../interfaces/interfaces";
 import { parseBGMFile, createBGMPlayer, resolveAudioPath } from "../utils/audioUtils";
 
 interface UseBGMProps {
-    bgmFile: string;
+    bgmFile?: string;
     bgmLoop?: boolean;
     state: State;
     setState: (state: State) => void;
@@ -14,17 +14,15 @@ interface UseBGMProps {
  * Handles: play new file, continue (keep playing), continue[filename], reset
  */
 export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
-    const currentAudio = useRef<HTMLAudioElement | null>(null);
+    const currentAudio = useRef<HTMLAudioElement | null>(state.currentMusic);
+    const currentMusicNameRef = useRef<string | undefined>(state.currentMusic?.src.split("/").pop());
 
+    // Update the ref when bgmFile changes
     useEffect(() => {
-        // Get current music name from state if exists
-        const currentMusicSrc = state.currentMusic?.src;
-        const currentMusicName = currentMusicSrc ? currentMusicSrc.split("/").pop() : undefined;
-
-        const action = parseBGMFile(bgmFile, currentMusicName);
+        const action = parseBGMFile(bgmFile, currentMusicNameRef.current);
 
         switch (action.action) {
-            case "play":
+            case "play": {
                 // Stop current music if exists
                 if (currentAudio.current) {
                     currentAudio.current.pause();
@@ -49,12 +47,13 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
                     currentMusic: audio
                 });
                 break;
+            }
 
             case "continue":
                 // Do nothing - keep playing current music
                 break;
 
-            case "reset":
+            case "reset": {
                 if (currentAudio.current) {
                     currentAudio.current.currentTime = 0;
                     // Ensure it's playing
@@ -63,6 +62,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
                     });
                 }
                 break;
+            }
 
             case "none":
                 // Do nothing
@@ -77,7 +77,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
                 currentAudio.current = null;
             }
         };
-    }, [bgmFile, bgmLoop, state.musicVolume, setState]);
+    }, [bgmFile, bgmLoop, setState, state]);
 
     // Expose functions to control music
     const playMusic = useCallback((file: string, loop: boolean = true) => {
@@ -88,7 +88,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
         currentAudio.current = audio;
         audio.play().catch((err) => console.error("Error playing BGM:", err));
         setState({ ...state, currentMusic: audio });
-    }, [state.musicVolume, setState]);
+    }, [state, setState]);
 
     const pauseMusic = useCallback(() => {
         if (currentAudio.current) {
@@ -115,8 +115,10 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
         }
     }, []);
 
+    // Return null for currentMusic since we can't expose RefObject
+    // Use state.currentMusic instead
     return {
-        currentMusic: currentAudio.current,
+        currentMusic: null,
         playMusic,
         pauseMusic,
         resumeMusic,
