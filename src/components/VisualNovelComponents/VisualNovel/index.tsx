@@ -16,13 +16,14 @@ interface VisualNovelProps {
 const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
 
-    // Handle background music
+    // Handle background music - use scene name as trigger to only play on scene entry
     const currentSceneData = script.story[state.currentScene];
     useBGM({
         bgmFile: currentSceneData.bgmFile,
         bgmLoop: currentSceneData.bgmLoop,
         state,
-        setState
+        setState,
+        trigger: state.currentScene
     });
 
     // Handle advancing to next dialogue
