@@ -56,10 +56,11 @@ export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAc
  * @param loop - Whether to loop the audio
  * @returns A configured HTMLAudioElement
  */
-export const createBGMPlayer = (audioFile: string, volume: number = 0.9, loop: boolean = true): HTMLAudioElement => {
+export const createBGMPlayer = (audioFile: string, volume: number = 0.5, loop: boolean = true): HTMLAudioElement => {
     const audio = new Audio(audioFile);
     audio.loop = loop;
-    audio.volume = volume;
+    // Clamp volume between 0 and 1 to prevent distortion
+    audio.volume = Math.max(0, Math.min(1, volume));
     audio.preload = "auto";
     return audio;
 };
