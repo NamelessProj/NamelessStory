@@ -178,6 +178,7 @@ export default class TypewriterUtils {
                     break;
                 }
                 case "v": {
+                    console.log("Variable found:", id, vars, char);
                     if (char) {
                         result = `<span class="character-name-${id}" style="color: ${char.color}">${vars.value}</span>`;
                     } else {
