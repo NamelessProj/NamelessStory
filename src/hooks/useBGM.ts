@@ -7,17 +7,19 @@ interface UseBGMProps {
     bgmLoop?: boolean;
     state: State;
     setState: (state: State) => void;
+    trigger: string; // Unique identifier to trigger music play on scene entry
 }
 
 /**
  * Custom hook to handle background music playback
  * Handles: play new file, continue (keep playing), continue[filename], reset
  */
-export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
+export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMProps) => {
     const currentAudio = useRef<HTMLAudioElement | null>(state.currentMusic);
     const currentMusicNameRef = useRef<string | undefined>(state.currentMusic?.src.split("/").pop());
+    const hasPlayedRef = useRef<boolean>(false);
 
-    // Update the ref when bgmFile changes
+    // Update the ref when bgmFile changes (scene entry)
     useEffect(() => {
         const action = parseBGMFile(bgmFile, currentMusicNameRef.current);
 
@@ -36,6 +38,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
                     bgmLoop !== false
                 );
                 currentAudio.current = audio;
+                hasPlayedRef.current = true;
 
                 audio.play().catch((err) => {
                     console.error("Error playing BGM:", err);
@@ -51,6 +54,13 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
 
             case "continue":
                 // Do nothing - keep playing current music
+                if (currentAudio.current && !hasPlayedRef.current) {
+                    // Resume if it was paused
+                    currentAudio.current.play().catch((err) => {
+                        console.error("Error continuing BGM:", err);
+                    });
+                }
+                hasPlayedRef.current = true;
                 break;
 
             case "reset": {
@@ -60,24 +70,23 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState }: UseBGMProps) => {
                     currentAudio.current.play().catch((err) => {
                         console.error("Error resetting BGM:", err);
                     });
+                    hasPlayedRef.current = true;
                 }
                 break;
             }
 
             case "none":
-                // Do nothing
+                hasPlayedRef.current = false;
                 break;
         }
 
-        // Cleanup function - pause music when scene changes
+        // Cleanup function - break reference but don't pause music
         return () => {
             if (currentAudio.current) {
-                // Don't pause - music should continue when scene changes
-                // Just break the reference
                 currentAudio.current = null;
             }
         };
-    }, [bgmFile, bgmLoop, setState, state]);
+    }, [trigger]);
 
     // Expose functions to control music
     const playMusic = useCallback((file: string, loop: boolean = true) => {
