@@ -13,14 +13,14 @@ const UserInputBox: React.FC<UserInputBoxProps> = ({variable, setVariable}) => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLElement>): void => {
         e.preventDefault();
 
-        if (!input || input == "") {
+        if (!input || input === "") {
             setIsWrong(true);
             setTimeout((): void => setIsWrong(false), 1000);
             return;
         }
 
-        setInput("");
         setVariable(input, variable.value, variable.color);
+        setInput("");
     }
 
     return (
