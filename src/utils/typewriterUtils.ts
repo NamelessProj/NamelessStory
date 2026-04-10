@@ -1,5 +1,5 @@
 import type {CharacterType, NameDisplay, PauseMap, Token, VariableType} from "../interfaces/interfaces.ts";
-import {PAUSE_SYMBOL} from "./constants.ts";
+import {PAUSE_SYMBOL, VARIABLE_REGEX} from "./constants.ts";
 
 export default class TypewriterUtils {
     static splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] => {
@@ -158,9 +158,7 @@ export default class TypewriterUtils {
     }
 
     static getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, variables: Record<string, VariableType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
-        const regex: RegExp = /{{([vcC]!)?([a-zA-Z0-9]+)}}/g;
-
-        return text.replace(regex, (match: string, prefix: string | undefined, id: string): string => {
+        return text.replace(VARIABLE_REGEX, (match: string, prefix: string | undefined, id: string): string => {
             const char: CharacterType | undefined = characters[id];
             const vars: VariableType | undefined = variables[id];
 
