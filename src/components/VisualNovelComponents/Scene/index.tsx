@@ -38,8 +38,6 @@ const Scene: React.FC<SceneProps> = ({
 
     // Handle click to advance
     const handleClick = (): void => {
-        return;
-
         if (state.isTyping) {
             // If typing, complete immediately (would be handled by Typewriter)
             return;
