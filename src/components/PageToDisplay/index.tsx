@@ -19,7 +19,7 @@ const PageToDisplay: React.FC<PageToDisplayProps> = ({page, script, state, setSt
         case "credits":
             return <CreditsPage script={script} handleChangeRoom={handleChangePage} />
         case "game":
-            return <VisualNovel script={script} state={state} setState={setState} />
+            return <VisualNovel script={script} state={state} setState={setState} onChangePage={handleChangePage} />
         default:
             return null;
     }
