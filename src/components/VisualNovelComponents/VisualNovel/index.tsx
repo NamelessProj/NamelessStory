@@ -34,6 +34,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         // Don't advance if waiting on user input
         if (state.waitingOnUserInput) return;
 
+        // Don't advance if overlay is hidden (user needs to click to show overlay before advancing)
+        if (isOverlayHidden) return;
+
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
             setState({
                 ...state,
