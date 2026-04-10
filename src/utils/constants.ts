@@ -6,3 +6,5 @@ export const DEFAULT_PAUSE_MAP: PauseMap = {
 };
 
 export const PAUSE_SYMBOL: string = "\\";
+
+export const VARIABLE_REGEX: RegExp = /{{([vcC]!)?([a-zA-Z0-9]+)}}/g;
