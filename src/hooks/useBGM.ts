@@ -23,7 +23,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
     // Update the ref when trigger changes (scene entry)
     useEffect(() => {
         // Track if this is a new trigger (scene change)
-        const isNewTrigger = currentTriggerRef.current !== trigger;
+        //const isNewTrigger = currentTriggerRef.current !== trigger;
         currentTriggerRef.current = trigger;
 
         const action = parseBGMFile(bgmFile, currentMusicNameRef.current);
