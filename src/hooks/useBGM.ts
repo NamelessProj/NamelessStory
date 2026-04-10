@@ -18,9 +18,14 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
     const currentAudio = useRef<HTMLAudioElement | null>(state.currentMusic);
     const currentMusicNameRef = useRef<string | undefined>(state.currentMusic?.src.split("/").pop());
     const hasPlayedRef = useRef<boolean>(false);
+    const currentTriggerRef = useRef<string>(trigger);
 
-    // Update the ref when bgmFile changes (scene entry)
+    // Update the ref when trigger changes (scene entry)
     useEffect(() => {
+        // Track if this is a new trigger (scene change)
+        const isNewTrigger = currentTriggerRef.current !== trigger;
+        currentTriggerRef.current = trigger;
+
         const action = parseBGMFile(bgmFile, currentMusicNameRef.current);
 
         switch (action.action) {
@@ -38,6 +43,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                     bgmLoop !== false
                 );
                 currentAudio.current = audio;
+                currentMusicNameRef.current = action.file;
                 hasPlayedRef.current = true;
 
                 audio.play().catch((err) => {
@@ -80,9 +86,10 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                 break;
         }
 
-        // Cleanup function - break reference but don't pause music
+        // Cleanup function - pause and nullify audio on unmount
         return () => {
             if (currentAudio.current) {
+                currentAudio.current.pause();
                 currentAudio.current = null;
             }
         };
@@ -95,6 +102,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         }
         const audio = createBGMPlayer(resolveAudioPath(file), state.musicVolume, loop);
         currentAudio.current = audio;
+        currentMusicNameRef.current = file;
         audio.play().catch((err) => console.error("Error playing BGM:", err));
         setState({ ...state, currentMusic: audio });
     }, [state, setState]);
