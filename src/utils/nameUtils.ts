@@ -1,4 +1,4 @@
-import type {CharacterType, NameDisplay, State, VariableType, VNStory} from "../interfaces/interfaces.ts";
+import type {CharacterType, NameDisplay, VariableType} from "../interfaces/interfaces.ts";
 
 /**
  * Resolves the character name to display based on the name property.
