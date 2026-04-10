@@ -1,5 +1,5 @@
 import * as React from "react";
-import type {State, VariableType, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Page, State, VariableType, VNStory} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
@@ -11,9 +11,10 @@ interface VisualNovelProps {
     script: VNStory;
     state: State;
     setState: (state: State) => void;
+    onChangePage?: (page: Page) => void;
 }
 
-const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
+const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onChangePage}) => {
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
 
     // Handle background music - use scene name as trigger to only play on scene entry
@@ -37,17 +38,29 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
             // End of scene, go to next scene if specified
             const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
             if (currentDialogue.next) {
-                setState({
-                    ...state,
-                    currentScene: currentDialogue.next,
-                    currentDialogueIndex: 0
-                });
+                if (currentDialogue.next === "__end__") {
+                    // End of story, show credits
+                    console.log("End of story reached, showing credits");
+                    onChangePage?.("credits");
+                } else {
+                    setState({
+                        ...state,
+                        currentScene: currentDialogue.next,
+                        currentDialogueIndex: 0
+                    });
+                }
             }
         }
-    }, [state, setState, script]);
+    }, [state, setState, script, onChangePage]);
 
     // Handle option selection
     const handleOptionSelect = React.useCallback((next: string): void => {
+        if (next === "__end__") {
+            // End of story, show credits
+            onChangePage?.("credits");
+            return;
+        }
+
         const currentScene: string = state.currentScene;
         let newScene: string = state.currentScene;
         let tempIndex: number = 0;
@@ -83,7 +96,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState}) => {
             currentDialogueIndexMax: newMaxIndex,
             waitingOnOptionSelection: false
         });
-    }, [state, setState, script]);
+    }, [state, setState, script, onChangePage]);
 
     // Handle user input
     const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
