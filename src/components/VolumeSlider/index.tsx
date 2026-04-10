@@ -9,12 +9,14 @@ interface VolumeSliderProps {
 }
 
 const VolumeSlider: React.FC<VolumeSliderProps> = ({state, setState}) => {
+    const [isHovered, setIsHovered] = React.useState<boolean>(false);
+
     // Handle volume change
     const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const newVolume = parseFloat(e.target.value);
 
         // Update the audio element's volume if it exists
-        if (state.currentMusic && !state.isMusicMuted) {
+        if (state.currentMusic) {
             state.currentMusic.volume = newVolume;
         }
 
@@ -24,11 +26,15 @@ const VolumeSlider: React.FC<VolumeSliderProps> = ({state, setState}) => {
         });
     };
 
-    // Handle mute toggle
+    // Handle mute toggle - click on the icon
     const handleMuteToggle = (): void => {
         const isMuted = !state.isMusicMuted;
         if (state.currentMusic) {
-            state.currentMusic.volume = isMuted ? 0 : state.musicVolume;
+            if (isMuted) {
+                state.currentMusic.volume = 0;
+            } else {
+                state.currentMusic.volume = state.musicVolume;
+            }
         }
         setState({
             ...state,
@@ -37,10 +43,15 @@ const VolumeSlider: React.FC<VolumeSliderProps> = ({state, setState}) => {
     };
 
     return (
-        <div className="volume-slider-container">
+        <div
+            className="volume-control"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
             <button
-                className="mute-button"
+                className="volume-icon"
                 onClick={handleMuteToggle}
+                type="button"
                 title={state.isMusicMuted ? "Unmute" : "Mute"}
             >
                 {state.isMusicMuted ? (
@@ -60,18 +71,20 @@ const VolumeSlider: React.FC<VolumeSliderProps> = ({state, setState}) => {
                     </svg>
                 )}
             </button>
-            <div className="slider-wrapper">
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={state.musicVolume}
-                    onChange={handleVolumeChange}
-                    className="volume-slider"
-                    title={`Volume: ${(state.isMusicMuted ? 0 : state.musicVolume * 100).toFixed(0)}%`}
-                />
-            </div>
+            {isHovered && (
+                <div className="volume-slider-container">
+                    <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={state.musicVolume}
+                        onChange={handleVolumeChange}
+                        className="volume-slider"
+                        title={`Volume: ${(state.musicVolume * 100).toFixed(0)}%`}
+                    />
+                </div>
+            )}
         </div>
     );
 };
