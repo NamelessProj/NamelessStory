@@ -17,11 +17,13 @@ interface VisualNovelProps {
 const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onChangePage}) => {
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
 
+    // If scene doesn't exist, return null (page transition is happening)
+    const currentScene = script.story[state.currentScene];
+
     // Handle background music - use scene name as trigger to only play on scene entry
-    const currentSceneData = script.story[state.currentScene];
     useBGM({
-        bgmFile: currentSceneData.bgmFile,
-        bgmLoop: currentSceneData.bgmLoop,
+        bgmFile: currentScene.bgmFile,
+        bgmLoop: currentScene.bgmLoop,
         state,
         setState,
         trigger: state.currentScene
@@ -40,7 +42,6 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
             if (currentDialogue.next) {
                 if (currentDialogue.next === "__end__") {
                     // End of story, show credits
-                    console.log("End of story reached, showing credits");
                     onChangePage?.("credits");
                 } else {
                     setState({
@@ -49,6 +50,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                         currentDialogueIndex: 0
                     });
                 }
+            } else {
+                // No next specified, end of story, show credits
+                onChangePage?.("credits");
             }
         }
     }, [state, setState, script, onChangePage]);
@@ -84,7 +88,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         }
 
         if (currentScene !== newScene) {
-            newMaxIndex = script.story[state.currentScene].dialogues.length - 1;
+            newMaxIndex = script.story[currentScene].dialogues.length - 1;
         }
 
         const newDialogueIndex: number = state.currentDialogueIndexMax >= tempIndex ? tempIndex : state.currentDialogueIndex;
