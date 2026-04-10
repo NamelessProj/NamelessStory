@@ -24,8 +24,13 @@ const Scene: React.FC<SceneProps> = ({
     onHandleOptionSelect,
     onHandleInput
 }) => {
-    const currentScene: SceneType = script.story[state.currentScene];
-    const currentDialogue: Dialogue = currentScene.dialogues[state.currentDialogueIndex];
+    const currentScene: SceneType | undefined = script.story[state.currentScene];
+    const currentDialogue: Dialogue | undefined = currentScene?.dialogues[state.currentDialogueIndex];
+
+    // If scene or dialogue doesn't exist, don't render
+    if (!currentScene || !currentDialogue) {
+        return null;
+    }
 
     // Check if we should show dialogue box
     const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
