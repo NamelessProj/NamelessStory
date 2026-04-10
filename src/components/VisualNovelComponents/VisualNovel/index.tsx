@@ -31,6 +31,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
 
     // Handle advancing to next dialogue
     const handleAdvance = React.useCallback((): void => {
+        // Don't advance if waiting on user input
+        if (state.waitingOnUserInput) return;
+
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
             setState({
                 ...state,
