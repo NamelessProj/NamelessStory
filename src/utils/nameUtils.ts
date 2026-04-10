@@ -39,9 +39,20 @@ export function getNameToDisplay(
     // Check if name matches a variable pattern (e.g., {{userName}})
     const match = name.match(VARIABLE_REGEX);
     if (match) {
+        const prefix = match[1]; // e.g., "v!" or undefined
         // Extract variable name (e.g., "userName" from "{{userName}}")
         const variableName = match[2];
         const variable = variables[variableName];
+
+        // Handle v! prefix (variable reference) - always use variable value
+        if (prefix === "v!") {
+            if (variable) {
+                return variable.value;
+            } else {
+                // Variable doesn't exist, return the variable name without the v! prefix
+                return variableName;
+            }
+        }
 
         if (variable) {
             // If the variable value matches a character ID, display that character's name
