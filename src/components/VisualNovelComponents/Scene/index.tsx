@@ -52,7 +52,7 @@ const Scene: React.FC<SceneProps> = ({
             return;
         }
         if (shouldShowInput) {
-            // Wait for input
+            // Wait for input - input will be handled by UserInput component
             return;
         }
         onAdvance();
