@@ -162,15 +162,15 @@ export default class TypewriterUtils {
             const char: CharacterType | undefined = characters[id];
             const vars: VariableType | undefined = variables[id];
 
-            // Handle v! prefix (variable reference)
+            // Handle v! prefix (variable reference with optional color)
             if (prefix === "v!") {
-                if (vars && vars.value) {
-                    // Variable exists, return its value
-                    return vars.value;
-                } else {
-                    // Variable doesn't exist, return the variable name without the v! prefix
-                    return id;
+                if (vars) {
+                    if (vars.color) {
+                        return `<span class="variable-${id}" style="color: ${vars.color}">${vars.value || id}</span>`;
+                    }
+                    return vars.value || id;
                 }
+                return id;
             }
 
             if (!char && !vars) return match;
@@ -184,14 +184,6 @@ export default class TypewriterUtils {
                 }
                 case "c": {
                     result = `<span class="character-name-${id}" style="color: ${char.color}">${char.name}</span>`;
-                    break;
-                }
-                case "v": {
-                    if (char) {
-                        result = `<span class="character-name-${id}" style="color: ${char.color}">${vars.value}</span>`;
-                    } else {
-                        result = vars.color ? `<span class="variable-${id}" style="color: ${vars.color}">${vars.value}</span>` : vars.value;
-                    }
                     break;
                 }
                 default: {
