@@ -7,7 +7,8 @@ import UserInputBox from "../UserInput";
 
 // Styles
 import './style.css';
-import type {Dialogue, SceneType, State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Dialogue, SceneType, Sprite, State, VNStory} from "../../../interfaces/interfaces.ts";
+import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 
 interface SceneProps {
     script: VNStory;
@@ -31,6 +32,21 @@ const Scene: React.FC<SceneProps> = ({
     if (!currentScene || !currentDialogue) {
         return null;
     }
+
+    // Resolve the character associated with the current dialogue's name field
+    const resolvedSpeaker = resolveCharacterFromName(
+        currentDialogue.name,
+        script.characters,
+        state.variables
+    );
+
+    // Use the explicit sprite from the dialogue, or auto-generate an idle sprite
+    // when the speaker is a character resolved via a variable and has sprites defined
+    const spriteToShow: Sprite | undefined = currentDialogue.sprite ?? (
+        resolvedSpeaker && resolvedSpeaker.character.sprite
+            ? { name: "idle" }
+            : undefined
+    );
 
     // Check if we should show dialogue box
     const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
@@ -68,11 +84,12 @@ const Scene: React.FC<SceneProps> = ({
             <BackgroundImage fileName={currentScene.background} id="vn-background" />
 
             {/* Characters/Sprites */}
-            {currentDialogue.sprite && (
+            {spriteToShow && (
                 <CharacterFullSprite
                     script={script}
-                    sprite={currentDialogue.sprite}
+                    sprite={spriteToShow}
                     currentDialogueIndex={state.currentDialogueIndex}
+                    characterId={resolvedSpeaker?.characterId}
                 />
             )}
 
@@ -83,7 +100,6 @@ const Scene: React.FC<SceneProps> = ({
                     textSpeed={currentDialogue.textSpeed || script.settings.textSpeed || 50}
                     name={currentDialogue.name}
                     nameDisplay={currentDialogue.nameDisplay || script.settings.defaultNameDisplay || "short"}
-                    characters={script.characters}
                     state={state}
                     script={script}
                 />
