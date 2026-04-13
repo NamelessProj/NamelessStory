@@ -39,7 +39,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                 // Play new music
                 const audio = createBGMPlayer(
                     resolveAudioPath(action.file!),
-                    state.musicVolume,
+                    state.isMusicMuted ? 0 : state.musicVolume,
                     bgmLoop !== false
                 );
                 currentAudio.current = audio;
@@ -101,7 +101,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         if (currentAudio.current) {
             currentAudio.current.pause();
         }
-        const audio = createBGMPlayer(resolveAudioPath(file), state.musicVolume, loop);
+        const audio = createBGMPlayer(resolveAudioPath(file), state.isMusicMuted ? 0 : state.musicVolume, loop);
         currentAudio.current = audio;
         currentMusicNameRef.current = file;
         audio.play().catch((err) => console.error("Error playing BGM:", err));
