@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import type { State } from "../interfaces/interfaces";
 import { parseBGMFile, createBGMPlayer, resolveAudioPath } from "../utils/audioUtils";
 
@@ -6,7 +6,7 @@ interface UseBGMProps {
     bgmFile?: string;
     bgmLoop?: boolean;
     state: State;
-    setState: (state: State) => void;
+    setState: React.Dispatch<React.SetStateAction<State>>;
     trigger: string; // Unique identifier to trigger music play on scene entry
 }
 
@@ -58,7 +58,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                 break;
             }
 
-            case "continue":
+            case "continue": {
                 // Do nothing - keep playing current music
                 if (currentAudio.current && !hasPlayedRef.current) {
                     // Resume if it was paused
@@ -68,6 +68,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                 }
                 hasPlayedRef.current = true;
                 break;
+            }
 
             case "reset": {
                 if (currentAudio.current) {
