@@ -1,5 +1,5 @@
 import type {CharacterType, NameDisplay, VariableType} from "../interfaces/interfaces.ts";
-import {VARIABLE_REGEX} from "./constants.ts";
+import {VARIABLE_REGEX_SINGLE} from "./constants.ts";
 
 /**
  * Resolves the character name to display based on the name property.
@@ -37,7 +37,7 @@ export function getNameToDisplay(
     }
 
     // Check if name matches a variable pattern (e.g., {{userName}})
-    const match = name.match(VARIABLE_REGEX);
+    const match = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         const prefix = match[1]; // e.g., "v!" or undefined
         // Extract variable name (e.g., "userName" from "{{userName}}")
@@ -74,7 +74,7 @@ export function getNameToDisplay(
 
 // Export getVariableName for backwards compatibility
 export const getVariableName = (variable: string): string => {
-    const match = variable.match(VARIABLE_REGEX);
+    const match = variable.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         return match[2]; // Return the variable name without the prefix
     }
