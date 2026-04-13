@@ -4,6 +4,7 @@ import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
 import { useBGM } from "../../../hooks/useBGM";
+import {ADVANCE_THRESHOLD_MS} from "../../../utils/constants.ts";
 
 import './style.css';
 
@@ -16,6 +17,8 @@ interface VisualNovelProps {
 
 const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onChangePage}) => {
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
+    // Timestamp of the last time typing completed — used to enforce the advance threshold
+    const lastTypingCompleteRef = React.useRef<number>(0);
 
     // If scene doesn't exist, return null (page transition is happening)
     const currentScene = script.story[state.currentScene];
@@ -29,6 +32,12 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         trigger: state.currentScene
     });
 
+    // Called by Typewriter (via DialogueBox → Scene) when text animation finishes
+    const handleTypingComplete = React.useCallback((): void => {
+        lastTypingCompleteRef.current = Date.now();
+        setState({...state, isTyping: false, skipTyping: false});
+    }, [state, setState]);
+
     // Handle advancing to next dialogue
     const handleAdvance = React.useCallback((): void => {
         // Don't advance if waiting on user input
@@ -37,12 +46,23 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         // Don't advance if overlay is hidden (user needs to click to show overlay before advancing)
         if (isOverlayHidden) return;
 
+        // If still typing, skip to the end instead of advancing
+        if (state.isTyping) {
+            setState({...state, skipTyping: true});
+            return;
+        }
+
+        // Enforce a small delay after typing completes to prevent accidental double-press
+        if (Date.now() - lastTypingCompleteRef.current < ADVANCE_THRESHOLD_MS) return;
+
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
             const nextIndex = state.currentDialogueIndex + 1;
             const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
                 currentDialogueIndex: nextIndex,
+                isTyping: true,
+                skipTyping: false,
                 waitingOnUserInput: nextDialogue?.input !== undefined
             });
         } else {
@@ -50,7 +70,6 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
             const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
             if (currentDialogue.next) {
                 if (currentDialogue.next === "__end__") {
-                    // End of story, show credits
                     onChangePage?.("credits");
                 } else {
                     const newScene = currentDialogue.next;
@@ -60,11 +79,12 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                         currentScene: newScene,
                         currentDialogueIndex: 0,
                         currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
+                        isTyping: true,
+                        skipTyping: false,
                         waitingOnUserInput: firstDialogue?.input !== undefined
                     });
                 }
             } else {
-                // No next specified, end of story, show credits
                 onChangePage?.("credits");
             }
         }
@@ -113,7 +133,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
             currentDialogueIndex: newDialogueIndex,
             currentDialogueIndexMax: newMaxIndex,
             waitingOnOptionSelection: false,
-            waitingOnUserInput: targetDialogue?.input !== undefined
+            waitingOnUserInput: targetDialogue?.input !== undefined,
+            isTyping: true,
+            skipTyping: false
         });
     }, [state, setState, script, onChangePage]);
 
@@ -131,6 +153,8 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                 ...state,
                 variables: updatedVariables,
                 currentDialogueIndex: nextIndex,
+                isTyping: true,
+                skipTyping: false,
                 waitingOnUserInput: nextDialogue?.input !== undefined
             });
         } else {
@@ -144,6 +168,8 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                     currentScene: newScene,
                     currentDialogueIndex: 0,
                     currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
+                    isTyping: true,
+                    skipTyping: false,
                     waitingOnUserInput: firstDialogue?.input !== undefined
                 });
             } else {
@@ -153,18 +179,13 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         }
     }, [state, setState, script, onChangePage]);
 
-    // Check if user can advance (typing must be complete, no options or inputs pending)
-    const canAdvance = !state.isTyping && !state.waitingOnOptionSelection && !state.waitingOnUserInput;
-
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
             if (isOverlayHidden) return;
+            if (state.waitingOnOptionSelection) return;
 
-            // Spacebar or Enter to advance
             if (event.code === "Space" || event.code === "Enter") {
-                if (canAdvance) {
-                    handleAdvance();
-                }
+                handleAdvance();
             }
         };
 
@@ -173,7 +194,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         return (): void => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [isOverlayHidden, canAdvance, handleAdvance, setIsOverlayHidden]);
+    }, [isOverlayHidden, state.waitingOnOptionSelection, handleAdvance]);
 
     const handleClick = (): void => {
         if (isOverlayHidden) setIsOverlayHidden(false);
@@ -195,6 +216,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                 script={script}
                 state={state}
                 onAdvance={handleAdvance}
+                onTypingComplete={handleTypingComplete}
                 onHandleOptionSelect={handleOptionSelect}
                 onHandleInput={handleInput}
             />
