@@ -112,7 +112,8 @@ export interface State {
     musicVolume: number,
     isMusicMuted: boolean,
     variables: Record<string, VariableType>,
-    history: string[]
+    history: string[],
+    skipTyping: boolean
 }
 
 
