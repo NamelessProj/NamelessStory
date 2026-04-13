@@ -14,14 +14,15 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
         textSpeed: 50,
         waitingOnUserInput: false,
         waitingOnOptionSelection: false,
-        isTyping: false,
+        isTyping: true,
         currentText: "",
         defaultNameColor: "#000000",
         currentMusic: null,
         musicVolume: 0.5,
         isMusicMuted: false,
         variables: {},
-        history: []
+        history: [],
+        skipTyping: false
     });
 
     useEffect(() => {
