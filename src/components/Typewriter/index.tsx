@@ -31,6 +31,7 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, sta
     // Skip to end when requested
     useEffect(() => {
         if (state.skipTyping && currentStep < totalSteps) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrentStep(totalSteps);
         }
     }, [state.skipTyping, currentStep, totalSteps]);
