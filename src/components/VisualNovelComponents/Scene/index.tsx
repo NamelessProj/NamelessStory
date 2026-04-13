@@ -14,6 +14,7 @@ interface SceneProps {
     script: VNStory;
     state: State;
     onAdvance: () => void;
+    onTypingComplete: () => void;
     onHandleOptionSelect: (nextScene: string) => void;
     onHandleInput: (value: string, variableName: string, color?: string) => void;
 }
@@ -22,6 +23,7 @@ const Scene: React.FC<SceneProps> = ({
     script,
     state,
     onAdvance,
+    onTypingComplete,
     onHandleOptionSelect,
     onHandleInput
 }) => {
@@ -57,20 +59,10 @@ const Scene: React.FC<SceneProps> = ({
     // Check if we should show user input
     const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
-    // Handle click to advance
+    // Handle click to advance — typing skip and threshold are handled inside onAdvance
     const handleClick = (): void => {
-        if (state.isTyping) {
-            // If typing, complete immediately (would be handled by Typewriter)
-            return;
-        }
-        if (shouldShowOptions) {
-            // Wait for option selection
-            return;
-        }
-        if (shouldShowInput) {
-            // Wait for input - input will be handled by UserInput component
-            return;
-        }
+        if (shouldShowOptions) return;
+        if (shouldShowInput) return;
         onAdvance();
     };
 
@@ -102,6 +94,7 @@ const Scene: React.FC<SceneProps> = ({
                     nameDisplay={currentDialogue.nameDisplay || script.settings.defaultNameDisplay || "short"}
                     state={state}
                     script={script}
+                    onTypingComplete={onTypingComplete}
                 />
             )}
 
