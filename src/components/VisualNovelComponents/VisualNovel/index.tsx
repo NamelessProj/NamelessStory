@@ -20,13 +20,12 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
     // Timestamp of the last time typing completed — used to enforce the advance threshold
     const lastTypingCompleteRef = React.useRef<number>(0);
 
-    // If scene doesn't exist, return null (page transition is happening)
     const currentScene = script.story[state.currentScene];
 
     // Handle background music - use scene name as trigger to only play on scene entry
     useBGM({
-        bgmFile: currentScene.bgmFile,
-        bgmLoop: currentScene.bgmLoop,
+        bgmFile: currentScene?.bgmFile,
+        bgmLoop: currentScene?.bgmLoop,
         state,
         setState,
         trigger: state.currentScene
@@ -199,6 +198,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
     const handleClick = (): void => {
         if (isOverlayHidden) setIsOverlayHidden(false);
     }
+
+    // If scene doesn't exist, a page transition is in progress — don't render
+    if (!currentScene) return null;
 
     return (
         <div
