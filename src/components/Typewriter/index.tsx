@@ -26,6 +26,13 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, sta
         return () => clearTimeout(timeout);
     }, [text, pauseMap]);
 
+    // Skip to end when requested
+    useEffect(() => {
+        if (state.skipTyping && currentStep < totalSteps) {
+            setCurrentStep(totalSteps);
+        }
+    }, [state.skipTyping, currentStep, totalSteps]);
+
     useEffect(() => {
         if (currentStep >= totalSteps) {
             if (!completedRef.current) {
