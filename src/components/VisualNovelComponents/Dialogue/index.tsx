@@ -1,8 +1,8 @@
 import * as React from "react";
 import Typewriter from "../../Typewriter";
-import type {CharacterType, NameDisplay, State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {NameDisplay, State, VNStory} from "../../../interfaces/interfaces.ts";
 // import TypewriterUtils from "../../../utils/typewriterUtils.ts";
-import {getNameToDisplay} from "../../../utils/nameUtils.ts";
+import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 
 // Styles
 import "./style.css";
@@ -12,7 +12,6 @@ interface DialogueProps {
     textSpeed: number;
     name: string;
     nameDisplay: NameDisplay;
-    characters: Record<string, CharacterType>;
     script: VNStory;
     state: State;
     onTypingComplete?: () => void;
@@ -23,7 +22,6 @@ const DialogueBox: React.FC<DialogueProps> = ({
     textSpeed,
     name,
     nameDisplay,
-    characters,
     script,
     state,
     onTypingComplete
@@ -33,18 +31,17 @@ const DialogueBox: React.FC<DialogueProps> = ({
         return getNameToDisplay(
             name,
             nameDisplay,
-            characters,
+            script.characters,
             state.variables
         );
-    }, [name, nameDisplay, characters, state.variables]);
+    }, [name, nameDisplay, script.characters, state.variables]);
 
-    // Find character for color (use current dialogue's character)
-    const scene = script.story[state.currentScene];
-    const dialogue = scene?.dialogues[state.currentDialogueIndex];
-    const characterID: string = dialogue?.name || "";
-    const character: CharacterType | undefined = characters[characterID];
+    // Find character for color — checks direct ID, variable name, and variable value
+    const resolved = React.useMemo(() => {
+        return resolveCharacterFromName(name, script.characters, state.variables);
+    }, [name, script.characters, state.variables]);
 
-    const nameColor = character ? character.color : state.defaultNameColor;
+    const nameColor = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
         <div className="vn-dialogue-container">
