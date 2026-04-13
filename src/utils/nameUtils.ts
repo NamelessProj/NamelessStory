@@ -2,6 +2,45 @@ import type {CharacterType, NameDisplay, VariableType} from "../interfaces/inter
 import {VARIABLE_REGEX_SINGLE} from "./constants.ts";
 
 /**
+ * Resolves the character (and its ID) associated with a dialogue name field.
+ *
+ * Priority:
+ * 1. Direct character ID (e.g., name = "Char1")
+ * 2. Variable whose NAME matches a character ID (e.g., name = "{{playerName}}" and characters["playerName"] exists)
+ * 3. Variable whose VALUE matches a character ID (e.g., name = "{{speaker}}" and variables["speaker"].value = "Char1")
+ */
+export function resolveCharacterFromName(
+    name: string,
+    characters: Record<string, CharacterType>,
+    variables: Record<string, VariableType>
+): { characterId: string; character: CharacterType } | undefined {
+    if (!name) return undefined;
+
+    // Direct character ID
+    const direct = characters[name];
+    if (direct) return { characterId: name, character: direct };
+
+    // Variable pattern
+    const match = name.match(VARIABLE_REGEX_SINGLE);
+    if (match) {
+        const variableName = match[2];
+
+        // Check if the variable NAME itself matches a character ID
+        const charByVarName = characters[variableName];
+        if (charByVarName) return { characterId: variableName, character: charByVarName };
+
+        // Check if the variable VALUE matches a character ID
+        const variable = variables[variableName];
+        if (variable) {
+            const charByValue = characters[variable.value];
+            if (charByValue) return { characterId: variable.value, character: charByValue };
+        }
+    }
+
+    return undefined;
+}
+
+/**
  * Resolves the character name to display based on the name property.
  *
  * Rules:
@@ -10,7 +49,8 @@ import {VARIABLE_REGEX_SINGLE} from "./constants.ts";
  *    - "full": use fullName if available, otherwise fall back to name
  *    - "short": use name
  * 3. If name matches a variable pattern (e.g., "{{userName}}"):
- *    - If the variable value matches a character ID, display that character's name
+ *    - If the variable NAME matches a character ID, display the variable's value
+ *    - If the variable VALUE matches a character ID, display that character's name
  *    - Otherwise, display the variable's value
  * 4. If nothing matches, return the raw name value
  */
@@ -40,7 +80,6 @@ export function getNameToDisplay(
     const match = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         const prefix = match[1]; // e.g., "v!" or undefined
-        // Extract variable name (e.g., "userName" from "{{userName}}")
         const variableName = match[2];
         const variable = variables[variableName];
 
@@ -49,13 +88,19 @@ export function getNameToDisplay(
             if (variable) {
                 return variable.value;
             } else {
-                // Variable doesn't exist, return the variable name without the v! prefix
                 return variableName;
             }
         }
 
         if (variable) {
-            // If the variable value matches a character ID, display that character's name
+            // If the variable NAME matches a character ID, the variable holds that
+            // character's display name — show the variable's value directly
+            const charByVarName = characters[variableName];
+            if (charByVarName) {
+                return variable.value;
+            }
+
+            // If the variable VALUE matches a character ID, display that character's name
             const charFromVar = characters[variable.value];
             if (charFromVar) {
                 if (nameDisplay === "full") {
@@ -63,6 +108,7 @@ export function getNameToDisplay(
                 }
                 return charFromVar.name;
             }
+
             // Otherwise, return the variable's value
             return variable.value;
         }
