@@ -21,8 +21,10 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, sta
     const completedRef = useRef(false);
 
     useEffect(() => {
-        completedRef.current = false;
-        const timeout: number = setTimeout(() => setCurrentStep(0), 0);
+        const timeout: number = setTimeout(() => {
+            completedRef.current = false;
+            setCurrentStep(0);
+        }, 0);
         return () => clearTimeout(timeout);
     }, [text, pauseMap]);
 
