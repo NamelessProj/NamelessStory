@@ -41,12 +41,15 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             }
 
             const data: VNStory = await res.json();
+            const startScene = data.story[data.settings.startingScene];
+            const startDialogue = startScene?.dialogues[0];
             setState(prev => ({
                 ...prev,
                 currentScene: data.settings.startingScene,
-                currentDialogueIndexMax: data.story[data.settings.startingScene].dialogues.length - 1,
+                currentDialogueIndexMax: startScene.dialogues.length - 1,
                 textSpeed: data.settings.textSpeed || 50,
-                defaultNameColor: data.settings.defaultNameColor || "#000000"
+                defaultNameColor: data.settings.defaultNameColor || "#000000",
+                waitingOnUserInput: startDialogue?.input !== undefined
             }));
             setScript(data);
         };
