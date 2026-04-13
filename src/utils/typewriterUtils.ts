@@ -165,8 +165,10 @@ export default class TypewriterUtils {
             // Handle v! prefix (variable reference with optional color)
             if (prefix === "v!") {
                 if (vars) {
-                    if (vars.color) {
-                        return `<span class="variable-${id}" style="color: ${vars.color}">${vars.value || id}</span>`;
+                    // If the variable name matches a character ID, use that character's color
+                    const color = char ? char.color : vars.color;
+                    if (color) {
+                        return `<span class="variable-${id}" style="color: ${color}">${vars.value || id}</span>`;
                     }
                     return vars.value || id;
                 }
@@ -187,6 +189,12 @@ export default class TypewriterUtils {
                     break;
                 }
                 default: {
+                    // If both a character and a variable share the same ID, show the variable's
+                    // value styled with the character's color
+                    if (char && vars) {
+                        result = `<span class="variable-${id}" style="color: ${char.color}">${vars.value || id}</span>`;
+                        break;
+                    }
                     let name: string | undefined = defaultNameDisplaySetting === "full" ? char.fullName : char.name;
                     name = name || char.name;
                     result = `<span class="character-name-${id}" style="color: ${char.color}">${name}</span>`;
