@@ -38,9 +38,12 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         if (isOverlayHidden) return;
 
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
+            const nextIndex = state.currentDialogueIndex + 1;
+            const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
-                currentDialogueIndex: state.currentDialogueIndex + 1
+                currentDialogueIndex: nextIndex,
+                waitingOnUserInput: nextDialogue?.input !== undefined
             });
         } else {
             // End of scene, go to next scene if specified
@@ -50,10 +53,14 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                     // End of story, show credits
                     onChangePage?.("credits");
                 } else {
+                    const newScene = currentDialogue.next;
+                    const firstDialogue = script.story[newScene]?.dialogues[0];
                     setState({
                         ...state,
-                        currentScene: currentDialogue.next,
-                        currentDialogueIndex: 0
+                        currentScene: newScene,
+                        currentDialogueIndex: 0,
+                        currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
+                        waitingOnUserInput: firstDialogue?.input !== undefined
                     });
                 }
             } else {
@@ -61,7 +68,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
                 onChangePage?.("credits");
             }
         }
-    }, [state, setState, script, onChangePage]);
+    }, [state, setState, script, onChangePage, isOverlayHidden]);
 
     // Handle option selection
     const handleOptionSelect = React.useCallback((next: string): void => {
@@ -94,35 +101,57 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         }
 
         if (currentScene !== newScene) {
-            newMaxIndex = script.story[currentScene].dialogues.length - 1;
+            newMaxIndex = script.story[newScene].dialogues.length - 1;
         }
 
-        const newDialogueIndex: number = state.currentDialogueIndexMax >= tempIndex ? tempIndex : state.currentDialogueIndex;
+        const newDialogueIndex: number = newMaxIndex >= tempIndex ? tempIndex : 0;
+        const targetDialogue = script.story[newScene]?.dialogues[newDialogueIndex];
 
         setState({
             ...state,
             currentScene: newScene,
             currentDialogueIndex: newDialogueIndex,
             currentDialogueIndexMax: newMaxIndex,
-            waitingOnOptionSelection: false
+            waitingOnOptionSelection: false,
+            waitingOnUserInput: targetDialogue?.input !== undefined
         });
     }, [state, setState, script, onChangePage]);
 
-    // Handle user input
+    // Handle user input — store variable then auto-advance
     const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
-        const newVariable: Record<string, VariableType> = {
-            [variableName]: {
-                value: value,
-                color: color
-            }
+        const updatedVariables = {
+            ...state.variables,
+            [variableName]: { value, color }
         };
 
-        setState({
-            ...state,
-            variables: {...state.variables, ...newVariable},
-            waitingOnUserInput: false
-        });
-    }, [state, setState]);
+        if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
+            const nextIndex = state.currentDialogueIndex + 1;
+            const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
+            setState({
+                ...state,
+                variables: updatedVariables,
+                currentDialogueIndex: nextIndex,
+                waitingOnUserInput: nextDialogue?.input !== undefined
+            });
+        } else {
+            const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
+            if (currentDialogue.next && currentDialogue.next !== "__end__") {
+                const newScene = currentDialogue.next;
+                const firstDialogue = script.story[newScene]?.dialogues[0];
+                setState({
+                    ...state,
+                    variables: updatedVariables,
+                    currentScene: newScene,
+                    currentDialogueIndex: 0,
+                    currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
+                    waitingOnUserInput: firstDialogue?.input !== undefined
+                });
+            } else {
+                setState({ ...state, variables: updatedVariables, waitingOnUserInput: false });
+                onChangePage?.("credits");
+            }
+        }
+    }, [state, setState, script, onChangePage]);
 
     // Check if user can advance (typing must be complete, no options or inputs pending)
     const canAdvance = !state.isTyping && !state.waitingOnOptionSelection && !state.waitingOnUserInput;
