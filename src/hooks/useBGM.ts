@@ -51,10 +51,10 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
                 });
 
                 // Update state with current music
-                setState({
-                    ...state,
+                setState(prev => ({
+                    ...prev,
                     currentMusic: audio
-                });
+                }));
                 break;
             }
 
@@ -104,7 +104,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         currentAudio.current = audio;
         currentMusicNameRef.current = file;
         audio.play().catch((err) => console.error("Error playing BGM:", err));
-        setState({ ...state, currentMusic: audio });
+        setState(prev => ({ ...prev, currentMusic: audio }));
     }, [state, setState]);
 
     const pauseMusic = useCallback(() => {
@@ -123,7 +123,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         if (currentAudio.current) {
             currentAudio.current.volume = volume;
         }
-        setState({ ...state, musicVolume: volume });
+        setState(prev => ({ ...prev, musicVolume: volume }));
     }, [state, setState]);
 
     const setLoop = useCallback((loop: boolean) => {
