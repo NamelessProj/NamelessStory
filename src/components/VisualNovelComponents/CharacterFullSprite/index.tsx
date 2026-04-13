@@ -8,9 +8,12 @@ const CharacterFullSprite: React.FC<{
     script: VNStory;
     sprite: Sprite;
     currentDialogueIndex: number;
-}> = ({script, sprite}) => {
+    characterId?: string;
+}> = ({script, sprite, characterId: characterIdOverride}) => {
     const spriteName = sprite.name;
-    const characterId = Object.keys(script.characters).find(key => {
+    // Use the provided character ID if given; otherwise search for the first character
+    // that has the requested sprite variant or an idle fallback
+    const characterId = characterIdOverride ?? Object.keys(script.characters).find(key => {
         const char = script.characters[key];
         return char.sprite && (char.sprite[spriteName] || char.sprite["idle"]);
     });
