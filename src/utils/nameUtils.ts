@@ -32,7 +32,7 @@ export const resolveCharacterFromName = (
         // Check if the variable VALUE matches a character ID
         const variable: VariableType = variables[variableName];
         if (variable) {
-            const charByValue = characters[variable.value];
+            const charByValue: CharacterType = characters[variable.value];
             if (charByValue) return { characterId: variable.value, character: charByValue };
         }
     }
@@ -79,8 +79,8 @@ export const getNameToDisplay = (
     // Check if name matches a variable pattern (e.g., {{userName}})
     const match = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
-        const prefix = match[1]; // e.g., "v!" or undefined
-        const variableName = match[2];
+        const prefix: string = match[1]; // e.g., "v!" or undefined
+        const variableName: string = match[2];
         const variable: VariableType = variables[variableName];
 
         // Handle v! prefix (variable reference) - always use variable value

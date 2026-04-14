@@ -1,11 +1,11 @@
 import type {State} from "../interfaces/interfaces.ts";
 
 export const exportSaveFile = (state: State, storyTitle: string): void => {
-    const saveData = JSON.stringify({...state, currentMusic: null}, null, 2);
+    const saveData: string = JSON.stringify({...state, currentMusic: null}, null, 2);
     const blob = new Blob([saveData], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const fileName = storyTitle.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-save.json";
+    const fileName: string = storyTitle.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-save.json";
     a.href = url;
     a.download = fileName;
     a.click();
@@ -13,7 +13,7 @@ export const exportSaveFile = (state: State, storyTitle: string): void => {
 }
 
 export const parseSaveFile = (json: string): State => {
-    const parsed = JSON.parse(json);
+    const parsed = JSON.parse(json) as Partial<State>;
     if (typeof parsed.currentScene !== "string" || typeof parsed.currentDialogueIndex !== "number") {
         throw new Error("Invalid save file");
     }
