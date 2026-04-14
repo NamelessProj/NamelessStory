@@ -4,7 +4,7 @@ import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 
-const TitleScreen: React.FC<{ handleStart: () => void, handleCredits: () => void }> = ({handleStart, handleCredits}) => {
+const TitleScreen: React.FC<{ handleStart: () => void, handleCredits: () => void, handleContinue?: () => void }> = ({handleStart, handleCredits, handleContinue}) => {
     const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
 
@@ -19,6 +19,13 @@ const TitleScreen: React.FC<{ handleStart: () => void, handleCredits: () => void
                     text={buttons?.start || "Start"}
                     onClick={handleStart}
                 />
+
+                {handleContinue && (
+                    <PrimaryButton
+                        text={buttons?.continue || "Continue"}
+                        onClick={handleContinue}
+                    />
+                )}
 
                 <PrimaryButton
                     text={buttons?.credits || "Credits"}
