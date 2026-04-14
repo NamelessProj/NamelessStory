@@ -88,6 +88,11 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
         setCurrentPage("game");
     } : undefined;
 
+    const handleLoadSave = (loadedState: State): void => {
+        setState(loadedState);
+        setCurrentPage("game");
+    };
+
     return (
         <>
             {!script ? (
@@ -97,7 +102,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             ) : (
                 <DataProvider value={{state, setState, script}}>
                     <div id="vn-player" className="vn-body">
-                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} />
+                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} handleLoadSave={handleLoadSave} />
                     </div>
                 </DataProvider>
             )}
