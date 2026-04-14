@@ -1,13 +1,12 @@
-import * as React from "react";
+import VolumeSlider from "../../VolumeSlider";
 
 import "./style.css";
-import VolumeSlider from "../../VolumeSlider";
 
 interface VNOverlayProps {
     isOverlayHidden: boolean;
 }
 
-const VNTopOverlay: React.FC<VNOverlayProps> = ({isOverlayHidden}) => {
+const VNTopOverlay = ({isOverlayHidden}: VNOverlayProps) => {
     return (
         <div className={`vn-overlay vn-overlay-top ${isOverlayHidden ? "hidden" : "show"}`}>
             <VolumeSlider />

@@ -6,7 +6,7 @@ interface UserInputBoxProps {
     setVariable: (value: string, variableName: string, color?: string) => void;
 }
 
-const UserInputBox: React.FC<UserInputBoxProps> = ({variable, setVariable}) => {
+const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
     const [input, setInput] = React.useState<string>("");
     const [isWrong, setIsWrong] = React.useState<boolean>(false);
 

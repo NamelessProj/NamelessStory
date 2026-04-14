@@ -1,11 +1,10 @@
 import * as React from "react";
 import Typewriter from "../../Typewriter";
-import type {NameDisplay} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, NameDisplay} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
-
-// Styles
-import "./style.css";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
+
+import "./style.css";
 
 interface DialogueProps {
     text: string;
@@ -15,17 +14,17 @@ interface DialogueProps {
     onTypingComplete?: () => void;
 }
 
-const DialogueBox: React.FC<DialogueProps> = ({
+const DialogueBox = ({
     text,
     textSpeed,
     name,
     nameDisplay,
     onTypingComplete
-}) => {
+}: DialogueProps) => {
     const {script, state} = useDataContext();
 
     // Get the resolved name to display
-    const nameToDisplay = React.useMemo(() => {
+    const nameToDisplay: string | undefined = React.useMemo(() => {
         return getNameToDisplay(
             name,
             nameDisplay,
@@ -35,11 +34,11 @@ const DialogueBox: React.FC<DialogueProps> = ({
     }, [name, nameDisplay, script.characters, state.variables]);
 
     // Find character for color — checks direct ID, variable name, and variable value
-    const resolved = React.useMemo(() => {
+    const resolved: { characterId: string, character: CharacterType } | undefined = React.useMemo(() => {
         return resolveCharacterFromName(name, script.characters, state.variables);
     }, [name, script.characters, state.variables]);
 
-    const nameColor = resolved ? resolved.character.color : state.defaultNameColor;
+    const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
         <div className="vn-dialogue-container">

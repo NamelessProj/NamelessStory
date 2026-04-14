@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, {useEffect, useRef, useCallback, type RefObject} from "react";
 import type { State } from "../interfaces/interfaces";
-import { parseBGMFile, createBGMPlayer, resolveAudioPath } from "../utils/audioUtils";
+import {parseBGMFile, createBGMPlayer, resolveAudioPath, type BGMAction} from "../utils/audioUtils";
 
 interface UseBGMProps {
     bgmFile?: string;
@@ -26,7 +26,7 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         //const isNewTrigger = currentTriggerRef.current !== trigger;
         currentTriggerRef.current = trigger;
 
-        const action = parseBGMFile(bgmFile, currentMusicNameRef.current);
+        const action: BGMAction = parseBGMFile(bgmFile, currentMusicNameRef.current);
 
         switch (action.action) {
             case "play": {

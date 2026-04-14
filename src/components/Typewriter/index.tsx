@@ -1,6 +1,6 @@
 import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {type RefObject, useEffect, useMemo, useRef, useState} from "react";
 import TypewriterUtils from "../../utils/typewriterUtils.ts";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 
@@ -21,7 +21,7 @@ const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, className, 
     const totalSteps: number = useMemo(() => TypewriterUtils.countSteps(tokens), [tokens]);
 
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const completedRef = useRef(false);
+    const completedRef: RefObject<boolean> = useRef(false);
 
     useEffect(() => {
         const timeout: number = setTimeout(() => {

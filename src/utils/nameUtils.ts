@@ -9,28 +9,28 @@ import {VARIABLE_REGEX_SINGLE} from "./constants.ts";
  * 2. Variable whose NAME matches a character ID (e.g., name = "{{playerName}}" and characters["playerName"] exists)
  * 3. Variable whose VALUE matches a character ID (e.g., name = "{{speaker}}" and variables["speaker"].value = "Char1")
  */
-export function resolveCharacterFromName(
+export const resolveCharacterFromName = (
     name: string,
     characters: Record<string, CharacterType>,
     variables: Record<string, VariableType>
-): { characterId: string; character: CharacterType } | undefined {
+): { characterId: string; character: CharacterType } | undefined => {
     if (!name) return undefined;
 
     // Direct character ID
-    const direct = characters[name];
+    const direct: CharacterType = characters[name];
     if (direct) return { characterId: name, character: direct };
 
     // Variable pattern
     const match = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
-        const variableName = match[2];
+        const variableName: string = match[2];
 
         // Check if the variable NAME itself matches a character ID
-        const charByVarName = characters[variableName];
+        const charByVarName: CharacterType = characters[variableName];
         if (charByVarName) return { characterId: variableName, character: charByVarName };
 
         // Check if the variable VALUE matches a character ID
-        const variable = variables[variableName];
+        const variable: VariableType = variables[variableName];
         if (variable) {
             const charByValue = characters[variable.value];
             if (charByValue) return { characterId: variable.value, character: charByValue };
@@ -54,19 +54,19 @@ export function resolveCharacterFromName(
  *    - Otherwise, display the variable's value
  * 4. If nothing matches, return the raw name value
  */
-export function getNameToDisplay(
+export const getNameToDisplay = (
     name: string,
     nameDisplay: NameDisplay,
     characters: Record<string, CharacterType>,
     variables: Record<string, VariableType>
-): string | undefined {
+): string | undefined => {
     // If name is empty, don't display anything
     if (!name || name === "") {
         return undefined;
     }
 
     // Check if name matches a character ID directly
-    const character = characters[name];
+    const character: CharacterType = characters[name];
 
     // If it's a character, use the appropriate name based on display mode
     if (character) {
@@ -81,7 +81,7 @@ export function getNameToDisplay(
     if (match) {
         const prefix = match[1]; // e.g., "v!" or undefined
         const variableName = match[2];
-        const variable = variables[variableName];
+        const variable: VariableType = variables[variableName];
 
         // Handle v! prefix (variable reference) - always use variable value
         if (prefix === "v!") {
@@ -95,13 +95,13 @@ export function getNameToDisplay(
         if (variable) {
             // If the variable NAME matches a character ID, the variable holds that
             // character's display name — show the variable's value directly
-            const charByVarName = characters[variableName];
+            const charByVarName: CharacterType = characters[variableName];
             if (charByVarName) {
                 return variable.value;
             }
 
             // If the variable VALUE matches a character ID, display that character's name
-            const charFromVar = characters[variable.value];
+            const charFromVar: CharacterType = characters[variable.value];
             if (charFromVar) {
                 if (nameDisplay === "full") {
                     return charFromVar.fullName || charFromVar.name;

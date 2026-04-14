@@ -1,15 +1,13 @@
-import * as React from "react";
 import BackgroundImage from "../../BackgroundImage";
 import CharacterFullSprite from "../CharacterFullSprite";
 import DialogueBox from "../Dialogue";
 import OptionsGroup from "../OptionsGroup";
 import UserInputBox from "../UserInput";
-
-// Styles
-import './style.css';
-import type {Dialogue, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, Dialogue, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
 import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
+
+import './style.css';
 
 interface SceneProps {
     onAdvance: () => void;
@@ -18,12 +16,12 @@ interface SceneProps {
     onHandleInput: (value: string, variableName: string, color?: string) => void;
 }
 
-const Scene: React.FC<SceneProps> = ({
+const Scene = ({
     onAdvance,
     onTypingComplete,
     onHandleOptionSelect,
     onHandleInput
-}) => {
+}: SceneProps) => {
     const {script, state} = useDataContext();
     const currentScene: SceneType | undefined = script.story[state.currentScene];
     const currentDialogue: Dialogue | undefined = currentScene?.dialogues[state.currentDialogueIndex];
@@ -34,7 +32,7 @@ const Scene: React.FC<SceneProps> = ({
     }
 
     // Resolve the character associated with the current dialogue's name field
-    const resolvedSpeaker = resolveCharacterFromName(
+    const resolvedSpeaker: { characterId: string, character: CharacterType } | undefined = resolveCharacterFromName(
         currentDialogue.name,
         script.characters,
         state.variables

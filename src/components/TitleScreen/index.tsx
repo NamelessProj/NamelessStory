@@ -4,14 +4,22 @@ import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 import {parseSaveFile} from "../../utils/saveFile.ts";
+import type {RefObject} from "react";
 
-const TitleScreen: React.FC<{ handleStart: () => void, handleCredits: () => void, handleContinue?: () => void, handleLoadSave: (state: State) => void }> = ({handleStart, handleCredits, handleContinue, handleLoadSave}) => {
+interface TitleScreenProps {
+    handleStart: () => void;
+    handleCredits: () => void;
+    handleContinue?: () => void;
+    handleLoadSave: (state: State) => void;
+}
+
+const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave}: TitleScreenProps) => {
     const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const fileInputRef: RefObject<HTMLInputElement | null> = React.useRef<HTMLInputElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        const file = e.target.files?.[0];
+        const file: File | undefined = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();

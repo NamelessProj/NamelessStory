@@ -1,14 +1,14 @@
-import * as React from "react";
-
-import "./style.css";
+import {type ChangeEvent, useState} from "react";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 
-const VolumeSlider: React.FC = () => {
+import "./style.css";
+
+const VolumeSlider = () => {
     const {state, setState} = useDataContext();
-    const [isHovered, setIsHovered] = React.useState<boolean>(false);
+    const [isHovered, setIsHovered] = useState<boolean>(false);
 
     // Handle volume change
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const newVolume = parseFloat(e.target.value);
 
         // Update the audio element's volume if it exists

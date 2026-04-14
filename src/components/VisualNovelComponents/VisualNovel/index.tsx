@@ -1,28 +1,29 @@
 import * as React from "react";
-import type {Page} from "../../../interfaces/interfaces.ts";
+import type {Page, SceneType} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
 import { useBGM } from "../../../hooks/useBGM";
 import {ADVANCE_THRESHOLD_MS} from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
-
-import './style.css';
 import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
 import {exportSaveFile} from "../../../utils/saveFile.ts";
+import type {RefObject} from "react";
+
+import './style.css';
 
 interface VisualNovelProps {
     onChangePage?: (page: Page) => void;
 }
 
-const VisualNovel: React.FC<VisualNovelProps> = ({onChangePage}) => {
+const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const {script, state, setState} = useDataContext();
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
     // Timestamp of the last time typing completed — used to enforce the advance threshold
-    const lastTypingCompleteRef = React.useRef<number>(0);
+    const lastTypingCompleteRef: RefObject<number> = React.useRef<number>(0);
 
-    const currentScene = script.story[state.currentScene];
+    const currentScene: SceneType = script.story[state.currentScene];
 
     // Handle background music - use scene name as trigger to only play on scene entry
     useBGM({

@@ -1,5 +1,4 @@
-import * as React from "react";
-import type {Page, State, VNStory} from "../../interfaces/interfaces.ts";
+import type {Dialogue, Page, SceneType, State, VNStory} from "../../interfaces/interfaces.ts";
 import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
@@ -7,7 +6,7 @@ import DataProvider from "../../context/DataProvider.tsx";
 import Cookies from "../../utils/cookies.ts";
 import {getCookieName} from "../../utils/helpMethods.ts";
 
-const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
+const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [script, setScript] = useState<VNStory|null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
     const [savedState, setSavedState] = useState<State | null>(null);
@@ -31,23 +30,23 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
 
     useEffect(() => {
         const loadStory = async () => {
-            const url = `../story/${scriptFile}.json`;
-            const res = await fetch(url);
+            const url: string = `../story/${scriptFile}.json`;
+            const res: Response = await fetch(url);
 
             if (!res.ok) {
-                const body = await res.text().catch(() => "");
+                const body: string = await res.text().catch(() => "");
                 throw new Error(`Failed to load story script: ${res.status} ${res.statusText} - ${body.slice(0, 120)}`);
             }
 
             const contentType = res.headers.get("content-type") ?? "";
             if (!contentType.includes("application/json")) {
-                const body = await res.text();
+                const body: string = await res.text();
                 throw new Error(`Expected JSON response but got ${contentType}: ${body.slice(0, 80)}`);
             }
 
             const data: VNStory = await res.json();
-            const startScene = data.story[data.settings.startingScene];
-            const startDialogue = startScene?.dialogues[0];
+            const startScene: SceneType = data.story[data.settings.startingScene];
+            const startDialogue: Dialogue = startScene?.dialogues[0];
             setState(prev => ({
                 ...prev,
                 currentScene: data.settings.startingScene,
@@ -62,7 +61,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             const cookieData = Cookies.get(cookieName);
             if (cookieData) {
                 try {
-                    const parsed = JSON.parse(cookieData) as State;
+                    const parsed: State = JSON.parse(cookieData) as State;
                     setSavedState({...parsed, currentMusic: null});
                 } catch {
                     // Ignore malformed cookie data

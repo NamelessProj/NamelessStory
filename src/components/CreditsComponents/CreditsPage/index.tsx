@@ -1,12 +1,12 @@
-import * as React from "react";
 import type {CreditGroupType, CreditsPageType, Page} from "../../../interfaces/interfaces.ts";
 import CreditGroup from "../CreditGroup";
-import './style.css';
 import {type CSSProperties, useEffect} from "react";
 import BackgroundImage from "../../BackgroundImage";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-const CreditsPage: React.FC<{ handleChangeRoom: (page: Page) => void }> = ({handleChangeRoom}) => {
+import './style.css';
+
+const CreditsPage = ({handleChangeRoom}: { handleChangeRoom: (page: Page) => void }) => {
     const {script} = useDataContext();
     const creditsPage: CreditsPageType = script.settings.creditsPage;
 

@@ -1,6 +1,10 @@
-import * as React from "react";
+interface PrimaryButtonProps {
+    text: string;
+    isDisabled?: boolean;
+    onClick: () => void;
+}
 
-const PrimaryButton: React.FC<{ text: string, isDisabled?: boolean, onClick: () => void }> = ({text, isDisabled=false, onClick}) => {
+const PrimaryButton = ({text, isDisabled=false, onClick}: PrimaryButtonProps) => {
     const handleClick: () => void = () => {if (!isDisabled) onClick();}
 
     return (

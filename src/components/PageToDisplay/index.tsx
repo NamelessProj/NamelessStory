@@ -1,4 +1,3 @@
-import * as React from "react";
 import type {Page, State} from "../../interfaces/interfaces.ts";
 import TitleScreen from "../TitleScreen";
 import CreditsPage from "../CreditsComponents/CreditsPage";
@@ -11,7 +10,7 @@ interface PageToDisplayProps {
     handleLoadSave: (state: State) => void;
 }
 
-const PageToDisplay: React.FC<PageToDisplayProps> = ({page, handleChangePage, handleContinue, handleLoadSave}) => {
+const PageToDisplay = ({page, handleChangePage, handleContinue, handleLoadSave}: PageToDisplayProps) => {
     switch (page) {
         case "title":
             return <TitleScreen handleStart={() => handleChangePage("game")} handleCredits={() => handleChangePage("credits")} handleContinue={handleContinue} handleLoadSave={handleLoadSave} />

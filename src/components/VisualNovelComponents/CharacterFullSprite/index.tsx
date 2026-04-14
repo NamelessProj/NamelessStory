@@ -1,26 +1,26 @@
-import * as React from "react";
-
-// Styles
-import "./style.css";
-import type {Sprite} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, Sprite} from "../../../interfaces/interfaces.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-const CharacterFullSprite: React.FC<{
+import "./style.css";
+
+interface CharacterFullSpriteProps {
     sprite: Sprite;
     currentDialogueIndex: number;
-    characterId?: string;
-}> = ({sprite, characterId: characterIdOverride}) => {
+    characterId?: string; // Optional character ID to directly specify which character's sprite to use
+}
+
+const CharacterFullSprite = ({sprite, characterId: characterIdOverride}: CharacterFullSpriteProps) => {
     const {script} = useDataContext();
-    const spriteName = sprite.name;
+    const spriteName: string = sprite.name;
     // Use the provided character ID if given; otherwise search for the first character
     // that has the requested sprite variant or an idle fallback
-    const characterId = characterIdOverride ?? Object.keys(script.characters).find(key => {
-        const char = script.characters[key];
+    const characterId: string | undefined = characterIdOverride ?? Object.keys(script.characters).find(key => {
+        const char: CharacterType = script.characters[key];
         return char.sprite && (char.sprite[spriteName] || char.sprite["idle"]);
     });
 
-    const character = characterId ? script.characters[characterId] : null;
-    const spriteUrl = character?.sprite?.[spriteName] || character?.sprite?.["idle"] || "";
+    const character: CharacterType | null = characterId ? script.characters[characterId] : null;
+    const spriteUrl: string = character?.sprite?.[spriteName] || character?.sprite?.["idle"] || "";
 
     // Determine position class
     const getPositionClass = (): string => {

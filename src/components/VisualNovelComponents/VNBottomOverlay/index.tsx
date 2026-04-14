@@ -1,4 +1,3 @@
-import * as React from "react";
 import type {Page} from "../../../interfaces/interfaces.ts";
 
 import './style.css';
@@ -10,7 +9,7 @@ interface VNOverlayProps {
     setIsOverlayHidden: (hidden: boolean) => void;
 }
 
-const VNBottomOverlay: React.FC<VNOverlayProps> = ({saveFunc, setPage, isOverlayHidden, setIsOverlayHidden}) => {
+const VNBottomOverlay = ({saveFunc, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
     return (
         <div className={`vn-overlay vn-overlay-bottom ${isOverlayHidden ? "hidden" : "show"}`}>
             <div className="buttons-wrapper">

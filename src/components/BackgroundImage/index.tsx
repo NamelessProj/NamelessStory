@@ -1,4 +1,3 @@
-import * as React from "react";
 import "./style.css";
 
 interface BackgroundImageProps {
@@ -6,7 +5,7 @@ interface BackgroundImageProps {
     id?: string;
 }
 
-const BackgroundImage: React.FC<BackgroundImageProps> = ({fileName, id}) => {
+const BackgroundImage = ({fileName, id}: BackgroundImageProps) => {
     return (
         <picture className="bg-img">
             <img

@@ -1,9 +1,9 @@
-import * as React from "react";
 import type {Credit, CreditGroupType} from "../../../interfaces/interfaces.ts";
 import CreditEl from "../CreditEl";
+
 import './style.css';
 
-const CreditGroup: React.FC<{ creditGroup: CreditGroupType }> = ({creditGroup}) => {
+const CreditGroup = ({creditGroup}: { creditGroup: CreditGroupType }) => {
     return (
         <div className="credit-group centered column">
             <h2>{creditGroup.groupName}</h2>
