@@ -28,7 +28,8 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
 8. [Saving and Loading](#saving-and-loading)
 9. [Deploying Online for Free (GitHub + Vercel)](#deploying-online-for-free-github--vercel)
 10. [Contributing](#contributing)
-11. [License](#license)
+11. [Disclaimer](#disclaimer)
+12. [License](#license)
 
 ## What is NamelessStory?
 
@@ -534,6 +535,23 @@ Contributions are welcome! If you find a bug, have a feature idea, or want to im
 4. Open a Pull Request describing what you changed and why
 
 Please keep the spirit of the project in mind: **accessibility first**. Changes should make it easier for non-programmers to create visual novels, not harder.
+
+## Disclaimer
+
+NamelessStory is provided **as is**, without any warranty of any kind, express or implied. By using, modifying, or distributing this software, you agree to the following:
+
+**Third-party content.** NamelessStory is a tool for creating stories. The authors of NamelessStory are not responsible for any content created by users of this engine, including but not limited to story scripts, images, audio, or any other assets. Story creators are solely responsible for ensuring their content complies with applicable laws and does not infringe on third-party rights.
+
+**Modified versions.** Because this project is open source, anyone can fork it, modify it, and distribute their own version. The original authors of NamelessStory have no control over, and accept no liability for, any modified version distributed by third parties. If you download a visual novel built on a fork of this engine, you are doing so at your own risk.
+
+**Save files.** The engine allows players to load `.json` save files from their computer. Save files are plain text data — they cannot contain executable code or traditional viruses. However, a save file from an unknown source could contain unexpected values that interact with a modified or poorly secured fork of the engine. **Only load save files from sources you trust.** The original authors of NamelessStory accept no liability for any issues arising from loading save files created by or obtained from third parties.
+
+**No liability.** To the maximum extent permitted by applicable law, the authors and contributors of NamelessStory shall not be held liable for any direct, indirect, incidental, special, or consequential damages arising from the use or inability to use this software, even if advised of the possibility of such damages.
+
+This disclaimer is in addition to, and does not replace, the warranty and liability exclusions already present in the [MIT License](LICENSE).
+
+> [!NOTE]
+> It may look scary, but don't worry, basically, don't do stupid thing and download stuff only from trusted sources.
 
 ## License
 
