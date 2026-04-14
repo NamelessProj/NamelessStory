@@ -4,10 +4,13 @@ import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
 import DataProvider from "../../context/DataProvider.tsx";
+import Cookies from "../../utils/cookies.ts";
+import {getCookieName} from "../../utils/helpMethods.ts";
 
 const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
     const [script, setScript] = useState<VNStory|null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
+    const [savedState, setSavedState] = useState<State | null>(null);
     const [state, setState] = useState<State>({
         currentScene: "start",
         currentDialogueIndex: 0,
@@ -54,6 +57,17 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                 waitingOnUserInput: startDialogue?.input !== undefined
             }));
             setScript(data);
+
+            const cookieName = getCookieName(data.settings.titlePage.title);
+            const cookieData = Cookies.get(cookieName);
+            if (cookieData) {
+                try {
+                    const parsed = JSON.parse(cookieData) as State;
+                    setSavedState({...parsed, currentMusic: null});
+                } catch {
+                    // Ignore malformed cookie data
+                }
+            }
         };
 
         loadStory().catch(err => {
@@ -69,6 +83,11 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
 
     const handleChangePage = (newPage: Page): void => setCurrentPage(newPage);
 
+    const handleContinue = savedState ? (): void => {
+        setState(savedState);
+        setCurrentPage("game");
+    } : undefined;
+
     return (
         <>
             {!script ? (
@@ -78,7 +97,7 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
             ) : (
                 <DataProvider value={{state, setState, script}}>
                     <div id="vn-player" className="vn-body">
-                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} />
+                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} />
                     </div>
                 </DataProvider>
             )}
