@@ -1,4 +1,4 @@
-import * as React from "react";
+import {useCallback, useState, useRef, useEffect} from "react";
 import type {Page, SceneType} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
@@ -19,9 +19,9 @@ interface VisualNovelProps {
 
 const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const {script, state, setState} = useDataContext();
-    const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
+    const [isOverlayHidden, setIsOverlayHidden] = useState<boolean>(false);
     // Timestamp of the last time typing completed — used to enforce the advance threshold
-    const lastTypingCompleteRef: RefObject<number> = React.useRef<number>(0);
+    const lastTypingCompleteRef: RefObject<number> = useRef<number>(0);
 
     const currentScene: SceneType = script.story[state.currentScene];
 
@@ -34,14 +34,21 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         trigger: state.currentScene
     });
 
+    const handleSave = useCallback((): void => {
+        const title: string = script.settings.titlePage.title;
+        const saveData: string = JSON.stringify({...state, currentMusic: null});
+        Cookies.set(getCookieName(title), saveData);
+        exportSaveFile(state, title);
+    }, [state, script]);
+
     // Called by Typewriter (via DialogueBox → Scene) when text animation finishes
-    const handleTypingComplete = React.useCallback((): void => {
+    const handleTypingComplete = useCallback((): void => {
         lastTypingCompleteRef.current = Date.now();
         setState({...state, isTyping: false, skipTyping: false});
     }, [state, setState]);
 
     // Handle advancing to next dialogue
-    const handleAdvance = React.useCallback((): void => {
+    const handleAdvance = useCallback((): void => {
         // Don't advance if waiting on user input
         if (state.waitingOnUserInput) return;
 
@@ -90,10 +97,11 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 onChangePage?.("credits");
             }
         }
-    }, [state, setState, script, onChangePage, isOverlayHidden]);
+        handleSave(); // Auto-save on advance
+    }, [state, setState, script, onChangePage, isOverlayHidden, handleSave]);
 
     // Handle option selection
-    const handleOptionSelect = React.useCallback((next: string): void => {
+    const handleOptionSelect = useCallback((next: string): void => {
         if (next === "__end__") {
             // End of story, show credits
             onChangePage?.("credits");
@@ -142,7 +150,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     }, [state, setState, script, onChangePage]);
 
     // Handle user input — store variable then auto-advance
-    const handleInput = React.useCallback((value: string, variableName: string, color?: string): void => {
+    const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
         const updatedVariables = {
             ...state.variables,
             [variableName]: { value, color }
@@ -181,7 +189,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         }
     }, [state, setState, script, onChangePage]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
             if (isOverlayHidden) return;
             if (state.waitingOnOptionSelection) return;
@@ -200,13 +208,6 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
     const handleClick = (): void => {
         if (isOverlayHidden) setIsOverlayHidden(false);
-    }
-
-    const handleSave = (): void => {
-        const title: string = script.settings.titlePage.title;
-        const saveData: string = JSON.stringify({...state, currentMusic: null});
-        Cookies.set(getCookieName(title), saveData);
-        exportSaveFile(state, title);
     }
 
     // If scene doesn't exist, a page transition is in progress — don't render

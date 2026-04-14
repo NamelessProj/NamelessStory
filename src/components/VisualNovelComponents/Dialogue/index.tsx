@@ -1,4 +1,4 @@
-import * as React from "react";
+import {useMemo} from "react";
 import Typewriter from "../../Typewriter";
 import type {CharacterType, NameDisplay} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
@@ -24,7 +24,7 @@ const DialogueBox = ({
     const {script, state} = useDataContext();
 
     // Get the resolved name to display
-    const nameToDisplay: string | undefined = React.useMemo(() => {
+    const nameToDisplay: string | undefined = useMemo(() => {
         return getNameToDisplay(
             name,
             nameDisplay,
@@ -34,7 +34,7 @@ const DialogueBox = ({
     }, [name, nameDisplay, script.characters, state.variables]);
 
     // Find character for color — checks direct ID, variable name, and variable value
-    const resolved: { characterId: string, character: CharacterType } | undefined = React.useMemo(() => {
+    const resolved: { characterId: string, character: CharacterType } | undefined = useMemo(() => {
         return resolveCharacterFromName(name, script.characters, state.variables);
     }, [name, script.characters, state.variables]);
 

@@ -1,4 +1,4 @@
-import * as React from "react";
+import {useState} from "react";
 import type {VariableType} from "../../../interfaces/interfaces.ts";
 
 interface UserInputBoxProps {
@@ -7,8 +7,8 @@ interface UserInputBoxProps {
 }
 
 const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
-    const [input, setInput] = React.useState<string>("");
-    const [isWrong, setIsWrong] = React.useState<boolean>(false);
+    const [input, setInput] = useState<string>("");
+    const [isWrong, setIsWrong] = useState<boolean>(false);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLElement>): void => {
         e.preventDefault();

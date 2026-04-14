@@ -1,4 +1,4 @@
-import * as React from "react";
+import {useRef} from "react";
 import type {State, TitleButtons} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
@@ -16,7 +16,7 @@ interface TitleScreenProps {
 const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave}: TitleScreenProps) => {
     const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
-    const fileInputRef: RefObject<HTMLInputElement | null> = React.useRef<HTMLInputElement>(null);
+    const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const file: File | undefined = e.target.files?.[0];

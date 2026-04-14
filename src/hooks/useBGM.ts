@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useCallback} from "react";
+import {useEffect, useRef, useCallback} from "react";
 import type { State } from "../interfaces/interfaces";
 import {parseBGMFile, createBGMPlayer, resolveAudioPath, type BGMAction} from "../utils/audioUtils";
 
