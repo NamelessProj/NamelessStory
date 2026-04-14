@@ -9,7 +9,7 @@ const VolumeSlider = () => {
 
     // Handle volume change
     const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>): void => {
-        const newVolume = parseFloat(e.target.value);
+        const newVolume: number = parseFloat(e.target.value);
 
         // Update the audio element's volume if it exists
         if (state.currentMusic) {
@@ -24,7 +24,7 @@ const VolumeSlider = () => {
 
     // Handle mute toggle - click on the icon
     const handleMuteToggle = (): void => {
-        const isMuted = !state.isMusicMuted;
+        const isMuted: boolean = !state.isMusicMuted;
         if (state.currentMusic) {
             if (isMuted) {
                 state.currentMusic.volume = 0;
