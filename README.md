@@ -161,7 +161,7 @@ The `settings` block controls global options, the title screen, and the credits 
 | `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
 | `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
 | `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
-| `creditsPage.scrollDurationInSeconds` | No | How long the credits take to scroll (seconds) |
+| `creditsPage.scrollDurationInSeconds` | :x: (No) | How long the credits take to scroll (seconds) |
 
 ### Characters
 
