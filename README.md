@@ -1,84 +1,540 @@
 # NamelessStory
 
-Wanna make a visual novel but don't know how to code? NamelessStory is a visual novel engine that allows you to create your own visual novel without any coding knowledge. It's text-based, so you can focus on writing your story and creating your characters. It's also open source, so you can contribute to the project and make it better.
+Want to make a visual novel but don't know how to code? NamelessStory is an open-source visual novel engine that lets you create your own interactive story by writing a single JSON file. No programming required — just write your story, drop in your images and music, and play.
 
 ![React.js version](https://img.shields.io/badge/React.js-^19.2.0-61DAFB?style=for-the-badge)
 ![License](https://img.shields.io/github/license/NamelessProj/NamelessStory?style=for-the-badge)
 ![Repo size](https://img.shields.io/github/repo-size/NamelessProj/NamelessStory?style=for-the-badge)
 
-## Introduction
+## Table of Contents
 
-NamelessStory is a visual novel engine that allows you to create your own visual novel without any coding knowledge. It's text-based, so you can focus on writing your story and creating your characters. It's also open source, so you can contribute to the project and make it better.
+1. [What is NamelessStory?](#what-is-namelessstory)
+2. [Getting Started (Running Locally)](#getting-started-running-locally)
+3. [Project Structure](#project-structure)
+4. [Writing Your Story](#writing-your-story)
+   - [The Story File](#the-story-file)
+   - [Settings](#settings)
+   - [Characters](#characters)
+   - [Scenes and Dialogues](#scenes-and-dialogues)
+   - [Player Choices (Options)](#player-choices-options)
+   - [Player Text Input](#player-text-input)
+   - [Character Sprites](#character-sprites)
+   - [Background Music](#background-music)
+   - [Text Formatting and Variables](#text-formatting-and-variables)
+   - [Navigating Between Scenes](#navigating-between-scenes)
+5. [Where to Put Your Files](#where-to-put-your-files)
+6. [Connecting Your Story to the App](#connecting-your-story-to-the-app)
+7. [What You Can Customize](#what-you-can-customize)
+8. [Saving and Loading](#saving-and-loading)
+9. [Deploying Online for Free (GitHub + Vercel)](#deploying-online-for-free-github--vercel)
+10. [Contributing](#contributing)
+11. [License](#license)
 
-## Goals / Philosophy
+## What is NamelessStory?
 
-**Accessibility**: We want to make it easy for anyone to create their own visual novel, regardless of their technical skills.
+NamelessStory is a web-based visual novel engine built with React and TypeScript. It renders interactive stories from a JSON script file — think of it like a screenplay format for games.
 
-**Easy to use**: We want to make it easy for users to create their own visual novel without having to learn a new programming language.
+**As a user (story creator)**, you only need to:
+- Write a `.json` file describing your story
+- Add your images to `public/assets/`
+- Add your music to `public/audio/`
+- Run one command to play it
 
-**Open source**: We want to make it open source so that anyone can contribute to the project and make it better.
+**As a player**, they get a classic visual novel experience: background images, character portraits, dialogue, choices, and music.
 
-## Demo / Example
+## Getting Started (Running Locally)
 
-[Here will be a demo of the engine.]
+### Prerequisites
 
-## Installation
+You need **Node.js** installed on your machine. Download it at [nodejs.org](https://nodejs.org/). The installer also includes `npm` (the package manager), so you only need to install Node.js.
 
-To install NamelessStory, you can clone the repository and run the following command in the terminal:
+> **Not sure if you have it?** Open a terminal and run `node -v`. If you see a version number, you're good.
 
-To clone the repository, run:
+### Steps
+
+**1. Get the project**
+
+If you have Git:
 ```bash
 git clone https://github.com/NamelessProj/NamelessStory.git
-```
-Then, navigate to the project directory and install the dependencies: (make sure you have Node.js and npm installed on your machine)
-```bash
 cd NamelessStory
+```
+
+Or download the ZIP from GitHub and unzip it, then open a terminal in that folder.
+
+**2. Install dependencies**
+```bash
 npm install
 ```
+This downloads all the libraries the engine needs. It only needs to be done once.
 
-### Node.js and npm
-If you don't have Node.js and npm installed, you can download them from the official website: [https://nodejs.org/](https://nodejs.org/). After installing Node.js, npm will be installed automatically.
-
-## Usage
-To start the development server, run the following command in the terminal:
+**3. Start the development server**
 ```bash
 npm run dev
 ```
-This will start the development server and open the application in your default web browser. You can then start creating your visual novel. The explanation can be found further in the documentation.
 
-## Quick Start
+Open your browser and go to `http://localhost:5173`. You'll see the sample story running.
 
-To create a visual novel, you can follow the example in the [`public/story/story.sample.json`](/public/story/story.sample.json) file. This file contains a sample story that you can use as a template for your own story. You can modify the file to create your own story. The file is in JSON format, so you can easily edit it with any text editor.
+**Stop the server** with `Ctrl + C` in the terminal.
 
-You can also create your own story from scratch by following the structure of the sample file with the name you want. You'll just have to update in the [`/src/App.tsx`](/src/App.tsx) file the name to your story file.
+## Project Structure
 
-```tsx
-<div id="app" className="centered">
-    <VNPlayer scriptFile="Here goes the name of the file" />
-</div>
+Here is what matters to you as a story creator:
+
+```
+NamelessStory/
+│
+├── public/                   ← Your content goes here
+│   ├── assets/               ← Background images & character sprites
+│   ├── audio/                ← Background music files
+│   └── story/                ← Your story JSON files
+│       └── story.sample.json ← Start here as a template
+│
+└── src/
+    └── App.tsx               ← Point this to your story file
 ```
 
-Example:
-```tsx
-<div id="app" className="centered">
-    <VNPlayer scriptFile="my_story.json" />
-</div>
+You should not need to touch anything else to create a story. The engine code is in `src/` and handles everything else automatically.
+
+## Writing Your Story
+
+### The Story File
+
+Your story lives in a single JSON file inside `public/story/`. Start by copying `story.sample.json` and renaming it (e.g., `my_story.json`).
+
+> [!IMPORTANT]
+> DO NOT put spaces in the name of your file! This could lead to unexpected errors. Here's what you could use instead of spaces: `.`, `-`, `_`.
+
+A story file has three top-level sections:
+
+```json
+{
+  "settings": { ... },
+  "characters": { ... },
+  "story": { ... }
+}
 ```
 
-## Writing Your First Story
-### Creating a Scene
-### Adding Characters
-### Writing Dialogue
-### Adding Choices
+### Settings
 
-## Running Locally
-To run the application locally, follow the installation steps above and then start the development server with `npm run dev`. This will allow you to test your visual novel in a local environment.
+The `settings` block controls global options, the title screen, and the credits screen.
 
-## Deploying / Hosting
-You can freely deploy your visual novel on any hosting platform that supports static sites, such as GitHub Pages, Netlify, or Vercel. Simply build the application using `npm run build` and then upload the contents of the `dist` folder to your hosting platform.
+```json
+"settings": {
+  "startingScene": "start",
+  "textSpeed": 50,
+  "defaultNameDisplay": "short",
+
+  "titlePage": {
+    "title": "My Visual Novel",
+    "background": "title_bg.png",
+    "buttons": {
+      "start": "Start Game",
+      "continue": "Continue",
+      "load": "Load Save File",
+      "credits": "Credits"
+    }
+  },
+
+  "creditsPage": {
+    "title": "Credits",
+    "background": "title_bg.png",
+    "scrollDurationInSeconds": 30,
+    "creditGroups": [
+      {
+        "groupName": "Story & Writing",
+        "credits": [
+          { "name": "Your Name", "role": "Writer" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `startingScene` | Yes | The ID of the first scene to play |
+| `textSpeed` | No | Typing animation speed. Lower = faster. Default: `50` |
+| `defaultNameDisplay` | No | `"short"` (default) or `"full"` — which character name to show |
+| `titlePage.title` | Yes | Your game's title |
+| `titlePage.background` | Yes | Background image filename (from `public/assets/`) |
+| `titlePage.buttons` | No | Custom button labels. You can custom just 1 or 2 if you want also. |
+| `creditsPage.scrollDurationInSeconds` | No | How long the credits take to scroll (seconds) |
+
+### Characters
+
+Define all your speaking characters in the `characters` block. Each character gets a unique ID (you choose the name), a display name, a color, and optionally sprite images.
+
+```json
+"characters": {
+  "Alice": {
+    "name": "Alice",
+    "fullName": "Alice Smith",
+    "color": "red",
+    "sprite": {
+      "idle": "alice_idle.png",
+      "happy": "alice_happy.png",
+      "wave": "alice_wave.png"
+    }
+  },
+  "Bob": {
+    "name": "Bob",
+    "color": "#4488ff"
+  },
+  "playerName": {
+    "name": "",
+    "color": "green"
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Short display name shown in the dialogue box |
+| `fullName` | No | Long name (used when `nameDisplay` is `"full"`) |
+| `color` | Yes | Name text color — any CSS color (`red`, `#FF0000`, `rgb(255, 0, 0)`) |
+| `sprite` | No | An object mapping variant names to image filenames |
+
+**The `playerName` variable:** To store the player's name, create a character with an empty `name` field (like above). Use a meaningful ID like `"playerName"` or `"hero"`. You can then prompt the player to type their name and use it in dialogue later. The variable system will be explained further down (see [Player Text Input](#player-text-input)).
+
+### Scenes and Dialogues
+
+The `story` block contains your scenes, each with a list of dialogues that play in order.
+
+```json
+"story": {
+  "intro": {
+    "background": "forest.png",
+    "bgmFile": "music_01.mp3",
+    "dialogues": [
+      {
+        "name": "",
+        "text": "It was a quiet evening in the forest."
+      },
+      {
+        "name": "Alice",
+        "text": "Hello? Is anyone there?"
+      },
+      {
+        "name": "Alice",
+        "text": "I could have sworn I heard something...",
+        "next": "scene02"
+      }
+    ]
+  },
+  "scene02": { ... }
+}
+```
+
+**Scene fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `background` | Yes | Background image filename |
+| `bgmFile` | No | Music file or music command (see [Background Music](#background-music)) |
+| `bgmLoop` | No | Whether music loops. Default: `true` |
+| `dialogues` | Yes | Array of dialogue objects |
+
+**Dialogue fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `text` | Yes | The dialogue text |
+| `name` | Yes | Character ID whose name is shown. Use `""` for narration |
+| `next` | No | Where to go after this line (only used when reaching the last dialogue of a scene) (see [Navigating Between Scenes](#navigating-between-scenes)) |
+| `textSpeed` | No | Override typing speed for this line only |
+| `nameDisplay` | No | `"short"` or `"full"` — override for this line only |
+| `background` | No | Change the background image mid-scene |
+| `options` | No | Multiple-choice options (see [Player Choices](#player-choices-options)) |
+| `input` | No | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
+| `sprite` | No | Show a character sprite (see [Character Sprites](#character-sprites)) |
+
+### Player Choices (Options)
+
+Add a `options` array to a dialogue to give the player a choice. Each option has a label and a destination.
+
+```json
+{
+  "name": "Alice",
+  "text": "What do you want to do?",
+  "options": [
+    { "text": "Go left",  "next": "path_left" },
+    { "text": "Go right", "next": "path_right" },
+    { "text": "Stay here", "next": "2" }
+  ]
+}
+```
+
+**Option `next` values:**
+
+| Value | Effect |
+|-------|--------|
+| `"scene_id"` | Jump to the start of another scene |
+| `"scene_id:3"` | Jump to a specific dialogue index in another scene |
+| `"2"` | Jump to dialogue index 2 in the **current** scene |
+| `""` | Continue to the next dialogue in the current scene |
+| `"__end__"` | End the story and show credits |
+
+> [!NOTE]
+> Options and `input` cannot be used in the same dialogue.
+
+### Player Text Input
+
+Use `input` to prompt the player to type something (like their name). The value is stored and can be used later in text.
+
+```json
+{
+  "name": "Alice",
+  "text": "What's your name?",
+  "input": {
+    "value": "playerName"
+  }
+}
+```
+
+The `value` field is the character ID where the input will be stored. Make sure that ID exists in `characters` with an empty `name`. The player cannot proceed without typing something.
+
+### Character Sprites
+
+Use the `sprite` field in a dialogue to display a character portrait.
+
+```json
+{
+  "name": "Alice",
+  "text": "Look at this!",
+  "sprite": {
+    "name": "wave",
+    "position": "right",
+    "mirror": false
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Sprite variant name (must exist in the character's `sprite` object) |
+| `position` | No | `"left"`, `"center"`, or `"right"` (default: center) |
+| `mirror` | No | Flip the sprite horizontally. Default: `false` |
+
+**Custom position:** Instead of a preset string, `position` can be an object:
+```json
+"position": { "x": 100, "y": 200 }
+```
+Where `x` is a pixel offset from center and `y` is the height.
+
+**Sprites persist** within a scene until you specify a different one (or the scene changes). To hide a sprite, advance to a dialogue without a `sprite` field or change scenes.
+
+### Background Music
+
+Control music with the `bgmFile` field on a scene.
+
+```json
+"bgmFile": "music_01.mp3"
+```
+
+**Special values:**
+
+| Value | Effect |
+|-------|--------|
+| `"filename.mp3"` | Play this file (stops any current music) |
+| `"continue"` | Keep whatever music is currently playing |
+| `"continue[filename.mp3]"` | Keep current music if it's already this file, otherwise play it |
+| `"reset"` | Restart the current music from the beginning |
+| `"none"` | Stop music |
+| *(omit the field)* | No music |
+
+The player can adjust or mute the volume from the top overlay bar during the game.
+
+### Text Formatting and Variables
+
+#### Pauses
+
+Use `\.` to insert a 1-second pause and `\,` for a 0.5-second pause while the text types out.
+
+```json
+"text": "And then\\.. silence."
+```
+
+The `\` acts as the pause marker. Each character after it is a pause type:
+- `.` → 1 second
+- `,` → 0.5 seconds
+
+#### Variables in Text
+
+Use double curly braces `{{ }}` to insert character names or stored values into text dynamically.
+
+| Syntax | Result |
+|--------|--------|
+| `{{Alice}}` | Alice's name (respects `defaultNameDisplay`) |
+| `{{c!Alice}}` | Forces short name |
+| `{{C!Alice}}` | Forces full name |
+| `{{v!playerName}}` | The value stored in the `playerName` variable |
+
+**Example:**
+```json
+{
+  "name": "Alice",
+  "text": "So, {{v!playerName}}, are you ready to meet {{C!Bob}}?"
+}
+```
+If the player entered "Sam", this renders as: *"So, Sam, are you ready to meet Bob Johnson?"*
+
+You can also use a variable as the speaker name:
+```json
+{
+  "name": "{{v!playerName}}",
+  "text": "That's me!"
+}
+```
+
+### Navigating Between Scenes
+
+Use the `next` field on the **last dialogue** of a scene to jump to another scene. If you don't include `next` on the last dialogue, the story ends and credits roll.
+
+```json
+{ "name": "Alice", "text": "See you later!", "next": "scene02" }
+```
+
+**`next` values for dialogue:**
+
+| Value | Effect |
+|-------|--------|
+| `"scene_id"` | Jump to the start of that scene |
+| `"scene_id:3"` | Jump to dialogue index 3 in that scene |
+| `"__end__"` | End the story and show credits |
+| *(omit)* | Go to the next dialogue. If it's the last one, end the story |
+
+## Where to Put Your Files
+
+```
+public/
+├── assets/        ← Images (backgrounds, character sprites)
+│   ├── title_bg.png
+│   ├── bg_forest.png
+│   ├── alice_idle.png
+│   └── ...
+│
+├── audio/         ← Music files
+│   ├── music_01.mp3
+│   ├── ambient.mp3
+│   └── ...
+│
+└── story/         ← Story JSON files
+    ├── story.sample.json
+    └── my_story.json
+```
+
+**In your JSON, always reference files by filename only** (no path needed):
+- `"background": "bg_forest.png"` — not `"assets/bg_forest.png"`
+- `"bgmFile": "music_01.mp3"` — not `"audio/music_01.mp3"`
+
+**Supported formats:**
+- Images: PNG, JPG, GIF, WebP, SVG
+- Audio: MP3 (recommended), WAV, OGG, M4A
+
+## Connecting Your Story to the App
+
+Once your story JSON is ready, open `src/App.tsx` and update the `scriptFile` prop to point to your file (without the `.json` extension):
+
+```tsx
+// src/App.tsx
+<VNPlayer scriptFile="my_story" />
+```
+
+If your file is `public/story/my_story.json`, then `scriptFile="my_story"`.
+
+## What You Can Customize
+
+### Without touching code (JSON only)
+
+- Story content, dialogue, branching paths
+- Character names, colors, sprite variants
+- Background images and music per scene
+- Title screen title, background, and button labels
+- Credits content and scroll speed
+- Text typing speed (global, per scene, per dialogue)
+- Player name collection and use throughout the story
+
+### By editing CSS (visual styling)
+
+Each component has its own `.module.css` file. You can change colors, fonts, sizes, and layout there without breaking any functionality.
+
+| File | Controls |
+|------|----------|
+| `src/components/VisualNovelComponents/Dialogue/Dialogue.module.css` | Dialogue box appearance |
+| `src/components/TitleScreen/TitleScreen.module.css` | Title screen layout |
+| `src/components/VisualNovelComponents/VNTopOverlay/VNTopOverlay.module.css` | Top bar |
+| `src/components/VisualNovelComponents/VNBottomOverlay/VNBottomOverlay.module.css` | Bottom bar |
+
+### By editing React components (advanced)
+
+The engine is fully open source. Developers can extend or change any behavior by modifying the components in `src/components/` or utilities in `src/utils/`.
+
+**Core components to know:**
+- `src/components/VNPlayer/` — loads the story and routes between pages
+- `src/components/VisualNovelComponents/VisualNovel/` — the main game loop
+- `src/components/VisualNovelComponents/Scene/` — renders the current dialogue
+- `src/utils/typewriterUtils.ts` — text animation and variable substitution logic
+
+## Saving and Loading
+
+The engine has a built-in save system accessible during gameplay:
+
+- **Auto-save to browser:** Progress is saved to a browser cookie automatically. When the player reopens the game, they can click "Continue" to pick up where they left off.
+- **Save to file:** The bottom bar has a "Save" button that downloads a `.json` save file to the player's computer.
+- **Load from file:** On the title screen, the "Load Save File" button lets the player load a previously saved `.json` file.
+
+## Deploying Online for Free (GitHub + Vercel)
+
+You can share your visual novel online for free using **GitHub** (to store your code) and **Vercel** (to host the website). No server needed.
+
+### Step 1 — Put your project on GitHub
+
+1. Create a free account at [github.com](https://github.com) if you don't have one.
+2. Create a new repository (click the `+` button → "New repository"). Give it a name, make it **Public**, and click "Create repository".
+3. Follow GitHub's instructions to push your local project. If you cloned NamelessStory, you'll want to change the remote origin to your own repo:
+   ```bash
+   git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   git add .
+   git commit -m "My visual novel"
+   git push -u origin main
+   ```
+
+> [!NOTE]
+> If you're not comfortable with Git, you can also drag and drop your files directly onto GitHub's web interface.
+
+### Step 2 — Deploy with Vercel
+
+1. Go to [vercel.com](https://vercel.com) and sign up (you can use your GitHub account).
+2. Click **"Add New Project"** → **"Import Git Repository"**.
+3. Select your GitHub repository from the list.
+4. Vercel will automatically detect it's a Vite project. The default settings are correct — just click **"Deploy"**.
+5. After a minute or two, Vercel gives you a public URL like `https://my-story.vercel.app`.
+
+### Step 3 — Update your story (auto-deploy)
+
+Every time you push a new commit to GitHub, Vercel automatically rebuilds and redeploys your site. No manual steps needed.
+
+### Building manually
+
+If you ever want to build the site yourself (e.g., to deploy elsewhere):
+```bash
+npm run build
+```
+This creates a `dist/` folder with all the static files. Upload that folder to any static hosting service (GitHub Pages, Netlify, Cloudflare Pages, etc.).
 
 ## Contributing
-If you want to contribute to the project, you can fork the repository and create a pull request with your changes. We welcome contributions of all kinds, whether it's fixing bugs, adding new features, or improving the documentation.
+
+Contributions are welcome! If you find a bug, have a feature idea, or want to improve the documentation:
+
+1. Fork the repository on GitHub
+2. Create a new branch: `git checkout -b my-feature`
+3. Make your changes and commit them
+4. Open a Pull Request describing what you changed and why
+
+Please keep the spirit of the project in mind: **accessibility first**. Changes should make it easier for non-programmers to create visual novels, not harder.
 
 ## License
+
 NamelessStory is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
