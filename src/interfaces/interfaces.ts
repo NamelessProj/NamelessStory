@@ -49,6 +49,7 @@ export interface CharacterType {
 export interface TitleButtons {
     start?: string,
     continue?: string,
+    load?: string,
     credits?: string,
     exit?: string
 }
