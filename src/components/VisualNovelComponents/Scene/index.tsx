@@ -7,12 +7,11 @@ import UserInputBox from "../UserInput";
 
 // Styles
 import './style.css';
-import type {Dialogue, SceneType, Sprite, State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Dialogue, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
 import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
+import {useDataContext} from "../../../hooks/useDataContext.ts";
 
 interface SceneProps {
-    script: VNStory;
-    state: State;
     onAdvance: () => void;
     onTypingComplete: () => void;
     onHandleOptionSelect: (nextScene: string) => void;
@@ -20,13 +19,12 @@ interface SceneProps {
 }
 
 const Scene: React.FC<SceneProps> = ({
-    script,
-    state,
     onAdvance,
     onTypingComplete,
     onHandleOptionSelect,
     onHandleInput
 }) => {
+    const {script, state} = useDataContext();
     const currentScene: SceneType | undefined = script.story[state.currentScene];
     const currentDialogue: Dialogue | undefined = currentScene?.dialogues[state.currentDialogueIndex];
 
@@ -78,7 +76,6 @@ const Scene: React.FC<SceneProps> = ({
             {/* Characters/Sprites */}
             {spriteToShow && (
                 <CharacterFullSprite
-                    script={script}
                     sprite={spriteToShow}
                     currentDialogueIndex={state.currentDialogueIndex}
                     characterId={resolvedSpeaker?.characterId}
@@ -92,8 +89,6 @@ const Scene: React.FC<SceneProps> = ({
                     textSpeed={currentDialogue.textSpeed || script.settings.textSpeed || 50}
                     name={currentDialogue.name}
                     nameDisplay={currentDialogue.nameDisplay || script.settings.defaultNameDisplay || "short"}
-                    state={state}
-                    script={script}
                     onTypingComplete={onTypingComplete}
                 />
             )}

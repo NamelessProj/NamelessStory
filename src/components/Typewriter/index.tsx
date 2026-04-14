@@ -2,8 +2,11 @@ import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {useEffect, useMemo, useRef, useState} from "react";
 import TypewriterUtils from "../../utils/typewriterUtils.ts";
+import {useDataContext} from "../../hooks/useDataContext.ts";
 
-const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, script, state, className, onComplete}: TypewriterProps) => {
+const Typewriter = ({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, className, onComplete}: TypewriterProps) => {
+    const {script, state} = useDataContext();
+
     const tokens: Token[] = useMemo(
         () => TypewriterUtils.tokenizeHtmlWithPauses(
             TypewriterUtils.getTextWithCharacters(

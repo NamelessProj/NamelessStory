@@ -1,21 +1,20 @@
 import * as React from "react";
-import type {Page, State, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Page} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
 import { useBGM } from "../../../hooks/useBGM";
 import {ADVANCE_THRESHOLD_MS} from "../../../utils/constants.ts";
+import {useDataContext} from "../../../hooks/useDataContext.ts";
 
 import './style.css';
 
 interface VisualNovelProps {
-    script: VNStory;
-    state: State;
-    setState: (state: State) => void;
     onChangePage?: (page: Page) => void;
 }
 
-const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onChangePage}) => {
+const VisualNovel: React.FC<VisualNovelProps> = ({onChangePage}) => {
+    const {script, state, setState} = useDataContext();
     const [isOverlayHidden, setIsOverlayHidden] = React.useState<boolean>(false);
     // Timestamp of the last time typing completed — used to enforce the advance threshold
     const lastTypingCompleteRef = React.useRef<number>(0);
@@ -210,13 +209,9 @@ const VisualNovel: React.FC<VisualNovelProps> = ({script, state, setState, onCha
         >
             <VNTopOverlay
                 isOverlayHidden={isOverlayHidden}
-                state={state}
-                setState={setState}
             />
 
             <Scene
-                script={script}
-                state={state}
                 onAdvance={handleAdvance}
                 onTypingComplete={handleTypingComplete}
                 onHandleOptionSelect={handleOptionSelect}

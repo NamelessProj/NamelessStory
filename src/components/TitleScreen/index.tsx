@@ -1,9 +1,11 @@
 import * as React from "react";
-import type {TitleButtons, VNStory} from "../../interfaces/interfaces.ts";
+import type {TitleButtons} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
+import {useDataContext} from "../../hooks/useDataContext.ts";
 
-const TitleScreen: React.FC<{ script: VNStory, handleStart: () => void, handleCredits: () => void }> = ({script, handleStart, handleCredits}) => {
+const TitleScreen: React.FC<{ handleStart: () => void, handleCredits: () => void }> = ({handleStart, handleCredits}) => {
+    const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
 
     return (

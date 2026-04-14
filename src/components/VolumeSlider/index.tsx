@@ -1,14 +1,10 @@
 import * as React from "react";
 
 import "./style.css";
-import type {State} from "../../interfaces/interfaces.ts";
+import {useDataContext} from "../../hooks/useDataContext.ts";
 
-interface VolumeSliderProps {
-    state: State;
-    setState: (state: State) => void;
-}
-
-const VolumeSlider: React.FC<VolumeSliderProps> = ({state, setState}) => {
+const VolumeSlider: React.FC = () => {
+    const {state, setState} = useDataContext();
     const [isHovered, setIsHovered] = React.useState<boolean>(false);
 
     // Handle volume change

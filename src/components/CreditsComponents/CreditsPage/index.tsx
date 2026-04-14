@@ -1,11 +1,13 @@
 import * as React from "react";
-import type {CreditGroupType, CreditsPageType, Page, VNStory} from "../../../interfaces/interfaces.ts";
+import type {CreditGroupType, CreditsPageType, Page} from "../../../interfaces/interfaces.ts";
 import CreditGroup from "../CreditGroup";
 import './style.css';
 import {type CSSProperties, useEffect} from "react";
 import BackgroundImage from "../../BackgroundImage";
+import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-const CreditsPage: React.FC<{ script: VNStory, handleChangeRoom: (page: Page) => void }> = ({script, handleChangeRoom}) => {
+const CreditsPage: React.FC<{ handleChangeRoom: (page: Page) => void }> = ({handleChangeRoom}) => {
+    const {script} = useDataContext();
     const creditsPage: CreditsPageType = script.settings.creditsPage;
 
     const scrollDurationInSeconds: number = creditsPage.scrollDurationInSeconds || 30;

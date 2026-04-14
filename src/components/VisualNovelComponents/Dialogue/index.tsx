@@ -1,19 +1,17 @@
 import * as React from "react";
 import Typewriter from "../../Typewriter";
-import type {NameDisplay, State, VNStory} from "../../../interfaces/interfaces.ts";
-// import TypewriterUtils from "../../../utils/typewriterUtils.ts";
+import type {NameDisplay} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 
 // Styles
 import "./style.css";
+import {useDataContext} from "../../../hooks/useDataContext.ts";
 
 interface DialogueProps {
     text: string;
     textSpeed: number;
     name: string;
     nameDisplay: NameDisplay;
-    script: VNStory;
-    state: State;
     onTypingComplete?: () => void;
 }
 
@@ -22,10 +20,10 @@ const DialogueBox: React.FC<DialogueProps> = ({
     textSpeed,
     name,
     nameDisplay,
-    script,
-    state,
     onTypingComplete
 }) => {
+    const {script, state} = useDataContext();
+
     // Get the resolved name to display
     const nameToDisplay = React.useMemo(() => {
         return getNameToDisplay(
@@ -60,8 +58,6 @@ const DialogueBox: React.FC<DialogueProps> = ({
                     text={text}
                     speed={textSpeed}
                     onComplete={onTypingComplete}
-                    script={script}
-                    state={state}
                     className="vn-dialogue-text"
                 />
             </div>

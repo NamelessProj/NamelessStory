@@ -2,14 +2,15 @@ import * as React from "react";
 
 // Styles
 import "./style.css";
-import type {Sprite, VNStory} from "../../../interfaces/interfaces.ts";
+import type {Sprite} from "../../../interfaces/interfaces.ts";
+import {useDataContext} from "../../../hooks/useDataContext.ts";
 
 const CharacterFullSprite: React.FC<{
-    script: VNStory;
     sprite: Sprite;
     currentDialogueIndex: number;
     characterId?: string;
-}> = ({script, sprite, characterId: characterIdOverride}) => {
+}> = ({sprite, characterId: characterIdOverride}) => {
+    const {script} = useDataContext();
     const spriteName = sprite.name;
     // Use the provided character ID if given; otherwise search for the first character
     // that has the requested sprite variant or an idle fallback
