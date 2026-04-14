@@ -10,6 +10,7 @@ import {useDataContext} from "../../../hooks/useDataContext.ts";
 import './style.css';
 import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
+import {exportSaveFile} from "../../../utils/saveFile.ts";
 
 interface VisualNovelProps {
     onChangePage?: (page: Page) => void;
@@ -201,9 +202,10 @@ const VisualNovel: React.FC<VisualNovelProps> = ({onChangePage}) => {
     }
 
     const handleSave = (): void => {
-        const name: string = getCookieName(script.settings.titlePage.title);
-        const saveData: string = JSON.stringify(state);
-        Cookies.set(name, saveData);
+        const title: string = script.settings.titlePage.title;
+        const saveData: string = JSON.stringify({...state, currentMusic: null});
+        Cookies.set(getCookieName(title), saveData);
+        exportSaveFile(state, title);
     }
 
     // If scene doesn't exist, a page transition is in progress — don't render
