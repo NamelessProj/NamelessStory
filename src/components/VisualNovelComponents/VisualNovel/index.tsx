@@ -8,6 +8,8 @@ import {ADVANCE_THRESHOLD_MS} from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
 import './style.css';
+import Cookies from "../../../utils/cookies.ts";
+import {getCookieName} from "../../../utils/helpMethods.ts";
 
 interface VisualNovelProps {
     onChangePage?: (page: Page) => void;
@@ -198,6 +200,12 @@ const VisualNovel: React.FC<VisualNovelProps> = ({onChangePage}) => {
         if (isOverlayHidden) setIsOverlayHidden(false);
     }
 
+    const handleSave = (): void => {
+        const name: string = getCookieName(script.settings.titlePage.title);
+        const saveData: string = JSON.stringify(state);
+        Cookies.set(name, saveData);
+    }
+
     // If scene doesn't exist, a page transition is in progress — don't render
     if (!currentScene) return null;
 
@@ -219,7 +227,7 @@ const VisualNovel: React.FC<VisualNovelProps> = ({onChangePage}) => {
             />
 
             <VNBottomOverlay
-                saveFunc={() => console.log("Save function not implemented")}
+                saveFunc={handleSave}
                 setPage={(page) => console.log(`Page change to ${page} not implemented`)}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
