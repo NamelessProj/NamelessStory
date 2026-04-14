@@ -155,12 +155,12 @@ The `settings` block controls global options, the title screen, and the credits 
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `startingScene` | Yes | The ID of the first scene to play |
-| `textSpeed` | No | Typing animation speed. Lower = faster. Default: `50` |
-| `defaultNameDisplay` | No | `"short"` (default) or `"full"` — which character name to show |
-| `titlePage.title` | Yes | Your game's title |
-| `titlePage.background` | Yes | Background image filename (from `public/assets/`) |
-| `titlePage.buttons` | No | Custom button labels. You can custom just 1 or 2 if you want also. |
+| `startingScene` | :heavy_check_mark: (Yes) | The ID of the first scene to play |
+| `textSpeed` | :x: (No) | Typing animation speed. Lower = faster. Default: `50` |
+| `defaultNameDisplay` | :x: (No) | `"short"` (default) or `"full"` — which character name to show |
+| `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
+| `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
+| `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
 | `creditsPage.scrollDurationInSeconds` | No | How long the credits take to scroll (seconds) |
 
 ### Characters
@@ -192,10 +192,10 @@ Define all your speaking characters in the `characters` block. Each character ge
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `name` | Yes | Short display name shown in the dialogue box |
-| `fullName` | No | Long name (used when `nameDisplay` is `"full"`) |
-| `color` | Yes | Name text color — any CSS color (`red`, `#FF0000`, `rgb(255, 0, 0)`) |
-| `sprite` | No | An object mapping variant names to image filenames |
+| `name` | :heavy_check_mark: (Yes) | Short display name shown in the dialogue box |
+| `fullName` | :x: (No) | Long name (used when `nameDisplay` is `"full"`) |
+| `color` | :heavy_check_mark: (Yes) | Name text color — any CSS color (`red`, `#FF0000`, `rgb(255, 0, 0)`) |
+| `sprite` | :x: (No) | An object mapping variant names to image filenames |
 
 **The `playerName` variable:** To store the player's name, create a character with an empty `name` field (like above). Use a meaningful ID like `"playerName"` or `"hero"`. You can then prompt the player to type their name and use it in dialogue later. The variable system will be explained further down (see [Player Text Input](#player-text-input)).
 
@@ -232,24 +232,24 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `background` | Yes | Background image filename |
-| `bgmFile` | No | Music file or music command (see [Background Music](#background-music)) |
-| `bgmLoop` | No | Whether music loops. Default: `true` |
-| `dialogues` | Yes | Array of dialogue objects |
+| `background` | :heavy_check_mark: (Yes) | Background image filename |
+| `bgmFile` | :x: (No) | Music file or music command (see [Background Music](#background-music)) |
+| `bgmLoop` | :x: (No) | Whether music loops. Default: `true` |
+| `dialogues` | :heavy_check_mark: (Yes) | Array of dialogue objects |
 
 **Dialogue fields:**
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `text` | Yes | The dialogue text |
-| `name` | Yes | Character ID whose name is shown. Use `""` for narration |
-| `next` | No | Where to go after this line (only used when reaching the last dialogue of a scene) (see [Navigating Between Scenes](#navigating-between-scenes)) |
-| `textSpeed` | No | Override typing speed for this line only |
-| `nameDisplay` | No | `"short"` or `"full"` — override for this line only |
-| `background` | No | Change the background image mid-scene |
-| `options` | No | Multiple-choice options (see [Player Choices](#player-choices-options)) |
-| `input` | No | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
-| `sprite` | No | Show a character sprite (see [Character Sprites](#character-sprites)) |
+| `text` | :heavy_check_mark: (Yes) | The dialogue text |
+| `name` | :heavy_check_mark: (Yes) | Character ID whose name is shown. Use `""` for narration |
+| `next` | :x: (No) | Where to go after this line (only used when reaching the last dialogue of a scene) (see [Navigating Between Scenes](#navigating-between-scenes)) |
+| `textSpeed` | :x: (No) | Override typing speed for this line only |
+| `nameDisplay` | :x: (No) | `"short"` or `"full"` — override for this line only |
+| `background` | :x: (No) | Change the background image mid-scene |
+| `options` | :x: (No) | Multiple-choice options (see [Player Choices](#player-choices-options)) |
+| `input` | :x: (No) | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
+| `sprite` | :x: (No) | Show a character sprite (see [Character Sprites](#character-sprites)) |
 
 ### Player Choices (Options)
 
@@ -314,9 +314,9 @@ Use the `sprite` field in a dialogue to display a character portrait.
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `name` | Yes | Sprite variant name (must exist in the character's `sprite` object) |
-| `position` | No | `"left"`, `"center"`, or `"right"` (default: center) |
-| `mirror` | No | Flip the sprite horizontally. Default: `false` |
+| `name` | :heavy_check_mark: (Yes) | Sprite variant name (must exist in the character's `sprite` object) |
+| `position` | :x: (No) | `"left"`, `"center"`, or `"right"` (default: center) |
+| `mirror` | :x: (No) | Flip the sprite horizontally. Default: `false` |
 
 **Custom position:** Instead of a preset string, `position` can be an object:
 ```json
