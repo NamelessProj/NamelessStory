@@ -3,6 +3,7 @@ import type {Page, State, VNStory} from "../../interfaces/interfaces.ts";
 import {useEffect, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
+import DataProvider from "../../context/DataProvider.tsx";
 
 const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
     const [script, setScript] = useState<VNStory|null>(null);
@@ -75,9 +76,11 @@ const VNPlayer: React.FC<{ scriptFile: string }> = ({scriptFile}) => {
                     <Spinner />
                 </div>
             ) : (
-                <div id="vn-player" className="vn-body">
-                    <PageToDisplay page={currentPage} script={script} state={state} setState={setState} handleChangePage={handleChangePage} />
-                </div>
+                <DataProvider value={{state, setState, script}}>
+                    <div id="vn-player" className="vn-body">
+                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} />
+                    </div>
+                </DataProvider>
             )}
         </>
     );
