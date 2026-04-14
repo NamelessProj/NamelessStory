@@ -123,8 +123,6 @@ export type TypewriterProps = {
     text: string;
     speed?: number;
     pauseMap?: PauseMap;
-    script: VNStory;
-    state: State;
     className?: string;
     onComplete?: () => void;
 };
