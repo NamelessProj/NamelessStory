@@ -1,10 +1,10 @@
 import {useCallback, useState, useRef, useEffect} from "react";
-import type {Page, SceneType} from "../../../interfaces/interfaces.ts";
+import type {HistoryEntry, Page, SceneType} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
 import { useBGM } from "../../../hooks/useBGM";
-import {ADVANCE_THRESHOLD_MS} from "../../../utils/constants.ts";
+import {ADVANCE_THRESHOLD_MS, DEFAULT_HISTORY_LIMIT, MAX_HISTORY_LIMIT, MIN_HISTORY_LIMIT} from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
@@ -33,6 +33,36 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         setState,
         trigger: state.currentScene
     });
+
+    const historyLimit: number = Math.min(
+        MAX_HISTORY_LIMIT,
+        Math.max(MIN_HISTORY_LIMIT, script.settings.historyLimit ?? DEFAULT_HISTORY_LIMIT)
+    );
+
+    const pushHistory = useCallback((history: HistoryEntry[], sceneId: string, dialogueIndex: number): HistoryEntry[] => {
+        if (historyLimit === 0) return history;
+        const entry: HistoryEntry = {sceneId, dialogueIndex};
+        const next: HistoryEntry[] = [...history, entry];
+        return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
+    }, [historyLimit]);
+
+    const handleBack = useCallback((): void => {
+        if (state.history.length === 0) return;
+        const prev: HistoryEntry = state.history[state.history.length - 1];
+        const newHistory: HistoryEntry[] = state.history.slice(0, -1);
+        const scene: SceneType = script.story[prev.sceneId];
+        setState({
+            ...state,
+            currentScene: prev.sceneId,
+            currentDialogueIndex: prev.dialogueIndex,
+            currentDialogueIndexMax: scene.dialogues.length - 1,
+            history: newHistory,
+            isTyping: true,
+            skipTyping: false,
+            waitingOnOptionSelection: false,
+            waitingOnUserInput: scene.dialogues[prev.dialogueIndex]?.input !== undefined
+        });
+    }, [state, setState, script]);
 
     const handleCookieSave = useCallback((): void => {
         const title: string = script.settings.titlePage.title;
@@ -70,11 +100,14 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         // Enforce a small delay after typing completes to prevent accidental double-press
         if (Date.now() - lastTypingCompleteRef.current < ADVANCE_THRESHOLD_MS) return;
 
+        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
+
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
             const nextIndex = state.currentDialogueIndex + 1;
             const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
+                history: newHistory,
                 currentDialogueIndex: nextIndex,
                 isTyping: true,
                 skipTyping: false,
@@ -91,6 +124,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                     const firstDialogue = script.story[newScene]?.dialogues[0];
                     setState({
                         ...state,
+                        history: newHistory,
                         currentScene: newScene,
                         currentDialogueIndex: 0,
                         currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
@@ -104,7 +138,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             }
         }
         handleCookieSave(); // Auto-save on advance
-    }, [state, setState, script, onChangePage, isOverlayHidden, handleCookieSave]);
+    }, [state, setState, script, onChangePage, isOverlayHidden, handleCookieSave, pushHistory]);
 
     // Handle option selection
     const handleOptionSelect = useCallback((next: string): void => {
@@ -142,9 +176,11 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
         const newDialogueIndex: number = newMaxIndex >= tempIndex ? tempIndex : 0;
         const targetDialogue = script.story[newScene]?.dialogues[newDialogueIndex];
+        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
 
         setState({
             ...state,
+            history: newHistory,
             currentScene: newScene,
             currentDialogueIndex: newDialogueIndex,
             currentDialogueIndexMax: newMaxIndex,
@@ -154,7 +190,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             skipTyping: false
         });
         handleCookieSave(); // Auto-save on option selection
-    }, [state, setState, script, onChangePage, handleCookieSave]);
+    }, [state, setState, script, onChangePage, handleCookieSave, pushHistory]);
 
     // Handle user input — store variable then auto-advance
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
@@ -162,12 +198,14 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             ...state.variables,
             [variableName]: { value, color }
         };
+        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
 
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
             const nextIndex = state.currentDialogueIndex + 1;
             const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
+                history: newHistory,
                 variables: updatedVariables,
                 currentDialogueIndex: nextIndex,
                 isTyping: true,
@@ -181,6 +219,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 const firstDialogue = script.story[newScene]?.dialogues[0];
                 setState({
                     ...state,
+                    history: newHistory,
                     variables: updatedVariables,
                     currentScene: newScene,
                     currentDialogueIndex: 0,
@@ -190,12 +229,12 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                     waitingOnUserInput: firstDialogue?.input !== undefined
                 });
             } else {
-                setState({ ...state, variables: updatedVariables, waitingOnUserInput: false });
+                setState({ ...state, history: newHistory, variables: updatedVariables, waitingOnUserInput: false });
                 onChangePage?.("credits");
             }
         }
         handleCookieSave(); // Auto-save on user input
-    }, [state, setState, script, onChangePage, handleCookieSave]);
+    }, [state, setState, script, onChangePage, handleCookieSave, pushHistory]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
@@ -240,6 +279,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
             <VNBottomOverlay
                 exportSaveFunc={handleExportSave}
+                onBack={handleBack}
+                hasHistory={state.history.length > 0}
                 setPage={(page) => onChangePage?.(page)}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
