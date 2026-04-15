@@ -1,0 +1,95 @@
+/*
+ * NamelessStory — Custom CSS
+ *
+ * Override any CSS variable here to restyle the engine without touching source code.
+ * All variables fall back to their defaults if not set, so you only need to include
+ * the ones you actually want to change.
+ *
+ * Usage: set variables on :root to apply them globally.
+ *
+ * ─── Dialogue box ────────────────────────────────────────────────────────────
+ *
+ * --vn-dialogue-bg          Background of the dialogue box   (default: rgba(0,0,0,0.75))
+ * --vn-dialogue-border      Border shorthand                  (default: 3px solid rgba(255,255,255,0.2))
+ * --vn-dialogue-border-radius  Corner rounding               (default: 12px)
+ * --vn-dialogue-padding     Inner spacing                     (default: 1.5rem)
+ * --vn-dialogue-min-height  Minimum height                    (default: 100px)
+ * --vn-text-color           Dialogue text color               (default: #fff)
+ * --vn-text-font-size       Dialogue text size                (default: 1.2rem)
+ * --vn-text-line-height     Dialogue line height              (default: 1.6)
+ * --vn-name-font-size       Character name size               (default: 1.5rem)
+ *
+ * ─── Choice buttons ──────────────────────────────────────────────────────────
+ *
+ * --vn-option-bg            Button background                 (default: blue gradient)
+ * --vn-option-bg-hover      Button background on hover        (default: brighter blue gradient)
+ * --vn-option-border        Button border shorthand           (default: 2px solid rgba(100,108,255,0.5))
+ * --vn-option-border-radius Button corner rounding            (default: 8px)
+ * --vn-option-color         Button text color                 (default: #fff)
+ * --vn-option-font-size     Button text size                  (default: 1.2rem)
+ * --vn-options-bottom       Distance from bottom of screen    (default: 20%)
+ * --vn-options-gap          Gap between option buttons        (default: 1rem)
+ *
+ * ─── Text input ──────────────────────────────────────────────────────────────
+ *
+ * --vn-input-bg             Input wrapper background          (default: rgba(0,0,0,0.8))
+ * --vn-input-border         Input wrapper border              (default: 2px solid rgba(255,255,255,0.3))
+ * --vn-input-border-radius  Input wrapper corner rounding     (default: 8px)
+ * --vn-input-color          Input text color                  (default: #fff)
+ * --vn-input-font-size      Input text size                   (default: 1.2rem)
+ * --vn-input-submit-bg      Submit button background          (default: rgba(100,108,255,0.5))
+ * --vn-input-submit-bg-hover  Submit button background hover  (default: rgba(100,108,255,0.7))
+ * --vn-input-wrong-color    Border color when input is wrong  (default: #ff4444)
+ * --vn-input-bottom         Distance from bottom of screen    (default: 20%)
+ *
+ * ─── Overlays ────────────────────────────────────────────────────────────────
+ *
+ * --vn-overlay-top-height   Top bar height                    (default: 60px)
+ * --vn-overlay-top-bg       Top bar gradient background       (default: dark-to-transparent gradient)
+ * --vn-overlay-bottom-height  Bottom bar height               (default: 120px)
+ * --vn-overlay-bottom-bg    Bottom bar gradient background    (default: dark-to-transparent gradient)
+ * --vn-overlay-button-bg    Overlay button background         (default: rgba(255,255,255,0.1))
+ * --vn-overlay-button-border  Overlay button border           (default: 2px solid rgba(255,255,255,0.3))
+ * --vn-overlay-button-bg-hover  Overlay button hover bg       (default: rgba(255,255,255,0.2))
+ * --vn-overlay-button-color Overlay button text color         (default: #fff)
+ *
+ * ─── Character sprites ───────────────────────────────────────────────────────
+ *
+ * --vn-sprite-bottom        Sprite distance from screen bottom  (default: 10%)
+ * --vn-sprite-side-offset   Left/right sprite offset from edge  (default: 10%)
+ *
+ * ─── Volume slider ───────────────────────────────────────────────────────────
+ *
+ * --vn-volume-slider-width  Width of the slider track          (default: 100px)
+ * --vn-volume-track-bg      Slider track color                 (default: rgba(255,255,255,0.3))
+ * --vn-volume-thumb-color   Slider thumb color                 (default: #fff)
+ *
+ * ─── Credits screen ──────────────────────────────────────────────────────────
+ *
+ * --vn-credits-padding-block  Top/bottom padding on credits    (default: 7rem)
+ * --vn-credit-el-margin       Margin below each credit entry   (default: 2rem)
+ * --vn-credit-group-h2-margin-top     Group title top margin   (default: 7rem)
+ * --vn-credit-group-h2-margin-bottom  Group title bottom margin (default: 4rem)
+ *
+ * ─── Background image ────────────────────────────────────────────────────────
+ *
+ * --vn-bg-position          Background image position          (default: center)
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * Example — dark purple theme:
+ *
+ * :root {
+ *     --vn-dialogue-bg: rgba(20, 5, 40, 0.9);
+ *     --vn-dialogue-border: 2px solid rgba(180, 100, 255, 0.4);
+ *     --vn-dialogue-border-radius: 4px;
+ *     --vn-text-color: #f0d0ff;
+ *     --vn-name-font-size: 1.3rem;
+ *     --vn-option-bg: linear-gradient(135deg, rgba(140, 60, 200, 0.4), rgba(100, 20, 160, 0.2));
+ *     --vn-option-border: 2px solid rgba(180, 100, 255, 0.5);
+ * }
+ */
+
+:root {
+    /* Add your overrides below */
+}
