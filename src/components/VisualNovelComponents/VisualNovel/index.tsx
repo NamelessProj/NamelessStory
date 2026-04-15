@@ -232,7 +232,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
             <VNBottomOverlay
                 saveFunc={handleSave}
-                setPage={(page) => console.log(`Page change to ${page} not implemented`)}
+                setPage={(page) => onChangePage?.(page)}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
             />
