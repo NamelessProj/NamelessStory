@@ -4,7 +4,7 @@ import {type CSSProperties, useEffect} from "react";
 import BackgroundImage from "../../BackgroundImage";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-import './style.css';
+import styles from './style.module.css';
 
 const CreditsPage = ({handleChangeRoom}: { handleChangeRoom: (page: Page) => void }) => {
     const {script} = useDataContext();
@@ -24,7 +24,7 @@ const CreditsPage = ({handleChangeRoom}: { handleChangeRoom: (page: Page) => voi
         <div className="h-100">
             <BackgroundImage fileName={creditsPage.background} />
 
-            <div className="credits-page h-100 centered column" style={style}>
+            <div className={`${styles.creditsPage} h-100 centered column`} style={style}>
                 <h2>{creditsPage.title}</h2>
 
                 {creditsPage.creditGroups.map((cg: CreditGroupType, i: number) => (

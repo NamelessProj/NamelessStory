@@ -1,5 +1,6 @@
 import {useState} from "react";
 import type {VariableType} from "../../../interfaces/interfaces.ts";
+import styles from './style.module.css';
 
 interface UserInputBoxProps {
     variable: VariableType;
@@ -24,10 +25,10 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
     }
 
     return (
-        <form className="vn-input-container" onSubmit={handleSubmit}>
-            <div className="vn-input-wrapper">
+        <form className={styles.vnInputContainer} onSubmit={handleSubmit}>
+            <div className={styles.vnInputWrapper}>
                 <input
-                    className={`vn-input ${isWrong ? "vn-input-wrong" : ""}`}
+                    className={`${styles.vnInput} ${isWrong ? styles.vnInputWrong : ""}`}
                     type="text"
                     value={input}
                     onChange={(e): void => setInput(e.target.value)}
@@ -36,7 +37,7 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
                 />
             </div>
             <button
-                className="vn-input-submit"
+                className={styles.vnInputSubmit}
                 type="submit"
                 onClick={handleSubmit}
             >

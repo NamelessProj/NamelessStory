@@ -11,7 +11,7 @@ import {getCookieName} from "../../../utils/helpMethods.ts";
 import {exportSaveFile} from "../../../utils/saveFile.ts";
 import type {RefObject} from "react";
 
-import './style.css';
+import styles from './style.module.css';
 
 interface VisualNovelProps {
     onChangePage?: (page: Page) => void;
@@ -263,7 +263,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     return (
         <div
             id="vn-game-wrapper"
-            className="h-100"
+            className={`${styles.gameWrapper} h-100`}
             onClick={handleClick}
         >
             <VNTopOverlay

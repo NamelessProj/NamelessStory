@@ -1,0 +1,24 @@
+.characterSprite {
+    position: absolute;
+    bottom: var(--vn-sprite-bottom, 10%);
+    transition: all 0.3s ease;
+}
+
+.spriteLeft {
+    left: var(--vn-sprite-side-offset, 10%);
+}
+
+.spriteCenter {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.spriteRight {
+    right: var(--vn-sprite-side-offset, 10%);
+}
+
+.characterSprite img {
+    max-height: 80%;
+    max-width: 30%;
+    object-fit: contain;
+}

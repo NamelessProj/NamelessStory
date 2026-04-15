@@ -1,7 +1,7 @@
 import type {CharacterType, Sprite} from "../../../interfaces/interfaces.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-import "./style.css";
+import styles from "./style.module.css";
 
 interface CharacterFullSpriteProps {
     sprite: Sprite;
@@ -24,15 +24,13 @@ const CharacterFullSprite = ({sprite, characterId: characterIdOverride}: Charact
 
     // Determine position class
     const getPositionClass = (): string => {
-        if (sprite.position) {
-            if (sprite.position.name) return `sprite-${sprite.position.name}`;
-            if (sprite.position.x !== undefined) return `sprite-x-${sprite.position.x}`;
-        }
-        return "sprite-center";
+        if (sprite.position?.name === "left") return styles.spriteLeft;
+        if (sprite.position?.name === "right") return styles.spriteRight;
+        return styles.spriteCenter;
     };
 
     return (
-        <div className={`character-sprite ${getPositionClass()}`}>
+        <div className={`${styles.characterSprite} ${getPositionClass()}`}>
             {spriteUrl && (
                 <img
                     src={`../assets/${spriteUrl}`}

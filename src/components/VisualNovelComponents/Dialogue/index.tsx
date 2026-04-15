@@ -4,7 +4,7 @@ import type {CharacterType, NameDisplay} from "../../../interfaces/interfaces.ts
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-import "./style.css";
+import styles from "./style.module.css";
 
 interface DialogueProps {
     text: string;
@@ -41,23 +41,23 @@ const DialogueBox = ({
     const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
-        <div className="vn-dialogue-container">
+        <div className={styles.dialogueContainer}>
             {/* Character Name - only display if nameToDisplay exists and is not empty */}
             {nameToDisplay && nameToDisplay !== "" && (
                 <div
-                    className="vn-dialogue-name"
+                    className={styles.dialogueName}
                     style={{color: nameColor}}
                 >
                     {nameToDisplay}
                 </div>
             )}
 
-            <div className="vn-dialogue-box">
+            <div className={styles.dialogueBox}>
                 <Typewriter
                     text={text}
                     speed={textSpeed}
                     onComplete={onTypingComplete}
-                    className="vn-dialogue-text"
+                    className={styles.dialogueText}
                 />
             </div>
         </div>

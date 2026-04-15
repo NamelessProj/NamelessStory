@@ -7,7 +7,7 @@ import type {CharacterType, Dialogue, SceneType, Sprite} from "../../../interfac
 import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
-import './style.css';
+import styles from './style.module.css';
 
 interface SceneProps {
     onAdvance: () => void;
@@ -65,7 +65,7 @@ const Scene = ({
     return (
         <div
             id="vn-scene"
-            className="vn-scene"
+            className={styles.vnScene}
             onClick={handleClick}
         >
             {/* Background */}

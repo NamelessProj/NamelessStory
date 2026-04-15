@@ -1,17 +1,19 @@
-*:has(> picture.bg-img) {
+:has(> picture.bgImg) {
     position: relative;
     isolation: isolate;
 }
-picture.bg-img {
+
+picture.bgImg {
     position: absolute;
     inset: 0;
     z-index: -1;
 }
-picture.bg-img > img {
+
+picture.bgImg > img {
     height: 100%;
     width: 100%;
     object-fit: cover;
-    object-position: center;
+    object-position: var(--vn-bg-position, center);
     user-select: none;
     pointer-events: none;
 }

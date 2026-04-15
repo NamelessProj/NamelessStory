@@ -1,6 +1,6 @@
 import VolumeSlider from "../../VolumeSlider";
 
-import "./style.css";
+import styles from "./style.module.css";
 
 interface VNOverlayProps {
     isOverlayHidden: boolean;
@@ -8,7 +8,7 @@ interface VNOverlayProps {
 
 const VNTopOverlay = ({isOverlayHidden}: VNOverlayProps) => {
     return (
-        <div className={`vn-overlay vn-overlay-top ${isOverlayHidden ? "hidden" : "show"}`}>
+        <div className={`${styles.overlay} ${styles.overlayTop} ${isOverlayHidden ? styles.hidden : ""}`}>
             <VolumeSlider />
         </div>
     );

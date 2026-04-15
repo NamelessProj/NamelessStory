@@ -1,0 +1,3 @@
+.creditEl {
+    margin-bottom: var(--vn-credit-el-margin, 2rem);
+}

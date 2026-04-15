@@ -1,6 +1,6 @@
 import type {Page} from "../../../interfaces/interfaces.ts";
 
-import './style.css';
+import styles from './style.module.css';
 
 interface VNOverlayProps {
     exportSaveFunc: () => void;
@@ -13,20 +13,20 @@ interface VNOverlayProps {
 
 const VNBottomOverlay = ({exportSaveFunc, onBack, hasHistory, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
     return (
-        <div className={`vn-overlay vn-overlay-bottom ${isOverlayHidden ? "hidden" : "show"}`}>
-            <div className="buttons-wrapper">
-                <button className="overlay-button" onClick={(): void => setPage("title")}>
+        <div className={`${styles.overlay} ${styles.overlayBottom} ${isOverlayHidden ? styles.hidden : ""}`}>
+            <div className={styles.buttonsWrapper}>
+                <button className={styles.overlayButton} onClick={(): void => setPage("title")}>
                     Return Home
                 </button>
                 {hasHistory && (
-                    <button className="overlay-button" onClick={onBack}>
+                    <button className={styles.overlayButton} onClick={onBack}>
                         Back
                     </button>
                 )}
-                <button className="overlay-button" onClick={exportSaveFunc}>
+                <button className={styles.overlayButton} onClick={exportSaveFunc}>
                     Export Save
                 </button>
-                <button className="overlay-button" onClick={(): void => setIsOverlayHidden(true)}>
+                <button className={styles.overlayButton} onClick={(): void => setIsOverlayHidden(true)}>
                     Hide Overlay
                 </button>
             </div>

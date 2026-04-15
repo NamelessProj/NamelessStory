@@ -1,0 +1,65 @@
+.overlay {
+    opacity: 1;
+    visibility: visible;
+    transition-property: opacity, visibility;
+    transition-duration: 1s, 0s;
+    transition-timing-function: ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition-property: opacity, visibility;
+    transition-duration: 0.5s, 0s;
+    transition-delay: 0s, 0.5s;
+    transition-timing-function: ease;
+}
+
+.overlayBottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--vn-overlay-bottom-height, 120px);
+    background: var(--vn-overlay-bottom-bg, linear-gradient(to top, rgba(0,0,0,0.9), transparent));
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 2rem 0.5rem;
+    box-sizing: border-box;
+}
+
+.buttonsWrapper {
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.buttonsWrapper:hover {
+    opacity: 1;
+}
+
+.overlayButton {
+    background-color: var(--vn-overlay-button-bg, rgba(255, 255, 255, 0.1));
+    border: var(--vn-overlay-button-border, 2px solid rgba(255, 255, 255, 0.3));
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    color: var(--vn-overlay-button-color, #fff);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.overlayButton:hover {
+    background-color: var(--vn-overlay-button-bg-hover, rgba(255, 255, 255, 0.2));
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.overlayButton:active {
+    transform: translateY(0);
+}

@@ -1,4 +1,4 @@
-.volume-control {
+.volumeControl {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -6,7 +6,7 @@
     position: relative;
 }
 
-.volume-icon {
+.volumeIcon {
     background: none;
     border: none;
     cursor: pointer;
@@ -18,58 +18,58 @@
     transition: background 0.2s;
 }
 
-.volume-icon:hover {
+.volumeIcon:hover {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.volume-icon svg {
+.volumeIcon svg {
     width: 24px;
     height: 24px;
     fill: none;
 }
 
-.volume-slider-container {
+.volumeSliderContainer {
     display: flex;
     align-items: center;
-    width: 100px;
+    width: var(--vn-volume-slider-width, 100px);
 }
 
-.volume-slider {
+.volumeSlider {
     -webkit-appearance: none;
     width: 100%;
     height: 4px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--vn-volume-track-bg, rgba(255, 255, 255, 0.3));
     outline: none;
     cursor: pointer;
 }
 
-.volume-slider::-webkit-slider-thumb {
+.volumeSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--vn-volume-thumb-color, #fff);
     cursor: pointer;
     transition: transform 0.2s;
 }
 
-.volume-slider::-webkit-slider-thumb:hover {
+.volumeSlider::-webkit-slider-thumb:hover {
     transform: scale(1.2);
 }
 
-.volume-slider::-moz-range-thumb {
+.volumeSlider::-moz-range-thumb {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--vn-volume-thumb-color, #fff);
     cursor: pointer;
     border: none;
 }
 
-.volume-slider::-moz-range-track {
+.volumeSlider::-moz-range-track {
     width: 100%;
     height: 4px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--vn-volume-track-bg, rgba(255, 255, 255, 0.3));
 }

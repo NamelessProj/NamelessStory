@@ -1,4 +1,4 @@
-import "./style.css";
+import styles from "./style.module.css";
 
 interface BackgroundImageProps {
     fileName: string;
@@ -7,7 +7,7 @@ interface BackgroundImageProps {
 
 const BackgroundImage = ({fileName, id}: BackgroundImageProps) => {
     return (
-        <picture className="bg-img">
+        <picture className={styles.bgImg}>
             <img
                 src={`../assets/${fileName}`}
                 alt="Background"

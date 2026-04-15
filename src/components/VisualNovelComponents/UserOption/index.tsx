@@ -1,3 +1,5 @@
+import styles from './style.module.css';
+
 interface UserOptionProps {
     text: string;
     onClick?: () => void;
@@ -9,7 +11,7 @@ const UserOption = ({text, onClick = undefined}: UserOptionProps) => {
     };
 
     return (
-        <button className="vn-user-option" onClick={handleClick}>
+        <button className={styles.vnUserOption} onClick={handleClick}>
             <span>{text}</span>
         </button>
     );

@@ -1,7 +1,6 @@
-/* User Input Styles */
-.vn-input-container {
+.vnInputContainer {
     position: absolute;
-    bottom: 20%;
+    bottom: var(--vn-input-bottom, 20%);
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -9,46 +8,50 @@
     max-width: 500px;
 }
 
-.vn-input-wrapper {
+.vnInputWrapper {
     display: flex;
     align-items: center;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
+    background: var(--vn-input-bg, rgba(0, 0, 0, 0.8));
+    border: var(--vn-input-border, 2px solid rgba(255, 255, 255, 0.3));
+    border-radius: var(--vn-input-border-radius, 8px);
     padding: 1rem;
     backdrop-filter: blur(10px);
     margin-bottom: 1rem;
 }
 
-.vn-input-label {
+.vnInputLabel {
     font-weight: bold;
     margin-right: 1rem;
     font-size: 1.1rem;
     white-space: nowrap;
 }
 
-.vn-input {
+.vnInput {
     flex: 1;
     background: transparent;
     border: none;
     border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    color: #fff;
-    font-size: 1.2rem;
+    color: var(--vn-input-color, #fff);
+    font-size: var(--vn-input-font-size, 1.2rem);
     padding: 0.5rem 0;
     outline: none;
     transition: border-color 0.2s ease;
 }
 
-.vn-input:focus {
+.vnInput:focus {
     border-bottom-color: #fff;
 }
 
-.vn-input::placeholder {
+.vnInput::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.vn-input-submit {
-    background: rgba(100, 108, 255, 0.5);
+.vnInputWrong {
+    border-bottom-color: var(--vn-input-wrong-color, #ff4444) !important;
+}
+
+.vnInputSubmit {
+    background: var(--vn-input-submit-bg, rgba(100, 108, 255, 0.5));
     border: none;
     border-radius: 6px;
     padding: 0.8rem 1.5rem;
@@ -58,6 +61,6 @@
     transition: background 0.2s ease;
 }
 
-.vn-input-submit:hover {
-    background: rgba(100, 108, 255, 0.7);
+.vnInputSubmit:hover {
+    background: var(--vn-input-submit-bg-hover, rgba(100, 108, 255, 0.7));
 }

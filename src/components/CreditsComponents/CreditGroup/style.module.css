@@ -1,0 +1,4 @@
+.creditGroup h2 {
+    margin-top: var(--vn-credit-group-h2-margin-top, 7rem);
+    margin-bottom: var(--vn-credit-group-h2-margin-bottom, 4rem);
+}

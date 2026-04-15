@@ -1,5 +1,6 @@
 import UserOption from "../UserOption";
 import type {Option} from "../../../interfaces/interfaces.ts";
+import styles from './style.module.css';
 
 interface OptionsGroupProps {
     options: Option[];
@@ -8,7 +9,7 @@ interface OptionsGroupProps {
 
 const OptionsGroup = ({options, handleClick}: OptionsGroupProps) => {
     return (
-        <div className="vn-options-container">
+        <div className={styles.vnOptionsContainer}>
             {options.map((option: Option, i: number) => (
                 <UserOption
                     text={option.text}

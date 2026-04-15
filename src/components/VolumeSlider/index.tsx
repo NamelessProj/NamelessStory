@@ -1,7 +1,7 @@
 import {type ChangeEvent, useState} from "react";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 
-import "./style.css";
+import styles from "./style.module.css";
 
 const VolumeSlider = () => {
     const {state, setState} = useDataContext();
@@ -40,12 +40,12 @@ const VolumeSlider = () => {
 
     return (
         <div
-            className="volume-control"
+            className={styles.volumeControl}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             <button
-                className="volume-icon"
+                className={styles.volumeIcon}
                 onClick={handleMuteToggle}
                 type="button"
                 title={state.isMusicMuted ? "Unmute" : "Mute"}
@@ -68,7 +68,7 @@ const VolumeSlider = () => {
                 )}
             </button>
             {isHovered && (
-                <div className="volume-slider-container">
+                <div className={styles.volumeSliderContainer}>
                     <input
                         type="range"
                         min="0"
@@ -76,7 +76,7 @@ const VolumeSlider = () => {
                         step="0.01"
                         value={state.musicVolume}
                         onChange={handleVolumeChange}
-                        className="volume-slider"
+                        className={styles.volumeSlider}
                         title={`Volume: ${(state.musicVolume * 100).toFixed(0)}%`}
                     />
                 </div>

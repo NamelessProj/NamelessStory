@@ -1,0 +1,23 @@
+@keyframes slideBottomToTop {
+    0% {
+        transform: translateY(100%);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+
+:has(> .creditsPage) {
+    overflow: hidden;
+    position: relative;
+}
+
+.creditsPage {
+    position: absolute;
+    inset-inline: 0;
+    height: fit-content;
+    min-height: 100%;
+    padding-block: var(--vn-credits-padding-block, 7rem);
+    animation: slideBottomToTop var(--credits-scroll-time) linear forwards;
+    justify-content: flex-start;
+}

@@ -1,11 +1,11 @@
 import type {Credit, CreditGroupType} from "../../../interfaces/interfaces.ts";
 import CreditEl from "../CreditEl";
 
-import './style.css';
+import styles from './style.module.css';
 
 const CreditGroup = ({creditGroup}: { creditGroup: CreditGroupType }) => {
     return (
-        <div className="credit-group centered column">
+        <div className={`${styles.creditGroup} centered column`}>
             <h2>{creditGroup.groupName}</h2>
 
             {creditGroup.credits.map((credit: Credit, i: number) => (
