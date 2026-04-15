@@ -457,16 +457,36 @@ If your file is `public/story/my_story.json`, then `scriptFile="my_story"`.
 - Text typing speed (global, per scene, per dialogue)
 - Player name collection and use throughout the story
 
-### By editing CSS (visual styling)
+### By setting CSS variables (easiest)
 
-Each component has its own `.module.css` file. You can change colors, fonts, sizes, and layout there without breaking any functionality.
+Every visual property is exposed as a CSS custom property. Create a file at `public/custom.css` — it is loaded automatically — and set any variables you want to override inside `:root`. You do not need to touch any source file.
+
+```css
+/* public/custom.css */
+:root {
+    --vn-dialogue-bg: rgba(20, 5, 40, 0.9);
+    --vn-dialogue-border: 2px solid rgba(180, 100, 255, 0.4);
+    --vn-text-color: #f0d0ff;
+    --vn-option-bg: linear-gradient(135deg, rgba(140, 60, 200, 0.4), rgba(100, 20, 160, 0.2));
+}
+```
+
+The full list of available variables is documented inside `public/custom.css`.
+
+### By editing the module CSS files (full control)
+
+Each component has its own `style.module.css` file with scoped styles. Editing these files gives you complete control over every visual detail without breaking functionality in other components (scoped styles cannot affect anything outside their own component).
 
 | File | Controls |
 |------|----------|
-| `src/components/VisualNovelComponents/Dialogue/Dialogue.module.css` | Dialogue box appearance |
-| `src/components/TitleScreen/TitleScreen.module.css` | Title screen layout |
-| `src/components/VisualNovelComponents/VNTopOverlay/VNTopOverlay.module.css` | Top bar |
-| `src/components/VisualNovelComponents/VNBottomOverlay/VNBottomOverlay.module.css` | Bottom bar |
+| `src/components/VisualNovelComponents/Dialogue/style.module.css` | Dialogue box, name label, text |
+| `src/components/VisualNovelComponents/VNTopOverlay/style.module.css` | Top bar, fade-in/out transition |
+| `src/components/VisualNovelComponents/VNBottomOverlay/style.module.css` | Bottom bar, overlay buttons |
+| `src/components/VisualNovelComponents/UserOption/style.module.css` | Choice buttons |
+| `src/components/VisualNovelComponents/UserInput/style.module.css` | Text input box |
+| `src/components/VisualNovelComponents/CharacterFullSprite/style.module.css` | Character sprite positioning |
+| `src/components/CreditsComponents/CreditsPage/style.module.css` | Credits scroll animation |
+| `src/components/VolumeSlider/style.module.css` | Volume control widget |
 
 ### By editing React components (advanced)
 
