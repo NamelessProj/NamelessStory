@@ -34,7 +34,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         trigger: state.currentScene
     });
 
-    const handleSave = useCallback((): void => {
+    const handleCookieSave = useCallback((): void => {
+        const title: string = script.settings.titlePage.title;
+        const saveData: string = JSON.stringify({...state, currentMusic: null});
+        Cookies.set(getCookieName(title), saveData);
+    }, [state, script]);
+
+    const handleExportSave = useCallback((): void => {
         const title: string = script.settings.titlePage.title;
         const saveData: string = JSON.stringify({...state, currentMusic: null});
         Cookies.set(getCookieName(title), saveData);
@@ -97,8 +103,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 onChangePage?.("credits");
             }
         }
-        handleSave(); // Auto-save on advance
-    }, [state, setState, script, onChangePage, isOverlayHidden, handleSave]);
+        handleCookieSave(); // Auto-save on advance
+    }, [state, setState, script, onChangePage, isOverlayHidden, handleCookieSave]);
 
     // Handle option selection
     const handleOptionSelect = useCallback((next: string): void => {
@@ -147,7 +153,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             isTyping: true,
             skipTyping: false
         });
-    }, [state, setState, script, onChangePage]);
+        handleCookieSave(); // Auto-save on option selection
+    }, [state, setState, script, onChangePage, handleCookieSave]);
 
     // Handle user input — store variable then auto-advance
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
@@ -187,7 +194,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 onChangePage?.("credits");
             }
         }
-    }, [state, setState, script, onChangePage]);
+        handleCookieSave(); // Auto-save on user input
+    }, [state, setState, script, onChangePage, handleCookieSave]);
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
@@ -231,7 +239,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             />
 
             <VNBottomOverlay
-                saveFunc={handleSave}
+                exportSaveFunc={handleExportSave}
                 setPage={(page) => onChangePage?.(page)}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
