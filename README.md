@@ -5,6 +5,7 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
 ![React.js version](https://img.shields.io/badge/React.js-^19.2.0-61DAFB?style=for-the-badge)
 ![License](https://img.shields.io/github/license/NamelessProj/NamelessStory?style=for-the-badge)
 ![Repo size](https://img.shields.io/github/repo-size/NamelessProj/NamelessStory?style=for-the-badge)
+[![Codacy Badge](https://img.shields.io/badge/code_quality-B-brightgreen?style=for-the-badge&logo=codacy)](https://app.codacy.com/gh/NamelessProj/NamelessStory/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ## Table of Contents
 
