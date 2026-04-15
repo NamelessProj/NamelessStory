@@ -100,6 +100,11 @@ export type VariableType = {
     color?: string
 }
 
+export interface HistoryEntry {
+    sceneId: string,
+    dialogueIndex: number
+}
+
 export interface State {
     currentScene: string,
     currentDialogueIndex: number,
@@ -114,7 +119,7 @@ export interface State {
     musicVolume: number,
     isMusicMuted: boolean,
     variables: Record<string, VariableType>,
-    history: string[],
+    history: HistoryEntry[],
     skipTyping: boolean
 }
 
