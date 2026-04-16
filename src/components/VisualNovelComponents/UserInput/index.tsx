@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {type FormEvent, type MouseEvent, useState} from "react";
 import type {VariableType} from "../../../interfaces/interfaces.ts";
 import styles from './style.module.css';
 
@@ -11,7 +11,12 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
     const [input, setInput] = useState<string>("");
     const [isWrong, setIsWrong] = useState<boolean>(false);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLElement>): void => {
+    /**
+     * Handles submission of user input. It validates that the input is not empty, and if valid, it calls the setVariable function passed in as a prop to update the variable in the global state.
+     * If the input is invalid (empty), it triggers a visual indication of the error by setting isWrong to true temporarily.
+     * @param e - The form submission event or button click event that triggers the input submission.
+     */
+    const handleSubmit = (e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>): void => {
         e.preventDefault();
 
         if (!input || input === "") {

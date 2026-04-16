@@ -1,5 +1,5 @@
 import {useCallback, useState, useRef, useEffect} from "react";
-import type {HistoryEntry, Page, SceneType} from "../../../interfaces/interfaces.ts";
+import type {Dialogue, HistoryEntry, Page, SceneType} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
@@ -39,6 +39,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         Math.max(MIN_HISTORY_LIMIT, script.settings.historyLimit ?? DEFAULT_HISTORY_LIMIT)
     );
 
+    /**
+     * Pushes a new entry onto the history stack, ensuring it does not exceed the specified history limit. If the limit is exceeded, the oldest entries are removed to maintain the limit.
+     * @param history {HistoryEntry[]} - The current history stack.
+     * @param sceneId {string} - The ID of the scene to add to the history.
+     * @param dialogueIndex {number} - The index of the dialogue within the scene to add to the history.
+     * @returns A new history stack with the new entry added and old entries removed if necessary.
+     */
     const pushHistory = useCallback((history: HistoryEntry[], sceneId: string, dialogueIndex: number): HistoryEntry[] => {
         if (historyLimit === 0) return history;
         const entry: HistoryEntry = {sceneId, dialogueIndex};
@@ -46,6 +53,11 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
     }, [historyLimit]);
 
+    /**
+     * Handles the "back" action, allowing the user to return to the previous dialogue.
+     * It checks if there is history available, and if so, it retrieves the last entry from the history stack and updates the current scene and dialogue index accordingly.
+     * It also updates the state to reflect that the user is now waiting on option selection or user input if applicable.
+     */
     const handleBack = useCallback((): void => {
         if (state.history.length === 0) return;
         const prev: HistoryEntry = state.history[state.history.length - 1];
@@ -64,12 +76,19 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         });
     }, [state, setState, script]);
 
+    /**
+     * Handles saving the game state to a cookie. It constructs a save data object by taking the current state and setting the currentMusic property to null (to avoid saving transient music state).
+     * It then converts this object to a JSON string and saves it in a cookie using a name derived from the script's title.
+     */
     const handleCookieSave = useCallback((): void => {
         const title: string = script.settings.titlePage.title;
         const saveData: string = JSON.stringify({...state, currentMusic: null});
         Cookies.set(getCookieName(title), saveData);
     }, [state, script]);
 
+    /**
+     * Handles exporting the game state as a save file. It first saves the current state to a cookie (similar to handleCookieSave) and then triggers a download of the save file using the exportSaveFile utility function, passing in the current state and the script's title for naming the file.
+     */
     const handleExportSave = useCallback((): void => {
         const title: string = script.settings.titlePage.title;
         const saveData: string = JSON.stringify({...state, currentMusic: null});
@@ -77,13 +96,22 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         exportSaveFile(state, title);
     }, [state, script]);
 
-    // Called by Typewriter (via DialogueBox → Scene) when text animation finishes
+    /**
+     * Handles the completion of text typing animation. It updates the lastTypingCompleteRef with the current timestamp and updates the state to indicate that typing has completed and any skipTyping flag should be reset.
+     */
     const handleTypingComplete = useCallback((): void => {
         lastTypingCompleteRef.current = Date.now();
         setState({...state, isTyping: false, skipTyping: false});
     }, [state, setState]);
 
-    // Handle advancing to next dialogue
+    /**
+     * Handles advancing the dialogue. It first checks if the game is currently waiting on user input or if the overlay is hidden, in which case it does not advance.
+     * If the text is still typing, it sets the skipTyping flag to true to immediately finish the text animation.
+     * It also enforces a small delay after typing completes to prevent accidental double-presses from advancing multiple dialogues at once.
+     * If advancing is allowed, it pushes the current scene and dialogue index onto the history stack, then checks if there are more dialogues in the current scene.
+     * If so, it advances to the next dialogue. If not, it checks if there is a specified next scene to transition to, and if so, it transitions to that scene.
+     * If there is no next scene or if the next scene is <code>\_\_end\_\_</code>, it triggers a page change to the credits.
+     */
     const handleAdvance = useCallback((): void => {
         // Don't advance if waiting on user input
         if (state.waitingOnUserInput) return;
@@ -103,8 +131,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
 
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
-            const nextIndex = state.currentDialogueIndex + 1;
-            const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
+            const nextIndex: number = state.currentDialogueIndex + 1;
+            const nextDialogue: Dialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
                 history: newHistory,
@@ -120,8 +148,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 if (currentDialogue.next === "__end__") {
                     onChangePage?.("credits");
                 } else {
-                    const newScene = currentDialogue.next;
-                    const firstDialogue = script.story[newScene]?.dialogues[0];
+                    const newScene: string = currentDialogue.next;
+                    const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
                     setState({
                         ...state,
                         history: newHistory,
@@ -140,7 +168,10 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         handleCookieSave(); // Auto-save on advance
     }, [state, setState, script, onChangePage, isOverlayHidden, handleCookieSave, pushHistory]);
 
-    // Handle option selection
+    /**
+     * Handles the selection of an option by the user. It takes the "next" value associated with the selected option and determines how to update the current scene and dialogue index based on its format.
+     * @param next {string} - The "next" value from the selected option, which can be in various formats (empty string, numeric index, scene name, scene:index, or <code>\_\_end\_\_</code>).
+     */
     const handleOptionSelect = useCallback((next: string): void => {
         if (next === "__end__") {
             // End of story, show credits
@@ -175,7 +206,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         }
 
         const newDialogueIndex: number = newMaxIndex >= tempIndex ? tempIndex : 0;
-        const targetDialogue = script.story[newScene]?.dialogues[newDialogueIndex];
+        const targetDialogue: Dialogue = script.story[newScene]?.dialogues[newDialogueIndex];
         const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
 
         setState({
@@ -192,7 +223,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         handleCookieSave(); // Auto-save on option selection
     }, [state, setState, script, onChangePage, handleCookieSave, pushHistory]);
 
-    // Handle user input — store variable then auto-advance
+    /**
+     * Handles user input submission. It takes the input value, the variable name to update, and an optional color for the variable.
+     * It updates the variables in the state with the new value and color, then advances the dialogue similarly to handleAdvance, but with the added step of updating the variables before advancing.
+     * @param value {string} - The value of the user input to set for the specified variable.
+     * @param variableName {string} - The name of the variable to update with the user input value.
+     * @param color {string?} - An optional color associated with the variable, which can be used for display purposes.
+     */
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
         const updatedVariables = {
             ...state.variables,
@@ -201,8 +238,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
 
         if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
-            const nextIndex = state.currentDialogueIndex + 1;
-            const nextDialogue = script.story[state.currentScene].dialogues[nextIndex];
+            const nextIndex: number = state.currentDialogueIndex + 1;
+            const nextDialogue: Dialogue = script.story[state.currentScene].dialogues[nextIndex];
             setState({
                 ...state,
                 history: newHistory,
@@ -213,10 +250,10 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 waitingOnUserInput: nextDialogue?.input !== undefined
             });
         } else {
-            const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
+            const currentDialogue: Dialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
             if (currentDialogue.next && currentDialogue.next !== "__end__") {
-                const newScene = currentDialogue.next;
-                const firstDialogue = script.story[newScene]?.dialogues[0];
+                const newScene: string = currentDialogue.next;
+                const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
                 setState({
                     ...state,
                     history: newHistory,

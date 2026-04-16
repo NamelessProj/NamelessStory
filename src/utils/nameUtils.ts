@@ -8,6 +8,10 @@ import {VARIABLE_REGEX_SINGLE} from "./constants.ts";
  * 1. Direct character ID (e.g., name = "Char1")
  * 2. Variable whose NAME matches a character ID (e.g., name = "{{playerName}}" and characters["playerName"] exists)
  * 3. Variable whose VALUE matches a character ID (e.g., name = "{{speaker}}" and variables["speaker"].value = "Char1")
+ * @param name {string} - The name field from the dialogue, which can be a direct character ID or a variable pattern.
+ * @param characters {Record<string, CharacterType>} - The characters defined in the script, keyed by their ID.
+ * @param variables {Record<string, VariableType>} - The variables defined in the state, keyed by their name.
+ * @returns An object containing the resolved character ID and character data, or undefined if no character is resolved.
  */
 export const resolveCharacterFromName = (
     name: string,
@@ -21,7 +25,7 @@ export const resolveCharacterFromName = (
     if (direct) return { characterId: name, character: direct };
 
     // Variable pattern
-    const match = name.match(VARIABLE_REGEX_SINGLE);
+    const match: RegExpMatchArray | null = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         const variableName: string = match[2];
 
@@ -53,6 +57,11 @@ export const resolveCharacterFromName = (
  *    - If the variable VALUE matches a character ID, display that character's name
  *    - Otherwise, display the variable's value
  * 4. If nothing matches, return the raw name value
+ * @param name {string} - The name field from the dialogue, which can be a direct character ID, a variable pattern, or a raw string.
+ * @param nameDisplay {NameDisplay} - The display mode for character names ("full" or "short").
+ * @param characters {Record<string, CharacterType>} - The characters defined in the script, keyed by their ID.
+ * @param variables {Record<string, VariableType>} - The variables defined in the state, keyed by their name.
+ * @returns The resolved name to display, or undefined if no name should be displayed.
  */
 export const getNameToDisplay = (
     name: string,
@@ -77,7 +86,7 @@ export const getNameToDisplay = (
     }
 
     // Check if name matches a variable pattern (e.g., {{userName}})
-    const match = name.match(VARIABLE_REGEX_SINGLE);
+    const match: RegExpMatchArray | null = name.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         const prefix: string = match[1]; // e.g., "v!" or undefined
         const variableName: string = match[2];
@@ -118,9 +127,14 @@ export const getNameToDisplay = (
     return name;
 }
 
-// Export getVariableName for backwards compatibility
+/**
+ * Extracts the variable name from a string that matches the variable pattern (e.g., "{{variableName}}" or "v!{{variableName}}").
+ * If the string doesn't match the pattern, it returns the original string.
+ * @param variable {string} - The string to extract the variable name from, which may be in the format "{{variableName}}" or "v!{{variableName}}".
+ * @returns The extracted variable name without the pattern, or the original string if it doesn't match the variable pattern.
+ */
 export const getVariableName = (variable: string): string => {
-    const match = variable.match(VARIABLE_REGEX_SINGLE);
+    const match: RegExpMatchArray | null = variable.match(VARIABLE_REGEX_SINGLE);
     if (match) {
         return match[2]; // Return the variable name without the prefix
     }

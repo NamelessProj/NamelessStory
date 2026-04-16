@@ -7,7 +7,10 @@ const VolumeSlider = () => {
     const {state, setState} = useDataContext();
     const [isHovered, setIsHovered] = useState<boolean>(false);
 
-    // Handle volume change
+    /**
+     * Handle volume change from the slider input
+     * @param e {ChangeEvent<HTMLInputElement>} - The change event from the volume slider input
+     */
     const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const newVolume: number = parseFloat(e.target.value);
 
@@ -22,7 +25,10 @@ const VolumeSlider = () => {
         });
     };
 
-    // Handle mute toggle - click on the icon
+    /**
+     * Handle mute toggle when the volume icon is clicked.
+     * It toggles the isMusicMuted state and updates the audio element's volume accordingly (<code>0</code> if muted, or the current musicVolume if unmuted).
+     */
     const handleMuteToggle = (): void => {
         const isMuted: boolean = !state.isMusicMuted;
         if (state.currentMusic) {

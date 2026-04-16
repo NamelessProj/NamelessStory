@@ -1,4 +1,4 @@
-import {useRef} from "react";
+import {type ChangeEvent, useRef} from "react";
 import type {State, TitleButtons} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
@@ -18,14 +18,18 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
     const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    /**
+     * Handles the file input change event when a user selects a save file. It reads the file, parses it, and calls the handleLoadSave callback with the loaded state.
+     * @param e - The change event from the file input element.
+     */
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const file: File | undefined = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (event): void => {
             try {
-                const loadedState = parseSaveFile(event.target?.result as string);
+                const loadedState: State = parseSaveFile(event.target?.result as string);
                 handleLoadSave(loadedState);
             } catch {
                 console.error("Failed to load save file: invalid or corrupted file.");

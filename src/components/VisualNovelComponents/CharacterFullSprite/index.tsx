@@ -22,7 +22,9 @@ const CharacterFullSprite = ({sprite, characterId: characterIdOverride}: Charact
     const character: CharacterType | null = characterId ? script.characters[characterId] : null;
     const spriteUrl: string = character?.sprite?.[spriteName] || character?.sprite?.["idle"] || "";
 
-    // Determine position class
+    /**
+     * Determines the CSS class for sprite positioning based on the sprite's position property.
+     */
     const getPositionClass = (): string => {
         if (sprite.position?.name === "left") return styles.spriteLeft;
         if (sprite.position?.name === "right") return styles.spriteRight;

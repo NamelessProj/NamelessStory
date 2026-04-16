@@ -55,7 +55,9 @@ const Scene = ({
     // Check if we should show user input
     const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
-    // Handle click to advance — typing skip and threshold are handled inside onAdvance
+    /**
+     * Handles click events on the scene. It advances the dialogue if there are no options to choose from and no user input required. If options or input are present, it does nothing to allow the user to interact with those elements.
+     */
     const handleClick = (): void => {
         if (shouldShowOptions) return;
         if (shouldShowInput) return;
