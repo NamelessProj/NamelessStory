@@ -31,7 +31,7 @@ export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAc
     }
 
     // "continue[filename.mp3]" - continue only if the current song matches, otherwise play new
-    const continueMatch = bgmFile.match(/^continue\[(.+)\]$/);
+    const continueMatch: RegExpMatchArray | null = bgmFile.match(/^continue\[(.+)\]$/);
     if (continueMatch) {
         const targetFile = continueMatch[1];
         if (currentMusicName && currentMusicName === targetFile) {
