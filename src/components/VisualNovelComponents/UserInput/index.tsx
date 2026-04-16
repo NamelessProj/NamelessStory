@@ -19,13 +19,13 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
     const handleSubmit = (e: FormEvent<HTMLFormElement> | MouseEvent<HTMLElement>): void => {
         e.preventDefault();
 
-        if (!input || input === "") {
+        if (!input || input.trim() === "") {
             setIsWrong(true);
             setTimeout((): void => setIsWrong(false), 1000);
             return;
         }
 
-        setVariable(input, variable.value, variable.color);
+        setVariable(input.trim(), variable.value, variable.color);
         setInput("");
     }
 
