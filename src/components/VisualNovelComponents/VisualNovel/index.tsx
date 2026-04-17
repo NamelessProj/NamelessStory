@@ -4,7 +4,13 @@ import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
 import { useBGM } from "../../../hooks/useBGM";
-import {ADVANCE_THRESHOLD_MS, DEFAULT_HISTORY_LIMIT, MAX_HISTORY_LIMIT, MIN_HISTORY_LIMIT} from "../../../utils/constants.ts";
+import {
+    ADVANCE_THRESHOLD_MS,
+    DEFAULT_HISTORY_LIMIT,
+    END_STORY_TOKEN,
+    MAX_HISTORY_LIMIT,
+    MIN_HISTORY_LIMIT
+} from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
@@ -145,7 +151,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             // End of scene, go to next scene if specified
             const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
             if (currentDialogue.next) {
-                if (currentDialogue.next === "__end__") {
+                if (currentDialogue.next === END_STORY_TOKEN) {
                     onChangePage?.("credits");
                 } else {
                     const newScene: string = currentDialogue.next;
@@ -173,7 +179,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
      * @param next {string} - The "next" value from the selected option, which can be in various formats (empty string, numeric index, scene name, scene:index, or <code>\_\_end\_\_</code>).
      */
     const handleOptionSelect = useCallback((next: string): void => {
-        if (next === "__end__") {
+        if (next === END_STORY_TOKEN) {
             // End of story, show credits
             onChangePage?.("credits");
             return;
@@ -251,7 +257,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             });
         } else {
             const currentDialogue: Dialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
-            if (currentDialogue.next && currentDialogue.next !== "__end__") {
+            if (currentDialogue.next && currentDialogue.next !== END_STORY_TOKEN) {
                 const newScene: string = currentDialogue.next;
                 const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
                 setState({

@@ -13,6 +13,9 @@ export const VARIABLE_REGEX_SINGLE: RegExp = /{{([vcC]!)?([a-zA-Z0-9]+)}}/;
 // Minimum ms to wait after typing completes before the player can advance
 export const ADVANCE_THRESHOLD_MS: number = 150;
 
+// The string that tells when the story ends
+export const END_STORY_TOKEN: string = "__end__";
+
 // Default and bounds for the history limit setting
 export const DEFAULT_HISTORY_LIMIT: number = 15;
 export const MIN_HISTORY_LIMIT: number = 0;
