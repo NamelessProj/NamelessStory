@@ -10,10 +10,10 @@
  * ─── Dialogue box ────────────────────────────────────────────────────────────
  *
  * --vn-dialogue-bg          Background of the dialogue box   (default: rgba(0,0,0,0.75))
- * --vn-dialogue-border      Border shorthand                  (default: 3px solid rgba(255,255,255,0.2))
- * --vn-dialogue-border-radius  Corner rounding               (default: 12px)
  * --vn-dialogue-padding     Inner spacing                     (default: 1.5rem)
  * --vn-dialogue-min-height  Minimum height                    (default: 100px)
+ * --vn-dialogue-min-width   Minimum width                     (default: 100%)
+ * --vn-dialogue-max-width   Maximum width                     (default: 800px)
  * --vn-text-color           Dialogue text color               (default: #fff)
  * --vn-text-font-size       Dialogue text size                (default: 1.2rem)
  * --vn-text-line-height     Dialogue line height              (default: 1.6)
