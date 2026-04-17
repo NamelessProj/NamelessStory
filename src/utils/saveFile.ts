@@ -26,7 +26,7 @@ export const exportSaveFile = (state: State, storyTitle: string): void => {
  * @throws {Error} - If the JSON string does not contain the required properties or if they are of the wrong type, an error is thrown indicating that the save file is invalid. This ensures that only properly formatted save files can be loaded into the game, preventing potential issues with corrupted or malformed data.
  */
 export const parseSaveFile = (json: string): State => {
-    const parsed = JSON.parse(json) as Partial<State>;
+    const parsed: Partial<State> = JSON.parse(json) as Partial<State>;
     if (typeof parsed.currentScene !== "string" || typeof parsed.currentDialogueIndex !== "number") {
         throw new Error("Invalid save file");
     }
