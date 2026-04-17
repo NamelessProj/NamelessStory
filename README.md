@@ -363,7 +363,7 @@ The `\` acts as the pause marker. Each character after it is a pause type:
 - `,` → 0.5 seconds
 
 > [!NOTE]
-> You may have to put 2 backslashes (`\` -> `\\`) back to back, cause on most language, including JSON, the backslash is used as an exit character, as you can see on the example above.
+> You may have to put 2 backslashes (`\` → `\\`) back to back, cause on most language, including JSON, the backslash is used as an exit character, as you can see on the example above.
 
 #### Variables in Text
 
