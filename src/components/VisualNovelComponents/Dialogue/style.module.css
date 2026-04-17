@@ -1,10 +1,8 @@
 .dialogueContainer {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    max-width: 800px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 
 .dialogueName {
@@ -17,12 +15,13 @@
 
 .dialogueBox {
     background: var(--vn-dialogue-bg, rgba(0, 0, 0, 0.75));
-    border: var(--vn-dialogue-border, 3px solid rgba(255, 255, 255, 0.2));
-    border-radius: var(--vn-dialogue-border-radius, 12px);
     padding: var(--vn-dialogue-padding, 1.5rem);
     min-height: var(--vn-dialogue-min-height, 100px);
     position: relative;
     backdrop-filter: blur(10px);
+    width: var(--vn-dialogue-min-width, 100%);
+    max-width: var(--vn-dialogue-max-width, 800px);
+    margin-inside: auto;
 }
 
 .dialogueText {
