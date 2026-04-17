@@ -7,7 +7,7 @@ import Cookies from "../../utils/cookies.ts";
 import {getCookieName} from "../../utils/helpMethods.ts";
 
 const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
-    const [script, setScript] = useState<VNStory|null>(null);
+    const [script, setScript] = useState<VNStory | null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
     const [savedState, setSavedState] = useState<State | null>(null);
     const [state, setState] = useState<State>({
@@ -91,7 +91,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
      * Handles the "Continue" action on the title screen. If a saved state was successfully loaded from cookies, this function will set the global state to the saved state and navigate to the game page.
      * If no saved state is available, this function will be undefined, and the "Continue" button will not be rendered on the title screen.
      */
-    const handleContinue = savedState ? (): void => {
+    const handleContinue: (() => void) | undefined = savedState ? (): void => {
         setState(savedState);
         setCurrentPage("game");
     } : undefined;
