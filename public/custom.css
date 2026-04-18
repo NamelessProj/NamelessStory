@@ -47,7 +47,6 @@
  * --vn-overlay-top-height   Top bar height                    (default: 60px)
  * --vn-overlay-top-bg       Top bar gradient background       (default: dark-to-transparent gradient)
  * --vn-overlay-bottom-height  Bottom bar height               (default: 120px)
- * --vn-overlay-bottom-bg    Bottom bar gradient background    (default: dark-to-transparent gradient)
  * --vn-overlay-button-bg    Overlay button background         (default: rgba(255,255,255,0.1))
  * --vn-overlay-button-border  Overlay button border           (default: 2px solid rgba(255,255,255,0.3))
  * --vn-overlay-button-bg-hover  Overlay button hover bg       (default: rgba(255,255,255,0.2))
