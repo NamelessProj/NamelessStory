@@ -12,6 +12,7 @@ interface DialogueProps {
     name: string;
     nameDisplay: NameDisplay;
     onTypingComplete?: () => void;
+    isOverlayHidden?: boolean;
 }
 
 const DialogueBox = ({
@@ -19,7 +20,8 @@ const DialogueBox = ({
     textSpeed,
     name,
     nameDisplay,
-    onTypingComplete
+    onTypingComplete,
+    isOverlayHidden,
 }: DialogueProps) => {
     const {script, state} = useDataContext();
 
@@ -41,7 +43,7 @@ const DialogueBox = ({
     const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
-        <div className={styles.dialogueContainer}>
+        <div className={`${styles.dialogueContainer} ${isOverlayHidden ? styles.hidden : ''}`}>
             {/* Character Name - only display if nameToDisplay exists and is not empty */}
             {nameToDisplay && nameToDisplay !== "" && (
                 <div
