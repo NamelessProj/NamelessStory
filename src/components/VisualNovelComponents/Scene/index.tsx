@@ -10,6 +10,7 @@ import {useDataContext} from "../../../hooks/useDataContext.ts";
 import styles from './style.module.css';
 
 interface SceneProps {
+    isOverlayHidden: boolean;
     onAdvance: () => void;
     onTypingComplete: () => void;
     onHandleOptionSelect: (nextScene: string) => void;
@@ -17,6 +18,7 @@ interface SceneProps {
 }
 
 const Scene = ({
+    isOverlayHidden,
     onAdvance,
     onTypingComplete,
     onHandleOptionSelect,
@@ -90,6 +92,7 @@ const Scene = ({
                     name={currentDialogue.name}
                     nameDisplay={currentDialogue.nameDisplay || script.settings.defaultNameDisplay || "short"}
                     onTypingComplete={onTypingComplete}
+                    isOverlayHidden={isOverlayHidden}
                 />
             )}
 
