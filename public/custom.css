@@ -9,7 +9,7 @@
  *
  * ─── Dialogue box ────────────────────────────────────────────────────────────
  *
- * --vn-dialogue-bg          Background of the dialogue box   (default: rgba(0,0,0,0.75))
+ * --vn-dialogue-bg          Background of the dialogue box    (default: rgba(0,0,0,0.75))
  * --vn-dialogue-padding     Inner spacing                     (default: 1.5rem)
  * --vn-dialogue-min-height  Minimum height                    (default: 100px)
  * --vn-dialogue-min-width   Minimum width                     (default: 100%)
@@ -65,9 +65,9 @@
  *
  * ─── Credits screen ──────────────────────────────────────────────────────────
  *
- * --vn-credits-padding-block  Top/bottom padding on credits    (default: 7rem)
- * --vn-credit-el-margin       Margin below each credit entry   (default: 2rem)
- * --vn-credit-group-h2-margin-top     Group title top margin   (default: 7rem)
+ * --vn-credits-padding-block  Top/bottom padding on credits     (default: 7rem)
+ * --vn-credit-el-margin       Margin below each credit entry    (default: 2rem)
+ * --vn-credit-group-h2-margin-top     Group title top margin    (default: 7rem)
  * --vn-credit-group-h2-margin-bottom  Group title bottom margin (default: 4rem)
  *
  * ─── Background image ────────────────────────────────────────────────────────
