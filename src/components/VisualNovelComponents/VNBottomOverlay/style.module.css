@@ -21,7 +21,6 @@
     left: 0;
     width: 100%;
     height: var(--vn-overlay-bottom-height, 120px);
-    background: var(--vn-overlay-bottom-bg, linear-gradient(to top, rgba(0,0,0,0.9), transparent));
     display: flex;
     align-items: flex-end;
     justify-content: center;
