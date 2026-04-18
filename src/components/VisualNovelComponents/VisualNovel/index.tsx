@@ -314,6 +314,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             />
 
             <Scene
+                isOverlayHidden={isOverlayHidden}
                 onAdvance={handleAdvance}
                 onTypingComplete={handleTypingComplete}
                 onHandleOptionSelect={handleOptionSelect}
