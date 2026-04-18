@@ -3,6 +3,7 @@
     bottom: 0;
     left: 0;
     width: 100%;
+    background: var(--vn-dialogue-bg, linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent));
 }
 
 .dialogueName {
@@ -14,14 +15,12 @@
 }
 
 .dialogueBox {
-    background: var(--vn-dialogue-bg, rgba(0, 0, 0, 0.75));
-    padding: var(--vn-dialogue-padding, 1.5rem);
+    padding: var(--vn-dialogue-padding, 1rem 2rem 3rem);
     min-height: var(--vn-dialogue-min-height, 100px);
     position: relative;
-    backdrop-filter: blur(10px);
     width: var(--vn-dialogue-min-width, 100%);
-    max-width: var(--vn-dialogue-max-width, 800px);
-    margin-inside: auto;
+    max-width: var(--vn-dialogue-max-width, 1000px);
+    margin: 0 auto;
 }
 
 .dialogueText {
