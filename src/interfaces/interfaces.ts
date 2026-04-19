@@ -1,6 +1,8 @@
 export type Page = "title" | "credits" | "game";
 
-export type NameDisplay = "short"|"full";
+export type NameDisplay = "short" | "full";
+
+export type DialoguePosition = "bottom" | "top" | "center";
 
 export interface SpritePosition {
     name?: "right"|"left"|"center",
@@ -29,7 +31,8 @@ export interface Dialogue {
     input?: VariableType,
     options?: Option[],
     sprite?: Sprite,
-    next?: string
+    next?: string,
+    dialoguePosition?: DialoguePosition
 }
 
 export interface SceneType {
@@ -82,6 +85,7 @@ export interface Settings {
     textSpeed?: number,
     defaultNameColor?: string,
     defaultNameDisplay?: NameDisplay,
+    defaultDialoguePosition?: DialoguePosition,
     historyLimit?: number,
     titlePage: TitlePage,
     creditsPage: CreditsPageType
