@@ -1,6 +1,6 @@
 import {useMemo} from "react";
 import Typewriter from "../../Typewriter";
-import type {CharacterType, NameDisplay} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, DialoguePosition, NameDisplay} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
@@ -11,15 +11,23 @@ interface DialogueProps {
     textSpeed: number;
     name: string;
     nameDisplay: NameDisplay;
+    position: DialoguePosition;
     onTypingComplete?: () => void;
     isOverlayHidden?: boolean;
 }
+
+const positionClass: Record<DialoguePosition, string> = {
+    bottom: styles.positionBottom,
+    top: styles.positionTop,
+    center: styles.positionCenter,
+};
 
 const DialogueBox = ({
     text,
     textSpeed,
     name,
     nameDisplay,
+    position,
     onTypingComplete,
     isOverlayHidden,
 }: DialogueProps) => {
@@ -43,24 +51,26 @@ const DialogueBox = ({
     const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
-        <div className={`${styles.dialogueContainer} ${isOverlayHidden ? styles.hidden : ''}`}>
-            {/* Character Name - only display if nameToDisplay exists and is not empty */}
-            {nameToDisplay && nameToDisplay !== "" && (
-                <div
-                    className={styles.dialogueName}
-                    style={{color: nameColor}}
-                >
-                    {nameToDisplay}
-                </div>
-            )}
+        <div className={`${styles.dialogueContainer} ${positionClass[position]} ${isOverlayHidden ? styles.hidden : ''}`}>
+            <div className={styles.dialogueInner}>
+                {/* Character Name - only display if nameToDisplay exists and is not empty */}
+                {nameToDisplay && nameToDisplay !== "" && (
+                    <div
+                        className={styles.dialogueName}
+                        style={{color: nameColor}}
+                    >
+                        {nameToDisplay}
+                    </div>
+                )}
 
-            <div className={styles.dialogueBox}>
-                <Typewriter
-                    text={text}
-                    speed={textSpeed}
-                    onComplete={onTypingComplete}
-                    className={styles.dialogueText}
-                />
+                <div className={styles.dialogueBox}>
+                    <Typewriter
+                        text={text}
+                        speed={textSpeed}
+                        onComplete={onTypingComplete}
+                        className={styles.dialogueText}
+                    />
+                </div>
             </div>
         </div>
     );
