@@ -7,17 +7,26 @@
  *
  * Usage: set variables on :root to apply them globally.
  *
- * ─── Dialogue box ────────────────────────────────────────────────────────────
+ * ─── Dialogue box (bottom / top positions) ───────────────────────────────────
  *
- * --vn-dialogue-bg          Background of the dialogue box    (default: rgba(0,0,0,0.75))
- * --vn-dialogue-padding     Inner spacing                     (default: 1.5rem)
- * --vn-dialogue-min-height  Minimum height                    (default: 100px)
- * --vn-dialogue-min-width   Minimum width                     (default: 100%)
- * --vn-dialogue-max-width   Maximum width                     (default: 800px)
- * --vn-text-color           Dialogue text color               (default: #fff)
- * --vn-text-font-size       Dialogue text size                (default: 1.2rem)
- * --vn-text-line-height     Dialogue line height              (default: 1.6)
- * --vn-name-font-size       Character name size               (default: 1.5rem)
+ * --vn-dialogue-bg          Background gradient (bottom position)  (default: dark-to-transparent gradient)
+ * --vn-dialogue-bg-top      Background gradient (top position)     (default: dark-to-transparent gradient)
+ * --vn-dialogue-padding     Inner spacing                          (default: 1rem 2rem 3rem)
+ * --vn-dialogue-min-height  Minimum height                         (default: 100px)
+ * --vn-dialogue-min-width   Minimum width                          (default: 100%)
+ * --vn-dialogue-max-width   Maximum width                          (default: 1000px)
+ * --vn-text-color           Dialogue text color                    (default: #fff)
+ * --vn-text-font-size       Dialogue text size                     (default: 1.2rem)
+ * --vn-text-line-height     Dialogue line height                   (default: 1.6)
+ * --vn-name-font-size       Character name size                    (default: 1.5rem)
+ * --vn-name-padding         Character name padding                 (default: 0 2rem)
+ *
+ * ─── Dialogue box (center position) ─────────────────────────────────────────
+ *
+ * --vn-dialogue-center-bg           Panel background           (default: rgba(0,0,0,0.82))
+ * --vn-dialogue-center-max-width    Panel maximum width        (default: 700px)
+ * --vn-dialogue-center-padding      Panel inner padding        (default: 1.25rem 2rem)
+ * --vn-dialogue-center-outer-padding  Padding around the panel (default: 0.25rem 0.5rem)
  *
  * ─── Choice buttons ──────────────────────────────────────────────────────────
  *
