@@ -3,7 +3,7 @@ import CharacterFullSprite from "../CharacterFullSprite";
 import DialogueBox from "../Dialogue";
 import OptionsGroup from "../OptionsGroup";
 import UserInputBox from "../UserInput";
-import type {CharacterType, Dialogue, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, Dialogue, DialoguePosition, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
 import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
@@ -48,6 +48,9 @@ const Scene = ({
             : undefined
     );
 
+    // Resolve dialogue position: per-dialogue → settings default → "bottom"
+    const dialoguePosition: DialoguePosition = currentDialogue.dialoguePosition ?? script.settings.defaultDialoguePosition ?? "bottom";
+
     // Check if we should show dialogue box
     const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
 
@@ -91,6 +94,7 @@ const Scene = ({
                     textSpeed={currentDialogue.textSpeed || script.settings.textSpeed || 50}
                     name={currentDialogue.name}
                     nameDisplay={currentDialogue.nameDisplay || script.settings.defaultNameDisplay || "short"}
+                    position={dialoguePosition}
                     onTypingComplete={onTypingComplete}
                     isOverlayHidden={isOverlayHidden}
                 />
