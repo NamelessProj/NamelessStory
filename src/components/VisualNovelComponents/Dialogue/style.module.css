@@ -54,7 +54,7 @@
 
 .positionCenter .dialogueInner {
     width: auto;
-    max-width: var(--vn-dialogue-center-max-width, 1000px);
+    max-width: var(--vn-dialogue-center-max-width, 700px);
     padding: var(--vn-dialogue-center-outer-padding, 0.25rem 0.5rem);
 }
 
