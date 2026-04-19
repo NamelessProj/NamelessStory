@@ -20,6 +20,7 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
    - [Player Choices (Options)](#player-choices-options)
    - [Player Text Input](#player-text-input)
    - [Character Sprites](#character-sprites)
+   - [Dialogue Position](#dialogue-position)
    - [Background Music](#background-music)
    - [Text Formatting and Variables](#text-formatting-and-variables)
    - [Navigating Between Scenes](#navigating-between-scenes)
@@ -159,6 +160,7 @@ The `settings` block controls global options, the title screen, and the credits 
 | `startingScene` | :heavy_check_mark: (Yes) | The ID of the first scene to play |
 | `textSpeed` | :x: (No) | Typing animation speed. Lower = faster. Default: `50` |
 | `defaultNameDisplay` | :x: (No) | `"short"` (default) or `"full"` — which character name to show |
+| `defaultDialoguePosition` | :x: (No) | `"bottom"` (default), `"top"`, or `"center"` — where the dialogue box appears on screen |
 | `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
 | `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
 | `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
@@ -251,6 +253,7 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 | `options` | :x: (No) | Multiple-choice options (see [Player Choices](#player-choices-options)) |
 | `input` | :x: (No) | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
 | `sprite` | :x: (No) | Show a character sprite (see [Character Sprites](#character-sprites)) |
+| `dialoguePosition` | :x: (No) | `"bottom"`, `"top"`, or `"center"` — override the dialogue box position for this line only (see [Dialogue Position](#dialogue-position)) |
 
 ### Player Choices (Options)
 
@@ -326,6 +329,64 @@ Use the `sprite` field in a dialogue to display a character portrait.
 Where `x` is a pixel offset from center and `y` is the height.
 
 **Sprites persist** within a scene until you specify a different one (or the scene changes). To hide a sprite, advance to a dialogue without a `sprite` field or change scenes.
+
+### Dialogue Position
+
+By default, the dialogue box sits at the bottom of the screen, but you can place it at the **top** or in the **center** — either for the entire story or on a per-line basis.
+
+#### Global default (settings)
+
+Set `defaultDialoguePosition` in `settings` to apply a position to every dialogue that does not override it:
+
+```json
+"settings": {
+  "defaultDialoguePosition": "bottom"
+}
+```
+
+If the field is omitted, `"bottom"` is used automatically.
+
+#### Per-dialogue override
+
+Add `dialoguePosition` directly on any dialogue line to override the global default for that specific line:
+
+```json
+{
+  "name": "Alice",
+  "text": "Look up here!",
+  "dialoguePosition": "top"
+},
+{
+  "name": "Narrator",
+  "text": "A mysterious voice echoes from the void...",
+  "dialoguePosition": "center"
+},
+{
+  "name": "Alice",
+  "text": "Back to normal now.",
+  "dialoguePosition": "bottom"
+}
+```
+
+#### The three positions
+
+| Value | Appearance |
+|-------|------------|
+| `"bottom"` | Dialogue strip anchored to the bottom edge, with a gradient fading upward. This is the classic visual novel look. |
+| `"top"` | Dialogue strip anchored to the top edge, with a gradient fading downward. |
+| `"center"` | Dialogue box centered on screen. A semi-transparent dark overlay dims the scene behind it to keep the text readable. |
+
+#### CSS variables (center box)
+
+The center panel has its own CSS variables you can override in `public/custom.css`:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--vn-dialogue-center-bg` | `rgba(0, 0, 0, 0.82)` | Background of the centered dialogue panel |
+| `--vn-dialogue-center-max-width` | `1000px` | Maximum width of the centered panel |
+| `--vn-dialogue-center-radius` | `8px` | Border radius of the centered panel |
+| `--vn-dialogue-center-padding` | `1.25rem 2rem` | Inner padding of the centered panel |
+| `--vn-dialogue-bg-top` | `linear-gradient(to bottom, rgba(0,0,0,0.9) 60%, transparent)` | Background gradient used when position is `"top"` |
 
 ### Background Music
 
