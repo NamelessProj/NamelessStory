@@ -157,7 +157,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                     onChangePage?.("credits");
                 } else {
                     const newScene: string = currentDialogue.next;
-                    const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
+                    const firstDialogue: Dialogue = script.story[newScene].dialogues[0];
                     setState({
                         ...s,
                         history: newHistory,
