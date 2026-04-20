@@ -7,7 +7,7 @@ import type {State} from "../interfaces/interfaces.ts";
  * @param storyTitle {string} - The title of the story, which is used to generate the file name for the exported save file. This should be a string that represents the name of the visual novel or story being played.
  */
 export const exportSaveFile = (state: State, storyTitle: string): void => {
-    const saveData: string = JSON.stringify({...state, currentMusic: null}, null, 2);
+    const saveData: string = JSON.stringify(state, null, 2);
     const blob = new Blob([saveData], {type: "application/json"});
     const url: string = URL.createObjectURL(blob);
     const a: HTMLAnchorElement = document.createElement("a");
@@ -30,5 +30,5 @@ export const parseSaveFile = (json: string): State => {
     if (typeof parsed.currentScene !== "string" || typeof parsed.currentDialogueIndex !== "number") {
         throw new Error("Invalid save file");
     }
-    return {...parsed, currentMusic: null} as State;
+    return parsed as State;
 }
