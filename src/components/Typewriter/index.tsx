@@ -44,6 +44,7 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     // Skip to end when requested
     useEffect(() => {
         if (typewriterState.skipTyping && currentStep < totalSteps) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setCurrentStep(totalSteps);
         }
     }, [typewriterState.skipTyping, currentStep, totalSteps]);
