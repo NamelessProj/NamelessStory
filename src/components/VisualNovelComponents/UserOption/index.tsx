@@ -1,3 +1,4 @@
+import {memo} from "react";
 import styles from './style.module.css';
 
 interface UserOptionProps {
@@ -5,20 +6,12 @@ interface UserOptionProps {
     onClick?: () => void;
 }
 
-const UserOption = ({text, onClick = undefined}: UserOptionProps) => {
-    /**
-     * Handles the click event on the user option button. If an onClick function is provided, it will be called when the button is clicked.
-     * If no onClick function is provided, the button will simply do nothing when clicked.
-     */
-    const handleClick = (): void => {
-        if (onClick) onClick();
-    };
-
+const UserOption = memo(({text, onClick = undefined}: UserOptionProps) => {
     return (
-        <button className={styles.vnUserOption} onClick={handleClick}>
+        <button className={styles.vnUserOption} onClick={onClick}>
             <span>{text}</span>
         </button>
     );
-};
+});
 
 export default UserOption;

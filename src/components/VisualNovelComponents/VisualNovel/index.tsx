@@ -1,5 +1,5 @@
-import {useCallback, useState, useRef, useEffect} from "react";
-import type {Dialogue, HistoryEntry, Page, SceneType} from "../../../interfaces/interfaces.ts";
+import {useCallback, useState, useRef, useEffect, type RefObject} from "react";
+import type {Dialogue, HistoryEntry, Page, SceneType, State, TypewriterState} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
@@ -12,10 +12,10 @@ import {
     MIN_HISTORY_LIMIT
 } from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
+import {useTypewriterContext} from "../../../hooks/useTypewriterContext.ts";
 import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
 import {exportSaveFile} from "../../../utils/saveFile.ts";
-import type {RefObject} from "react";
 
 import styles from './style.module.css';
 
@@ -25,13 +25,35 @@ interface VisualNovelProps {
 
 const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const {script, state, setState} = useDataContext();
+    const {typewriterState, setTypewriterState} = useTypewriterContext();
     const [isOverlayHidden, setIsOverlayHidden] = useState<boolean>(false);
-    // Timestamp of the last time typing completed — used to enforce the advance threshold
+
     const lastTypingCompleteRef: RefObject<number> = useRef<number>(0);
+
+    // Refs mirror live values so callbacks don't need them as deps and remain stable
+    const stateRef = useRef<State>(state);
+    const typewriterStateRef = useRef<TypewriterState>(typewriterState);
+    const isOverlayHiddenRef = useRef<boolean>(isOverlayHidden);
+    useEffect(() => { stateRef.current = state; }, [state]);
+    useEffect(() => { typewriterStateRef.current = typewriterState; }, [typewriterState]);
+    useEffect(() => { isOverlayHiddenRef.current = isOverlayHidden; }, [isOverlayHidden]);
+
+    // Web Worker for off-thread cookie serialization
+    const saveWorkerRef = useRef<Worker | null>(null);
+    useEffect(() => {
+        const worker = new Worker(new URL('../../../workers/saveWorker.ts', import.meta.url), { type: 'module' });
+        worker.addEventListener('message', (e: MessageEvent<{serialized: string; cookieName: string}>) => {
+            Cookies.set(e.data.cookieName, e.data.serialized);
+        });
+        saveWorkerRef.current = worker;
+        return () => {
+            worker.terminate();
+            saveWorkerRef.current = null;
+        };
+    }, []);
 
     const currentScene: SceneType = script.story[state.currentScene];
 
-    // Handle background music - use scene name as trigger to only play on scene entry
     useBGM({
         bgmFile: currentScene?.bgmFile,
         bgmLoop: currentScene?.bgmLoop,
@@ -45,13 +67,6 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         Math.max(MIN_HISTORY_LIMIT, script.settings.historyLimit ?? DEFAULT_HISTORY_LIMIT)
     );
 
-    /**
-     * Pushes a new entry onto the history stack, ensuring it does not exceed the specified history limit. If the limit is exceeded, the oldest entries are removed to maintain the limit.
-     * @param history {HistoryEntry[]} - The current history stack.
-     * @param sceneId {string} - The ID of the scene to add to the history.
-     * @param dialogueIndex {number} - The index of the dialogue within the scene to add to the history.
-     * @returns A new history stack with the new entry added and old entries removed if necessary.
-     */
     const pushHistory = useCallback((history: HistoryEntry[], sceneId: string, dialogueIndex: number): HistoryEntry[] => {
         if (historyLimit === 0) return history;
         const entry: HistoryEntry = {sceneId, dialogueIndex};
@@ -59,248 +74,234 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
     }, [historyLimit]);
 
-    /**
-     * Handles the "back" action, allowing the user to return to the previous dialogue.
-     * It checks if there is history available, and if so, it retrieves the last entry from the history stack and updates the current scene and dialogue index accordingly.
-     * It also updates the state to reflect that the user is now waiting on option selection or user input if applicable.
-     */
+    // Reads stateRef.current so it doesn't depend on state and remains stable
+    const handleCookieSave = useCallback((): void => {
+        const cookieName = getCookieName(script.settings.titlePage.title);
+        saveWorkerRef.current?.postMessage({ state: stateRef.current, cookieName });
+    }, [script]);
+
     const handleBack = useCallback((): void => {
-        if (state.history.length === 0) return;
-        const prev: HistoryEntry = state.history[state.history.length - 1];
-        const newHistory: HistoryEntry[] = state.history.slice(0, -1);
+        const s = stateRef.current;
+        if (s.history.length === 0) return;
+        const prev: HistoryEntry = s.history[s.history.length - 1];
+        const newHistory: HistoryEntry[] = s.history.slice(0, -1);
         const scene: SceneType = script.story[prev.sceneId];
         setState({
-            ...state,
+            ...s,
             currentScene: prev.sceneId,
             currentDialogueIndex: prev.dialogueIndex,
             currentDialogueIndexMax: scene.dialogues.length - 1,
             history: newHistory,
-            isTyping: true,
-            skipTyping: false,
             waitingOnOptionSelection: false,
             waitingOnUserInput: scene.dialogues[prev.dialogueIndex]?.input !== undefined
         });
-    }, [state, setState, script]);
+        setTypewriterState({isTyping: true, skipTyping: false});
+    }, [script, setState, setTypewriterState]);
 
     /**
-     * Handles saving the game state to a cookie. It constructs a save data object by taking the current state and setting the currentMusic property to null (to avoid saving transient music state).
-     * It then converts this object to a JSON string and saves it in a cookie using a name derived from the script's title.
-     */
-    const handleCookieSave = useCallback((): void => {
-        const title: string = script.settings.titlePage.title;
-        const saveData: string = JSON.stringify({...state, currentMusic: null});
-        Cookies.set(getCookieName(title), saveData);
-    }, [state, script]);
-
-    /**
-     * Handles exporting the game state as a save file. It first saves the current state to a cookie (similar to handleCookieSave) and then triggers a download of the save file using the exportSaveFile utility function, passing in the current state and the script's title for naming the file.
+     * Handles saving the current game state to a file. When the player chooses to export their save, this function will take the current state, serialize it, and trigger a download of the save file.
+     * It also sends the state to a Web Worker for off-thread cookie saving, ensuring that the player's progress is preserved both in a downloadable file and in a cookie for future sessions.
      */
     const handleExportSave = useCallback((): void => {
+        const s = stateRef.current;
         const title: string = script.settings.titlePage.title;
-        const saveData: string = JSON.stringify({...state, currentMusic: null});
-        Cookies.set(getCookieName(title), saveData);
-        exportSaveFile(state, title);
-    }, [state, script]);
+        exportSaveFile(s, title);
+        saveWorkerRef.current?.postMessage({ state: s, cookieName: getCookieName(title) });
+    }, [script]);
 
     /**
-     * Handles the completion of text typing animation. It updates the lastTypingCompleteRef with the current timestamp and updates the state to indicate that typing has completed and any skipTyping flag should be reset.
+     * Handles the completion of the typewriter effect for dialogue text.
+     * When the typewriter effect finishes displaying the current dialogue text, this function is called to update the typewriter state, indicating that typing is complete and resetting the skipTyping flag.
+     * This allows the game to know when it can allow the player to advance to the next dialogue or scene, and ensures that any logic related to typing completion (such as enabling input or options) can be triggered appropriately.
      */
     const handleTypingComplete = useCallback((): void => {
         lastTypingCompleteRef.current = Date.now();
-        setState({...state, isTyping: false, skipTyping: false});
-    }, [state, setState]);
+        setTypewriterState({isTyping: false, skipTyping: false});
+    }, [setTypewriterState]);
 
     /**
-     * Handles advancing the dialogue. It first checks if the game is currently waiting on user input or if the overlay is hidden, in which case it does not advance.
-     * If the text is still typing, it sets the skipTyping flag to true to immediately finish the text animation.
-     * It also enforces a small delay after typing completes to prevent accidental double-presses from advancing multiple dialogues at once.
-     * If advancing is allowed, it pushes the current scene and dialogue index onto the history stack, then checks if there are more dialogues in the current scene.
-     * If so, it advances to the next dialogue. If not, it checks if there is a specified next scene to transition to, and if so, it transitions to that scene.
-     * If there is no next scene or if the next scene is <code>\_\_end\_\_</code>, it triggers a page change to the credits.
+     * Handles advancing the dialogue when the player clicks or presses a key.
+     * This function checks various conditions to determine whether advancing is allowed (e.g., not waiting on user input, not skipping typing, etc.) and then updates the game state to move to the next dialogue or scene as appropriate.
+     * It also manages the typewriter state to control text display and ensures that the player's progress is saved to a cookie after advancing.
      */
     const handleAdvance = useCallback((): void => {
-        // Don't advance if waiting on user input
-        if (state.waitingOnUserInput) return;
+        const s = stateRef.current;
+        const ts = typewriterStateRef.current;
 
-        // Don't advance if overlay is hidden (user needs to click to show overlay before advancing)
-        if (isOverlayHidden) return;
+        if (s.waitingOnUserInput) return;
+        if (isOverlayHiddenRef.current) return;
 
-        // If still typing, skip to the end instead of advancing
-        if (state.isTyping) {
-            setState({...state, skipTyping: true});
+        if (ts.isTyping) {
+            setTypewriterState({isTyping: true, skipTyping: true});
             return;
         }
 
-        // Enforce a small delay after typing completes to prevent accidental double-press
         if (Date.now() - lastTypingCompleteRef.current < ADVANCE_THRESHOLD_MS) return;
 
-        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
+        const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
-        if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
-            const nextIndex: number = state.currentDialogueIndex + 1;
-            const nextDialogue: Dialogue = script.story[state.currentScene].dialogues[nextIndex];
+        if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
+            const nextIndex: number = s.currentDialogueIndex + 1;
+            const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
             setState({
-                ...state,
+                ...s,
                 history: newHistory,
                 currentDialogueIndex: nextIndex,
-                isTyping: true,
-                skipTyping: false,
                 waitingOnUserInput: nextDialogue?.input !== undefined
             });
+            setTypewriterState({isTyping: true, skipTyping: false});
         } else {
-            // End of scene, go to next scene if specified
-            const currentDialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
+            const currentDialogue: Dialogue = script.story[s.currentScene].dialogues[s.currentDialogueIndex];
             if (currentDialogue.next) {
                 if (currentDialogue.next === END_STORY_TOKEN) {
                     onChangePage?.("credits");
                 } else {
                     const newScene: string = currentDialogue.next;
-                    const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
+                    const firstDialogue: Dialogue = script.story[newScene].dialogues[0];
                     setState({
-                        ...state,
+                        ...s,
                         history: newHistory,
                         currentScene: newScene,
                         currentDialogueIndex: 0,
                         currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
-                        isTyping: true,
-                        skipTyping: false,
                         waitingOnUserInput: firstDialogue?.input !== undefined
                     });
+                    setTypewriterState({isTyping: true, skipTyping: false});
                 }
             } else {
                 onChangePage?.("credits");
             }
         }
-        handleCookieSave(); // Auto-save on advance
-    }, [state, setState, script, onChangePage, isOverlayHidden, handleCookieSave, pushHistory]);
+        handleCookieSave();
+    }, [script, onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave]);
 
     /**
-     * Handles the selection of an option by the user. It takes the "next" value associated with the selected option and determines how to update the current scene and dialogue index based on its format.
-     * @param next {string} - The "next" value from the selected option, which can be in various formats (empty string, numeric index, scene name, scene:index, or <code>\_\_end\_\_</code>).
+     * Handles the selection of an option in the dialogue. When the player selects an option, this function determines the next scene and dialogue index based on the option's "next" value, updates the game state accordingly, and saves the updated state to a cookie. This allows for branching narratives where player choices can lead to different scenes and dialogues, and ensures that the player's progress is preserved across sessions.
+     * @param next {string} The "next" value associated with the selected option. This value can take several forms:
+     * - If the value is <code>\_\_end\_\_</code>, the game will navigate to the credits page.
+     * - If the value is an empty string, it will advance to the next dialogue in the current scene.
+     * - If the value is a number (as a string), it will jump to that dialogue index within the current scene.
+     * - If the value contains a colon (e.g., <code>"sceneName:3"</code>), it will jump to the specified scene and dialogue index.
+     * - If the value is a string without a colon, it will jump to the first dialogue of the specified scene.
      */
     const handleOptionSelect = useCallback((next: string): void => {
+        const s = stateRef.current;
+
         if (next === END_STORY_TOKEN) {
-            // End of story, show credits
             onChangePage?.("credits");
             return;
         }
 
-        const currentScene: string = state.currentScene;
-        let newScene: string = state.currentScene;
+        const currentSceneId: string = s.currentScene;
+        let newScene: string = s.currentScene;
         let tempIndex: number = 0;
-        let newMaxIndex: number = state.currentDialogueIndexMax;
+        let newMaxIndex: number = s.currentDialogueIndexMax;
         const radix: number = 10;
 
         if (next === "") {
-            // Empty string: go to next index of current scene
-            tempIndex = state.currentDialogueIndex + 1;
+            tempIndex = s.currentDialogueIndex + 1;
         } else if (!isNaN(Number(next))) {
-            // Numeric value: stay in current scene, change dialogue index
             tempIndex = parseInt(next, radix);
         } else if (next.includes(":")) {
-            // Scene:index format: change scene and dialogue index
             const [sceneName, indexStr] = next.split(":");
             newScene = sceneName;
             tempIndex = parseInt(indexStr, radix);
         } else {
-            // Scene name only: change scene and start from index 0
             newScene = next;
         }
 
-        if (currentScene !== newScene) {
+        if (currentSceneId !== newScene) {
             newMaxIndex = script.story[newScene].dialogues.length - 1;
         }
 
         const newDialogueIndex: number = newMaxIndex >= tempIndex ? tempIndex : 0;
         const targetDialogue: Dialogue = script.story[newScene]?.dialogues[newDialogueIndex];
-        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
+        const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
         setState({
-            ...state,
+            ...s,
             history: newHistory,
             currentScene: newScene,
             currentDialogueIndex: newDialogueIndex,
             currentDialogueIndexMax: newMaxIndex,
             waitingOnOptionSelection: false,
             waitingOnUserInput: targetDialogue?.input !== undefined,
-            isTyping: true,
-            skipTyping: false
         });
-        handleCookieSave(); // Auto-save on option selection
-    }, [state, setState, script, onChangePage, handleCookieSave, pushHistory]);
+        setTypewriterState({isTyping: true, skipTyping: false});
+        handleCookieSave();
+    }, [script, onChangePage, setState, setTypewriterState, pushHistory, handleCookieSave]);
 
     /**
-     * Handles user input submission. It takes the input value, the variable name to update, and an optional color for the variable.
-     * It updates the variables in the state with the new value and color, then advances the dialogue similarly to handleAdvance, but with the added step of updating the variables before advancing.
-     * @param value {string} - The value of the user input to set for the specified variable.
-     * @param variableName {string} - The name of the variable to update with the user input value.
-     * @param color {string?} - An optional color associated with the variable, which can be used for display purposes.
+     * Handles user input for dialogues that require it. When the player submits input, this function updates the game state with the new variable values, advances to the next dialogue or scene as appropriate, and saves the updated state to a cookie.
+     * This allows for dynamic storytelling where player choices can influence the narrative and be preserved across sessions.
+     * @param value {string} The value of the user input. This is typically the text that the player has entered in response to a prompt in the dialogue.
+     * @param variableName {string} The name of the variable that should be updated with the user's input. This variable can then be used in the script to influence future dialogues, options, or conditions based on the player's input.
+     * @param color {string?} An optional color value that can be associated with the variable. This can be used for display purposes, such as showing the player's name in a specific color when they input it.
      */
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
-        const updatedVariables = {
-            ...state.variables,
-            [variableName]: { value, color }
-        };
-        const newHistory: HistoryEntry[] = pushHistory(state.history, state.currentScene, state.currentDialogueIndex);
+        const s = stateRef.current;
+        const updatedVariables = { ...s.variables, [variableName]: { value, color } };
+        const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
-        if (state.currentDialogueIndex < state.currentDialogueIndexMax) {
-            const nextIndex: number = state.currentDialogueIndex + 1;
-            const nextDialogue: Dialogue = script.story[state.currentScene].dialogues[nextIndex];
+        if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
+            const nextIndex: number = s.currentDialogueIndex + 1;
+            const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
             setState({
-                ...state,
+                ...s,
                 history: newHistory,
                 variables: updatedVariables,
                 currentDialogueIndex: nextIndex,
-                isTyping: true,
-                skipTyping: false,
                 waitingOnUserInput: nextDialogue?.input !== undefined
             });
         } else {
-            const currentDialogue: Dialogue = script.story[state.currentScene].dialogues[state.currentDialogueIndex];
+            const currentDialogue: Dialogue = script.story[s.currentScene].dialogues[s.currentDialogueIndex];
             if (currentDialogue.next && currentDialogue.next !== END_STORY_TOKEN) {
                 const newScene: string = currentDialogue.next;
                 const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
                 setState({
-                    ...state,
+                    ...s,
                     history: newHistory,
                     variables: updatedVariables,
                     currentScene: newScene,
                     currentDialogueIndex: 0,
                     currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
-                    isTyping: true,
-                    skipTyping: false,
                     waitingOnUserInput: firstDialogue?.input !== undefined
                 });
             } else {
-                setState({ ...state, history: newHistory, variables: updatedVariables, waitingOnUserInput: false });
+                setState({ ...s, history: newHistory, variables: updatedVariables, waitingOnUserInput: false });
                 onChangePage?.("credits");
             }
         }
-        handleCookieSave(); // Auto-save on user input
-    }, [state, setState, script, onChangePage, handleCookieSave, pushHistory]);
+        setTypewriterState({isTyping: true, skipTyping: false});
+        handleCookieSave();
+    }, [script, onChangePage, setState, setTypewriterState, pushHistory, handleCookieSave]);
 
+    // Stable — handleAdvance reads refs, no tick-sensitive deps here
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent): void => {
-            if (isOverlayHidden) return;
-            if (state.waitingOnOptionSelection) return;
-
+            if (typewriterStateRef.current.skipTyping) return;
+            if (stateRef.current.waitingOnOptionSelection) return;
             if (event.code === "Space" || event.code === "Enter") {
                 handleAdvance();
             }
         };
-
         window.addEventListener("keydown", handleKeyDown);
+        return (): void => { window.removeEventListener("keydown", handleKeyDown); };
+    }, [handleAdvance]);
 
-        return (): void => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [isOverlayHidden, state.waitingOnOptionSelection, handleAdvance]);
+    /**
+     * Handles the page change when the player clicks the "Back" button.
+     */
+    const handleSetPage = useCallback((page: Page) => onChangePage?.(page), [onChangePage]);
 
-    const handleClick = (): void => {
-        if (isOverlayHidden) setIsOverlayHidden(false);
-    }
+    /**
+     * Handles clicks on the main game wrapper. If the overlay is currently hidden, this function will set it to be visible again.
+     * This allows players to click anywhere on the game area to bring back the UI overlay if they have hidden it, ensuring that they can always access important information and controls when needed.
+     */
+    const handleClick = useCallback((): void => {
+        if (isOverlayHiddenRef.current) setIsOverlayHidden(false);
+    }, []);
 
-    // If scene doesn't exist, a page transition is in progress — don't render
     if (!currentScene) return null;
 
     return (
@@ -309,9 +310,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             className={`${styles.gameWrapper} h-100`}
             onClick={handleClick}
         >
-            <VNTopOverlay
-                isOverlayHidden={isOverlayHidden}
-            />
+            <VNTopOverlay isOverlayHidden={isOverlayHidden} />
 
             <Scene
                 isOverlayHidden={isOverlayHidden}
@@ -325,7 +324,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
                 exportSaveFunc={handleExportSave}
                 onBack={handleBack}
                 hasHistory={state.history.length > 0}
-                setPage={(page) => onChangePage?.(page)}
+                setPage={handleSetPage}
                 isOverlayHidden={isOverlayHidden}
                 setIsOverlayHidden={setIsOverlayHidden}
             />

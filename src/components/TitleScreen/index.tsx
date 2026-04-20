@@ -20,7 +20,7 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
 
     /**
      * Handles the file input change event when a user selects a save file. It reads the file, parses it, and calls the handleLoadSave callback with the loaded state.
-     * @param e - The change event from the file input element.
+     * @param e {ChangeEvent<HTMLInputElement>} The change event from the file input element.
      */
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const file: File | undefined = e.target.files?.[0];

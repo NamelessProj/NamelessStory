@@ -1,3 +1,4 @@
+import {type ButtonHTMLAttributes, type DetailedHTMLProps, memo} from "react";
 import type {Page} from "../../../interfaces/interfaces.ts";
 
 import styles from './style.module.css';
@@ -11,27 +12,32 @@ interface VNOverlayProps {
     setIsOverlayHidden: (hidden: boolean) => void;
 }
 
-const VNBottomOverlay = ({exportSaveFunc, onBack, hasHistory, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
+const defaultButtonProps: DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> = {
+    className: styles.overlayButton,
+    type: 'button'
+}
+
+const VNBottomOverlay = memo(({exportSaveFunc, onBack, hasHistory, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
     return (
         <div className={`${styles.overlay} ${styles.overlayBottom} ${isOverlayHidden ? styles.hidden : ""}`}>
             <div className={styles.buttonsWrapper}>
-                <button className={styles.overlayButton} onClick={(): void => setPage("title")}>
+                <button {...defaultButtonProps} onClick={(): void => setPage("title")}>
                     Return Home
                 </button>
                 {hasHistory && (
-                    <button className={styles.overlayButton} onClick={onBack}>
+                    <button {...defaultButtonProps} onClick={onBack}>
                         Back
                     </button>
                 )}
-                <button className={styles.overlayButton} onClick={exportSaveFunc}>
+                <button {...defaultButtonProps} onClick={exportSaveFunc}>
                     Export Save
                 </button>
-                <button className={styles.overlayButton} onClick={(): void => setIsOverlayHidden(true)}>
+                <button {...defaultButtonProps} onClick={(): void => setIsOverlayHidden(true)}>
                     Hide Overlay
                 </button>
             </div>
         </div>
     );
-};
+});
 
 export default VNBottomOverlay;

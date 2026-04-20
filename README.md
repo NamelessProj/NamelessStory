@@ -23,6 +23,9 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
    - [Dialogue Position](#dialogue-position)
    - [Background Music](#background-music)
    - [Text Formatting and Variables](#text-formatting-and-variables)
+     - [Pauses](#pauses)
+     - [Variables in Text](#variables-in-text)
+     - [Text Markup](#text-markup-bold-italic-colors-and-more)
    - [Navigating Between Scenes](#navigating-between-scenes)
 5. [Where to Put Your Files](#where-to-put-your-files)
 6. [Connecting Your Story to the App](#connecting-your-story-to-the-app)
@@ -453,6 +456,170 @@ You can also use a variable as the speaker name:
   "text": "That's me!"
 }
 ```
+
+#### Text Markup (Bold, Italic, Colors, and More)
+
+You can style your dialogue text using simple tags. Wrap the text you want to format between an opening tag and a closing tag. If you have ever used a forum, Discord, or a chat app, this will feel familiar.
+
+##### Basic formatting
+
+| What you write | What it does      |
+|----------------|-------------------|
+| `[b]text[/b]` | **Bold**          |
+| `[i]text[/i]` | *Italic*          |
+| `[u]text[/u]` | <u>Underline</u>  |
+| `[s]text[/s]` | ~~Strikethrough~~ |
+
+```json
+{
+  "name": "Alice",
+  "text": "This is [b]very important[/b], and [i]please[/i] don't forget it."
+}
+```
+
+```json
+{
+  "name": "",
+  "text": "The [s]old world[/s] was gone. [b][i]Everything had changed.[/i][/b]"
+}
+```
+
+##### Colors
+
+Use `[color=...]...[/color]` to change the color of a word or phrase. Three formats are supported. Use whichever is easiest for you:
+
+| Format | Example | When to use |
+|--------|---------|-------------|
+| Color name | `[color=red]text[/color]` | Quick, simple colors |
+| Hex code | `[color=#ff6600]text[/color]` | Exact brand or palette colors |
+| RGB value | `[color=rgb(255, 100, 0)]text[/color]` | When you have RGB values from a color picker |
+
+```json
+{
+  "name": "",
+  "text": "The sky turned [color=red]crimson[/color] as the sun disappeared."
+}
+```
+
+```json
+{
+  "name": "Alice",
+  "text": "I felt [color=#4488ff]calm[/color], yet [color=rgb(220, 50, 50)]afraid[/color]."
+}
+```
+
+> [!TIP]
+> You can find hex and RGB values using any color picker tool, there are plenty of free ones online.
+
+##### Line breaks
+
+`[br]` inserts a line break inside a dialogue box. This is useful for poems, letters, or any text where you want to control where lines start.
+
+```json
+{
+  "name": "",
+  "text": "Dear Alice,[br]I hope this letter finds you well.[br][br]Yours,[br]Bob"
+}
+```
+
+Two `[br]` tags in a row create an empty line between paragraphs.
+
+##### Custom styled blocks
+
+If you know a little CSS, you can wrap text in a `[class=...]` tag to apply your own style. First, add the class to `public/custom.css`, then use it in your text.
+
+**In your story JSON:**
+```json
+{
+  "name": "",
+  "text": "She [class=highlight]screamed[/class] into the void."
+}
+```
+
+**In `public/custom.css`:**
+```css
+.highlight {
+  background-color: yellow;
+  color: black;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+```
+
+You can also assign multiple CSS classes by separating them with a space:
+```json
+"text": "[class=big red-text]DANGER[/class]"
+```
+
+**In `public/custom.css`:**
+```css
+.big {
+  font-size: 1.5em;
+}
+.red-text {
+  color: red;
+}
+```
+
+> [!NOTE]
+> Class names may only contain letters, numbers, hyphens (`-`), underscores (`_`), and spaces (for multiple classes). Anything else will be ignored for safety.
+
+##### Links
+
+Since NamelessStory runs in a browser, you can make any word or phrase into a clickable link that opens a website. The link opens in a new tab and does not interrupt the game.
+
+```json
+{
+  "name": "",
+  "text": "You can find the map on [link href=\"https://example.com/map\"]this page[/link]."
+}
+```
+
+> [!NOTE]
+> Only `http://` and `https://` links are allowed. This prevents unsafe links from being embedded in story files.
+
+> [!WARNING]
+> When you put a link, make sure it's in between `"`. If you use `'` instead, it will not work and the text will show the raw tag instead of a link.
+
+##### Combining tags
+
+Tags can be nested inside each other to combine effects. Close tags in the reverse order you opened them (innermost first):
+
+```json
+{
+  "name": "",
+  "text": "[b][color=red]WARNING:[/color][/b] [i]Do not open the door.[/i]"
+}
+```
+
+```json
+{
+  "name": "Alice",
+  "text": "I thought it was [b][i]impossible[/i][/b], yet here we are."
+}
+```
+
+Tags also work alongside variables — you can color a character's name reference, for example:
+
+```json
+{
+  "name": "",
+  "text": "[i]And so, [b]{{v!playerName}}[/b] set off on their journey...[/i]"
+}
+```
+
+##### Quick reference
+
+| Tag                         | Usage | Notes |
+|-----------------------------|-------|-------|
+| `[b]...[/b]`                | Bold text | |
+| `[i]...[/i]`                | Italic text | |
+| `[u]...[/u]`                | Underlined text | |
+| `[s]...[/s]`                | Strikethrough text | |
+| `[color=VALUE]...[/color]`  | Colored text | Accepts name, `#hex`, `rgb(…)` |
+| `[class=NAME]...[/class]`   | Span with a CSS class | Letters, numbers, `-`, `_`, spaces only |
+| `[link href="URL"]...[/link]` | Clickable link (opens new tab) | `https://` or `http://` only |
+| `[br]`                      | Line break | Self-closing, no `[/br]` needed |
 
 ### Navigating Between Scenes
 

@@ -13,6 +13,7 @@ const PrimaryButton = ({text, isDisabled=false, onClick}: PrimaryButtonProps) =>
                 className={`primary-button ${isDisabled ? "disabled" : ""}`}
                 onClick={handleClick}
                 disabled={isDisabled}
+                type="button"
             >
                 {text}
             </button>

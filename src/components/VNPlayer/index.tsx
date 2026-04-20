@@ -1,10 +1,12 @@
-import type {Dialogue, Page, SceneType, State, VNStory} from "../../interfaces/interfaces.ts";
-import {useEffect, useState} from "react";
+import type {Dialogue, Page, SceneType, State, TypewriterState, VNStory} from "../../interfaces/interfaces.ts";
+import {useEffect, useMemo, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
 import DataProvider from "../../context/DataProvider.tsx";
 import Cookies from "../../utils/cookies.ts";
 import {getCookieName} from "../../utils/helpMethods.ts";
+
+const INITIAL_TYPEWRITER_STATE: TypewriterState = { isTyping: true, skipTyping: false };
 
 const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [script, setScript] = useState<VNStory | null>(null);
@@ -17,16 +19,14 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
         textSpeed: 50,
         waitingOnUserInput: false,
         waitingOnOptionSelection: false,
-        isTyping: true,
         currentText: "",
         defaultNameColor: "#000000",
-        currentMusic: null,
         musicVolume: 0.5,
         isMusicMuted: false,
         variables: {},
         history: [],
-        skipTyping: false
     });
+    const [typewriterState, setTypewriterState] = useState<TypewriterState>(INITIAL_TYPEWRITER_STATE);
 
     useEffect(() => {
         const loadStory = async () => {
@@ -61,8 +61,8 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
             const cookieData: string | null = Cookies.get(cookieName);
             if (cookieData) {
                 try {
-                    const parsed: State = JSON.parse(cookieData) as State;
-                    setSavedState({...parsed, currentMusic: null});
+                    const parsed = JSON.parse(cookieData) as State;
+                    setSavedState(parsed);
                 } catch {
                     // Ignore malformed cookie data
                 }
@@ -74,37 +74,44 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
         });
     }, [scriptFile]);
 
-    // TODO: Remove this after testing
-    useEffect(() => {
-        console.log("Current state:", state);
-        console.log("Loaded script:", script);
-    }, [script, state]);
-
     /**
-     * Handles page changes by updating the currentPage state variable. This function is passed down to child components that need to trigger page changes, such as the title screen or credits page.
-     * When called, it updates the currentPage state, which in turn determines which component is rendered on the screen.
-     * @param newPage {Page} - The new page to navigate to, which can be <code>title</code>, <code>game</code>, or <code>credits</code>. This value is used to conditionally render the appropriate component in the PageToDisplay component.
+     * Handles changing the current page of the VNPlayer. This function is passed down to child components and can be called to update the current page being displayed (e.g., "title", "game", "settings", etc.).
+     * @param newPage {Page} The new page to switch to. This should be a string that corresponds to one of the defined pages in the Page type (e.g., <code>"title"</code>, <code>"game"</code>, <code>"settings"</code>). When this function is called, it will update the currentPage state variable, which will trigger a re-render and display the appropriate page component based on the new value. 
      */
     const handleChangePage = (newPage: Page): void => setCurrentPage(newPage);
 
     /**
-     * Handles the "Continue" action on the title screen. If a saved state was successfully loaded from cookies, this function will set the global state to the saved state and navigate to the game page.
-     * If no saved state is available, this function will be undefined, and the "Continue" button will not be rendered on the title screen.
+     * Handles continuing from a saved game state. If there is a saved state available (indicated by the presence of savedState), this function will update the current state with the saved state,
+     * reset the typewriter state to start typing immediately without skipping, and change the current page to the game view. This allows players to seamlessly continue their progress from a previously saved state when they click the "Continue" button on the title screen.
+     * If there is no saved state available, this function will be undefined, and the "Continue" button can be conditionally rendered or disabled based on the presence of a saved state.
      */
     const handleContinue: (() => void) | undefined = savedState ? (): void => {
         setState(savedState);
+        setTypewriterState({ isTyping: true, skipTyping: false });
         setCurrentPage("game");
     } : undefined;
 
     /**
-     * Handles loading a saved game state from a save file. This function is passed down to the title screen component, which allows the user to select a save file to load.
-     * When a valid save file is loaded, this function updates the global state with the loaded state and navigates to the game page.
-     * @param loadedState {State} - The game state that was loaded from the save file. This state should match the structure of the State interface defined in the application's types, and it will be used to restore the game to the point where it was saved.
+     * Handles loading a saved game state. When a save file is loaded, this function updates the current state with the loaded state,
+     * resets the typewriter state to start typing immediately without skipping, and changes the current page to the game view. This allows players to resume their progress from a saved state seamlessly.
+     * @param loadedState {State} The game state that has been loaded from a save file. This should include all relevant information about the player's progress, such as the current scene, dialogue index,
+     * inventory, variables, and any other state variables defined in the State interface. The function will use this loaded state to update the current game state and transition back to the game view.
      */
     const handleLoadSave = (loadedState: State): void => {
         setState(loadedState);
+        setTypewriterState({ isTyping: true, skipTyping: false });
         setCurrentPage("game");
     };
+
+    const dataContextValue = useMemo(
+        () => ({ state, setState, script: script as VNStory }),
+        [state, setState, script]
+    );
+
+    const typewriterContextValue = useMemo(
+        () => ({ typewriterState, setTypewriterState }),
+        [typewriterState, setTypewriterState]
+    );
 
     return (
         <>
@@ -113,7 +120,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
                     <Spinner />
                 </div>
             ) : (
-                <DataProvider value={{state, setState, script}}>
+                <DataProvider value={dataContextValue} typewriterValue={typewriterContextValue}>
                     <div id="vn-player" className="vn-body">
                         <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} handleLoadSave={handleLoadSave} />
                     </div>

@@ -116,15 +116,17 @@ export interface State {
     textSpeed: number,
     waitingOnUserInput: boolean,
     waitingOnOptionSelection: boolean,
-    isTyping: boolean,
     currentText: string,
     defaultNameColor: string,
-    currentMusic: HTMLAudioElement|null,
     musicVolume: number,
     isMusicMuted: boolean,
     variables: Record<string, VariableType>,
     history: HistoryEntry[],
-    skipTyping: boolean
+}
+
+export interface TypewriterState {
+    isTyping: boolean,
+    skipTyping: boolean,
 }
 
 
