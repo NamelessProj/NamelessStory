@@ -193,15 +193,70 @@ export default class TypewriterUtils {
     }
 
     /**
-     * Replaces variable references in the input text with their corresponding values, applying character-specific styling when applicable.
-     * It supports both character and variable references, allowing for dynamic text generation based on the provided characters and variables.
-     * The function also takes into account a default name display setting to determine how character names should be displayed when referenced.
-     * @param text {string} - The input text containing variable references in the format of {C!id}, {c!id}, or {v!id}, where "id" is the identifier for a character or variable.
-     * @param characters {Record<string, CharacterType>} - A mapping of character IDs to their corresponding CharacterType objects, which contain information such as name and color.
-     * @param variables {Record<string, VariableType>} - A mapping of variable IDs to their corresponding VariableType objects, which contain information such as value and color.
-     * @param defaultNameDisplaySetting {NameDisplay} - A setting that determines how character names should be displayed when referenced without an explicit display type (e.g., "short" for name or "full" for fullName).
-     * @returns {string} The resulting text with variable references replaced by their corresponding values and styled according to the character's color when applicable.
+     * Precomputes all HTML snapshots and per-step delays in a single O(n) pass over tokens.
+     * Each index in the returned arrays corresponds to a step value:
+     *   htmlSnapshots[i] = the HTML string to display when currentStep === i
+     *   delays[i]        = the delay in ms before advancing from step i to step i+1
+     * This makes the Typewriter component O(1) per tick instead of O(n).
+     * @param tokens {Token[]} - Pre-tokenised token array
+     * @param speed {number} - Default delay per character in ms
      */
+    static precomputeSteps = (tokens: Token[], speed: number): { htmlSnapshots: string[]; delays: number[] } => {
+        const total = TypewriterUtils.countSteps(tokens);
+        const htmlSnapshots: string[] = new Array(total + 1);
+        const delays: number[] = new Array(total).fill(speed);
+
+        let result = "";
+        const openTags: string[] = [];
+        let step = 0;
+
+        const snapshot = (): string => {
+            if (openTags.length === 0) return result;
+            let closeTags = "";
+            for (let i = openTags.length - 1; i >= 0; i--) closeTags += `</${openTags[i]}>`;
+            return result + closeTags;
+        };
+
+        htmlSnapshots[0] = "";
+
+        for (const token of tokens) {
+            switch (token.type) {
+                case "text": {
+                    for (let ci = 0; ci < token.value.length; ci++) {
+                        delays[step] = speed;
+                        result += token.value[ci];
+                        step++;
+                        htmlSnapshots[step] = snapshot();
+                    }
+                    break;
+                }
+                case "pause": {
+                    delays[step] = token.duration;
+                    step++;
+                    htmlSnapshots[step] = snapshot();
+                    break;
+                }
+                case "openTag": {
+                    result += token.value;
+                    const tagName = TypewriterUtils.getTagName(token.value);
+                    if (tagName) openTags.push(tagName);
+                    break;
+                }
+                case "closeTag": {
+                    result += token.value;
+                    openTags.pop();
+                    break;
+                }
+                case "selfClosingTag": {
+                    result += token.value;
+                    break;
+                }
+            }
+        }
+
+        return { htmlSnapshots, delays };
+    }
+
     static getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, variables: Record<string, VariableType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
         return text.replace(VARIABLE_REGEX, (match: string, prefix: string | undefined, id: string): string => {
             const char: CharacterType | undefined = characters[id];
