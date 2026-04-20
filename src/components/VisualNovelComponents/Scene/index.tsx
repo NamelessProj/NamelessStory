@@ -1,3 +1,4 @@
+import {memo, useMemo} from "react";
 import BackgroundImage from "../../BackgroundImage";
 import CharacterFullSprite from "../CharacterFullSprite";
 import DialogueBox from "../Dialogue";
@@ -17,7 +18,7 @@ interface SceneProps {
     onHandleInput: (value: string, variableName: string, color?: string) => void;
 }
 
-const Scene = ({
+const Scene = memo(({
     isOverlayHidden,
     onAdvance,
     onTypingComplete,
@@ -28,57 +29,36 @@ const Scene = ({
     const currentScene: SceneType | undefined = script.story[state.currentScene];
     const currentDialogue: Dialogue | undefined = currentScene?.dialogues[state.currentDialogueIndex];
 
-    // If scene or dialogue doesn't exist, don't render
-    if (!currentScene || !currentDialogue) {
-        return null;
-    }
-
-    // Resolve the character associated with the current dialogue's name field
-    const resolvedSpeaker: { characterId: string, character: CharacterType } | undefined = resolveCharacterFromName(
-        currentDialogue.name,
-        script.characters,
-        state.variables
+    const resolvedSpeaker: { characterId: string, character: CharacterType } | undefined = useMemo(
+        () => currentDialogue ? resolveCharacterFromName(currentDialogue.name, script.characters, state.variables) : undefined,
+        [currentDialogue, script.characters, state.variables]
     );
 
-    // Use the explicit sprite from the dialogue, or auto-generate an idle sprite
-    // when the speaker is a character resolved via a variable and has sprites defined
-    const spriteToShow: Sprite | undefined = currentDialogue.sprite ?? (
-        resolvedSpeaker && resolvedSpeaker.character.sprite
-            ? { name: "idle" }
-            : undefined
+    const spriteToShow: Sprite | undefined = useMemo(
+        () => currentDialogue?.sprite ?? (resolvedSpeaker?.character.sprite ? { name: "idle" } : undefined),
+        [currentDialogue, resolvedSpeaker]
     );
 
-    // Resolve dialogue position: per-dialogue → settings default → "bottom"
-    const dialoguePosition: DialoguePosition = currentDialogue.dialoguePosition ?? script.settings.defaultDialoguePosition ?? "bottom";
+    const dialoguePosition: DialoguePosition = useMemo(
+        () => currentDialogue?.dialoguePosition ?? script.settings.defaultDialoguePosition ?? "bottom",
+        [currentDialogue, script.settings.defaultDialoguePosition]
+    );
 
-    // Check if we should show dialogue box
+    if (!currentScene || !currentDialogue) return null;
+
     const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
-
-    // Check if we should show options
-    const shouldShowOptions: boolean | undefined = currentDialogue.options && currentDialogue.options.length > 0;
-
-    // Check if we should show user input
+    const shouldShowOptions: boolean = !!(currentDialogue.options && currentDialogue.options.length > 0);
     const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
-    /**
-     * Handles click events on the scene. It advances the dialogue if there are no options to choose from and no user input required. If options or input are present, it does nothing to allow the user to interact with those elements.
-     */
     const handleClick = (): void => {
-        if (shouldShowOptions) return;
-        if (shouldShowInput) return;
+        if (shouldShowOptions || shouldShowInput) return;
         onAdvance();
     };
 
     return (
-        <div
-            id="vn-scene"
-            className={styles.vnScene}
-            onClick={handleClick}
-        >
-            {/* Background */}
+        <div id="vn-scene" className={styles.vnScene} onClick={handleClick}>
             <BackgroundImage fileName={currentScene.background} id="vn-background" />
 
-            {/* Characters/Sprites */}
             {spriteToShow && (
                 <CharacterFullSprite
                     sprite={spriteToShow}
@@ -87,7 +67,6 @@ const Scene = ({
                 />
             )}
 
-            {/* Dialogue Box */}
             {shouldShowDialogue && (
                 <DialogueBox
                     text={currentDialogue.text}
@@ -100,15 +79,13 @@ const Scene = ({
                 />
             )}
 
-            {/* Options */}
             {shouldShowOptions && (
                 <OptionsGroup
-                    options={shouldShowOptions ? currentDialogue.options! : []}
+                    options={currentDialogue.options!}
                     handleClick={onHandleOptionSelect}
                 />
             )}
 
-            {/* User Input */}
             {(shouldShowInput && currentDialogue.input) && (
                 <UserInputBox
                     variable={currentDialogue.input}
@@ -117,6 +94,6 @@ const Scene = ({
             )}
         </div>
     );
-};
+});
 
 export default Scene;
