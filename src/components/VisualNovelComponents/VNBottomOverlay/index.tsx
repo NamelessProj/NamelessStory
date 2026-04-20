@@ -1,3 +1,4 @@
+import {memo} from "react";
 import type {Page} from "../../../interfaces/interfaces.ts";
 
 import styles from './style.module.css';
@@ -11,7 +12,7 @@ interface VNOverlayProps {
     setIsOverlayHidden: (hidden: boolean) => void;
 }
 
-const VNBottomOverlay = ({exportSaveFunc, onBack, hasHistory, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
+const VNBottomOverlay = memo(({exportSaveFunc, onBack, hasHistory, setPage, isOverlayHidden, setIsOverlayHidden}: VNOverlayProps) => {
     return (
         <div className={`${styles.overlay} ${styles.overlayBottom} ${isOverlayHidden ? styles.hidden : ""}`}>
             <div className={styles.buttonsWrapper}>
@@ -32,6 +33,6 @@ const VNBottomOverlay = ({exportSaveFunc, onBack, hasHistory, setPage, isOverlay
             </div>
         </div>
     );
-};
+});
 
 export default VNBottomOverlay;
