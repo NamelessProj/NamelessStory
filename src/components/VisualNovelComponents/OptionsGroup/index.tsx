@@ -1,3 +1,4 @@
+import {memo} from "react";
 import UserOption from "../UserOption";
 import type {Option} from "../../../interfaces/interfaces.ts";
 import styles from './style.module.css';
@@ -7,18 +8,18 @@ interface OptionsGroupProps {
     handleClick: (value: string) => void;
 }
 
-const OptionsGroup = ({options, handleClick}: OptionsGroupProps) => {
+const OptionsGroup = memo(({options, handleClick}: OptionsGroupProps) => {
     return (
         <div className={styles.vnOptionsContainer}>
-            {options.map((option: Option, i: number) => (
+            {options.map((option: Option) => (
                 <UserOption
                     text={option.text}
                     onClick={(): void => handleClick(option.next)}
-                    key={i}
+                    key={option.next || option.text}
                 />
             ))}
         </div>
     );
-};
+});
 
 export default OptionsGroup;
