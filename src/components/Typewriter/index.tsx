@@ -3,6 +3,7 @@ import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {type RefObject, useEffect, useMemo, useRef, useState} from "react";
 import TypewriterUtils from "../../utils/typewriterUtils.ts";
+import {parseMarkup} from "../../utils/markupParser.ts";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 import {useTypewriterContext} from "../../hooks/useTypewriterContext.ts";
 
@@ -12,11 +13,11 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
 
     const tokens: Token[] = useMemo(
         () => TypewriterUtils.tokenizeHtmlWithPauses(
-            TypewriterUtils.getTextWithCharacters(
+            parseMarkup(TypewriterUtils.getTextWithCharacters(
                 text,
                 script.characters,
                 state.variables,
-                script.settings.defaultNameDisplay),
+                script.settings.defaultNameDisplay)),
             pauseMap),
         [text, script.characters, script.settings.defaultNameDisplay, state.variables, pauseMap]
     );
