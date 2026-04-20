@@ -1,4 +1,4 @@
-import {useMemo} from "react";
+import {memo, useMemo} from "react";
 import Typewriter from "../../Typewriter";
 import type {CharacterType, DialoguePosition, NameDisplay} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
@@ -22,7 +22,7 @@ const positionClass: Record<DialoguePosition, string> = {
     center: styles.positionCenter,
 };
 
-const DialogueBox = ({
+const DialogueBox = memo(({
     text,
     textSpeed,
     name,
@@ -33,36 +33,26 @@ const DialogueBox = ({
 }: DialogueProps) => {
     const {script, state} = useDataContext();
 
-    // Get the resolved name to display
-    const nameToDisplay: string | undefined = useMemo(() => {
-        return getNameToDisplay(
-            name,
-            nameDisplay,
-            script.characters,
-            state.variables
-        );
-    }, [name, nameDisplay, script.characters, state.variables]);
+    const nameToDisplay: string | undefined = useMemo(
+        () => getNameToDisplay(name, nameDisplay, script.characters, state.variables),
+        [name, nameDisplay, script.characters, state.variables]
+    );
 
-    // Find character for color — checks direct ID, variable name, and variable value
-    const resolved: { characterId: string, character: CharacterType } | undefined = useMemo(() => {
-        return resolveCharacterFromName(name, script.characters, state.variables);
-    }, [name, script.characters, state.variables]);
+    const resolved: { characterId: string, character: CharacterType } | undefined = useMemo(
+        () => resolveCharacterFromName(name, script.characters, state.variables),
+        [name, script.characters, state.variables]
+    );
 
     const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
     return (
         <div className={`${styles.dialogueContainer} ${positionClass[position]} ${isOverlayHidden ? styles.hidden : ''}`}>
             <div className={styles.dialogueInner}>
-                {/* Character Name - only display if nameToDisplay exists and is not empty */}
                 {nameToDisplay && nameToDisplay !== "" && (
-                    <div
-                        className={styles.dialogueName}
-                        style={{color: nameColor}}
-                    >
+                    <div className={styles.dialogueName} style={{color: nameColor}}>
                         {nameToDisplay}
                     </div>
                 )}
-
                 <div className={styles.dialogueBox}>
                     <Typewriter
                         text={text}
@@ -74,6 +64,6 @@ const DialogueBox = ({
             </div>
         </div>
     );
-};
+});
 
 export default DialogueBox;
