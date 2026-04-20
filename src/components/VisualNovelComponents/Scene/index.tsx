@@ -50,6 +50,10 @@ const Scene = memo(({
     const shouldShowOptions: boolean = !!(currentDialogue.options && currentDialogue.options.length > 0);
     const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
+    /**
+     * Handles advancing the dialogue when the player clicks on the scene.
+     * This function checks if options or input are currently being displayed, and if not, it calls the onAdvance function passed in as a prop to move to the next dialogue or scene.
+     */
     const handleClick = (): void => {
         if (shouldShowOptions || shouldShowInput) return;
         onAdvance();

@@ -4,8 +4,8 @@ import {PAUSE_SYMBOL, VARIABLE_REGEX} from "./constants.ts";
 export default class TypewriterUtils {
     /**
      * Splits text into tokens of text and pauses based on a provided pause map.
-     * @param text {string} - The input text containing potential pause symbols.
-     * @param pauseMap {PauseMap} - A mapping of characters following the pause symbol to their corresponding pause durations.
+     * @param text {string} The input text containing potential pause symbols.
+     * @param pauseMap {PauseMap} A mapping of characters following the pause symbol to their corresponding pause durations.
      * @returns {Token[]} An array of tokens representing the split text and pauses.
      */
     static splitTextWithPauses = (text: string, pauseMap: PauseMap): Token[] => {
@@ -38,8 +38,8 @@ export default class TypewriterUtils {
 
     /**
      * Tokenizes an HTML string into a sequence of tokens representing text, pauses, and HTML tags.
-     * @param html {string} - The input HTML string to tokenize.
-     * @param pauseMap {PauseMap} - A mapping of characters following the pause symbol to their corresponding pause durations.
+     * @param html {string} The input HTML string to tokenize.
+     * @param pauseMap {PauseMap} A mapping of characters following the pause symbol to their corresponding pause durations.
      * @returns {Token[]} An array of tokens representing the tokenized HTML content.
      */
     static tokenizeHtmlWithPauses = (html: string, pauseMap: PauseMap): Token[] => {
@@ -80,7 +80,7 @@ export default class TypewriterUtils {
 
     /**
      * Extracts the tag name from an HTML tag string.
-     * @param tag {string} - The HTML tag string to extract the name from.
+     * @param tag {string} The HTML tag string to extract the name from.
      * @returns {string | null} The extracted tag name, or null if the input is not a valid tag.
      */
     static getTagName = (tag: string): string | null => {
@@ -91,8 +91,8 @@ export default class TypewriterUtils {
 
     /**
      * Builds an HTML string from a sequence of tokens up to a specified step, ensuring that all opened tags are properly closed.
-     * @param tokens {Token[]} - The array of tokens to build the HTML from.
-     * @param currentStep {number} - The current step up to which the HTML should be built, counting text characters and pauses.
+     * @param tokens {Token[]} The array of tokens to build the HTML from.
+     * @param currentStep {number} The current step up to which the HTML should be built, counting text characters and pauses.
      * @returns {string} The resulting HTML string that represents the content up to the specified step, with all opened tags properly closed.
      */
     static buildHtmlUntilStep = (tokens: Token[], currentStep: number): string => {
@@ -147,7 +147,7 @@ export default class TypewriterUtils {
 
     /**
      * Counts the total number of steps represented by an array of tokens, where each text character counts as one step and each pause counts as one step.
-     * @param tokens {Token[]} - The array of tokens to count steps from.
+     * @param tokens {Token[]} The array of tokens to count steps from.
      * @returns {number} The total number of steps represented by the tokens.
      */
     static countSteps = (tokens: Token[]): number => {
@@ -165,9 +165,9 @@ export default class TypewriterUtils {
 
     /**
      * Determines the appropriate delay for the current step in a typewriter effect based on the provided tokens, the current step, and a default speed. It accounts for both text characters and pause tokens to calculate the correct delay.
-     * @param tokens {Token[]} - The array of tokens representing the text and pauses.
-     * @param currentStep {number} - The current step in the typewriter effect, counting text characters and pauses.
-     * @param defaultSpeed {number} - The default delay in milliseconds for each step when no pause tokens are encountered.
+     * @param tokens {Token[]} The array of tokens representing the text and pauses.
+     * @param currentStep {number} The current step in the typewriter effect, counting text characters and pauses.
+     * @param defaultSpeed {number} The default delay in milliseconds for each step when no pause tokens are encountered.
      * @returns {number} The calculated delay in milliseconds for the current step, accounting for any pause tokens at that step.
      */
     static getDelayForStep = (tokens: Token[], currentStep: number, defaultSpeed: number): number => {
@@ -195,11 +195,15 @@ export default class TypewriterUtils {
     /**
      * Precomputes all HTML snapshots and per-step delays in a single O(n) pass over tokens.
      * Each index in the returned arrays corresponds to a step value:
+     *
      *   htmlSnapshots[i] = the HTML string to display when currentStep === i
+     *   
      *   delays[i]        = the delay in ms before advancing from step i to step i+1
+     * 
      * This makes the Typewriter component O(1) per tick instead of O(n).
      * @param tokens {Token[]} - Pre-tokenised token array
      * @param speed {number} - Default delay per character in ms
+     * @return {{ htmlSnapshots: string[]; delays: number[] }} Object containing precomputed htmlSnapshots and delays arrays
      */
     static precomputeSteps = (tokens: Token[], speed: number): { htmlSnapshots: string[]; delays: number[] } => {
         const total = TypewriterUtils.countSteps(tokens);
@@ -257,6 +261,15 @@ export default class TypewriterUtils {
         return { htmlSnapshots, delays };
     }
 
+    /**
+     * Replaces variable references in the input text with their corresponding values, styled according to the associated character's color if applicable.
+     * It supports different prefixes to determine how to display the variable or character name, and it uses a default name display setting to choose between short and full names when both are available.
+     * @param text {string} - The input text containing variable references that need to be replaced with their corresponding values.
+     * @param characters {Record<string, CharacterType>} - A mapping of character IDs to their corresponding CharacterType objects, which contain information about the character's name, full name, color, and optional sprite.
+     * @param variables {Record<string, VariableType>} - A mapping of variable IDs to their corresponding VariableType objects, which contain information about the variable's value and optional color. 
+     * @param defaultNameDisplaySetting {NameDisplay} - A setting that determines whether to display the short name or full name of a character when both are available. This setting is used when the variable reference does not specify a prefix to indicate which name to use.
+     * @returns {string} The resulting text with all variable references replaced by their corresponding values, styled according to the associated character's color if applicable. If a variable reference does not match any character or variable, it is returned unchanged in the output text.
+     */
     static getTextWithCharacters = (text: string, characters: Record<string, CharacterType>, variables: Record<string, VariableType>, defaultNameDisplaySetting: NameDisplay = "short"): string => {
         return text.replace(VARIABLE_REGEX, (match: string, prefix: string | undefined, id: string): string => {
             const char: CharacterType | undefined = characters[id];

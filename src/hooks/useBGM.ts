@@ -78,7 +78,12 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         // and by the "play" case stopping the old track before starting a new one.
     }, [trigger]);
 
-    const playMusic = useCallback((file: string, loop: boolean = true) => {
+    /**
+     * Plays a specified audio file as background music. If there is already an active audio track, it will be paused before the new track is played. The new audio track is created using the createBGMPlayer function, which sets the appropriate volume and loop settings based on the current state. The name of the currently playing music is stored in a ref for later reference.
+     * @param file {string} The name of the audio file to play (e.g., <code>"song.mp3"</code>). This should correspond to a file in the public/audio directory.
+     * @param loop {boolean?} An optional boolean indicating whether the audio should loop. If set to <code>true</code>, the audio will repeat indefinitely until paused or stopped. If set to <code>false</code> or omitted, the audio will play only once.
+     */
+    const playMusic = useCallback((file: string, loop: boolean = true): void => {
         currentAudio.current?.pause();
         const audio: HTMLAudioElement = createBGMPlayer(resolveAudioPath(file), state.isMusicMuted ? 0 : state.musicVolume, loop);
         currentAudio.current = audio;
@@ -87,22 +92,41 @@ export const useBGM = ({ bgmFile, bgmLoop, state, setState, trigger }: UseBGMPro
         audio.play().catch((err) => console.error("Error playing BGM:", err));
     }, [state.isMusicMuted, state.musicVolume]);
 
-    const pauseMusic = useCallback(() => {
+    /**
+     * Pauses the current audio track if it exists. This function is useful for temporarily stopping background music, such as when the player navigates away from the game or when pausing the game.
+     * If there is an active audio track, it will be paused, allowing for later resumption without losing the current playback position.
+     */
+    const pauseMusic = useCallback((): void => {
         currentAudio.current?.pause();
     }, []);
 
-    const resumeMusic = useCallback(() => {
+    /**
+     * Resumes playback of the current audio track if it exists.
+     * This function is useful for resuming background music after it has been paused, such as when the player returns to the game after being away or when unpausing the game.
+     * If there is an active audio track, it will attempt to play it and log any errors that occur during playback.
+     */
+    const resumeMusic = useCallback((): void => {
         currentAudio.current?.play().catch((err) => console.error("Error resuming BGM:", err));
     }, []);
 
-    const setVolume = useCallback((volume: number) => {
+    /**
+     * Sets the volume of the current audio track. If there is an active audio track, its volume will be updated to the specified value.
+     * Additionally, the musicVolume property in the state will be updated to reflect the new volume level, allowing for consistent volume control across the application.
+     * @param volume {number} A number between 0 and 1 representing the desired volume level, where 0 is completely silent and 1 is the maximum volume.
+     * This value will be applied to the current audio track if it exists, and it will also update the musicVolume property in the state for future reference.
+     */
+    const setVolume = useCallback((volume: number): void => {
         if (currentAudio.current) {
             currentAudio.current.volume = volume;
         }
         setState(prev => ({ ...prev, musicVolume: volume }));
     }, [setState]);
 
-    const setLoop = useCallback((loop: boolean) => {
+    /**
+     * Sets the loop property of the current audio track. If there is an active audio track, its loop property will be updated to the specified value. This allows for dynamic control over whether the background music should repeat continuously or play only once.
+     * @param loop {boolean} A boolean value indicating whether the audio should loop. If set to <code>true</code>, the audio will repeat indefinitely until paused or stopped. If set to <code>false</code>, the audio will play only once and then stop.
+     */
+    const setLoop = useCallback((loop: boolean): void => {
         if (currentAudio.current) {
             currentAudio.current.loop = loop;
         }

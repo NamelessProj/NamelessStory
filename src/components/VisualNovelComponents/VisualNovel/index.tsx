@@ -98,6 +98,10 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         setTypewriterState({isTyping: true, skipTyping: false});
     }, [script, setState, setTypewriterState]);
 
+    /**
+     * Handles saving the current game state to a file. When the player chooses to export their save, this function will take the current state, serialize it, and trigger a download of the save file.
+     * It also sends the state to a Web Worker for off-thread cookie saving, ensuring that the player's progress is preserved both in a downloadable file and in a cookie for future sessions.
+     */
     const handleExportSave = useCallback((): void => {
         const s = stateRef.current;
         const title: string = script.settings.titlePage.title;
@@ -105,11 +109,21 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         saveWorkerRef.current?.postMessage({ state: s, cookieName: getCookieName(title) });
     }, [script]);
 
+    /**
+     * Handles the completion of the typewriter effect for dialogue text.
+     * When the typewriter effect finishes displaying the current dialogue text, this function is called to update the typewriter state, indicating that typing is complete and resetting the skipTyping flag.
+     * This allows the game to know when it can allow the player to advance to the next dialogue or scene, and ensures that any logic related to typing completion (such as enabling input or options) can be triggered appropriately.
+     */
     const handleTypingComplete = useCallback((): void => {
         lastTypingCompleteRef.current = Date.now();
         setTypewriterState({isTyping: false, skipTyping: false});
     }, [setTypewriterState]);
 
+    /**
+     * Handles advancing the dialogue when the player clicks or presses a key.
+     * This function checks various conditions to determine whether advancing is allowed (e.g., not waiting on user input, not skipping typing, etc.) and then updates the game state to move to the next dialogue or scene as appropriate.
+     * It also manages the typewriter state to control text display and ensures that the player's progress is saved to a cookie after advancing.
+     */
     const handleAdvance = useCallback((): void => {
         const s = stateRef.current;
         const ts = typewriterStateRef.current;
@@ -161,6 +175,15 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         handleCookieSave();
     }, [script, onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave]);
 
+    /**
+     * Handles the selection of an option in the dialogue. When the player selects an option, this function determines the next scene and dialogue index based on the option's "next" value, updates the game state accordingly, and saves the updated state to a cookie. This allows for branching narratives where player choices can lead to different scenes and dialogues, and ensures that the player's progress is preserved across sessions.
+     * @param next {string} The "next" value associated with the selected option. This value can take several forms:
+     * - If the value is <code>\_\_end\_\_</code>, the game will navigate to the credits page.
+     * - If the value is an empty string, it will advance to the next dialogue in the current scene.
+     * - If the value is a number (as a string), it will jump to that dialogue index within the current scene.
+     * - If the value contains a colon (e.g., <code>"sceneName:3"</code>), it will jump to the specified scene and dialogue index.
+     * - If the value is a string without a colon, it will jump to the first dialogue of the specified scene.
+     */
     const handleOptionSelect = useCallback((next: string): void => {
         const s = stateRef.current;
 
@@ -208,6 +231,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         handleCookieSave();
     }, [script, onChangePage, setState, setTypewriterState, pushHistory, handleCookieSave]);
 
+    /**
+     * Handles user input for dialogues that require it. When the player submits input, this function updates the game state with the new variable values, advances to the next dialogue or scene as appropriate, and saves the updated state to a cookie.
+     * This allows for dynamic storytelling where player choices can influence the narrative and be preserved across sessions.
+     * @param value {string} The value of the user input. This is typically the text that the player has entered in response to a prompt in the dialogue.
+     * @param variableName {string} The name of the variable that should be updated with the user's input. This variable can then be used in the script to influence future dialogues, options, or conditions based on the player's input.
+     * @param color {string?} An optional color value that can be associated with the variable. This can be used for display purposes, such as showing the player's name in a specific color when they input it.
+     */
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
         const s = stateRef.current;
         const updatedVariables = { ...s.variables, [variableName]: { value, color } };
@@ -259,8 +289,15 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         return (): void => { window.removeEventListener("keydown", handleKeyDown); };
     }, [handleAdvance]);
 
+    /**
+     * Handles the page change when the player clicks the "Back" button.
+     */
     const handleSetPage = useCallback((page: Page) => onChangePage?.(page), [onChangePage]);
 
+    /**
+     * Handles clicks on the main game wrapper. If the overlay is currently hidden, this function will set it to be visible again.
+     * This allows players to click anywhere on the game area to bring back the UI overlay if they have hidden it, ensuring that they can always access important information and controls when needed.
+     */
     const handleClick = useCallback((): void => {
         if (isOverlayHiddenRef.current) setIsOverlayHidden(false);
     }, []);

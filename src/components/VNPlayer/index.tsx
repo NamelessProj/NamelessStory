@@ -74,14 +74,29 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
         });
     }, [scriptFile]);
 
+    /**
+     * Handles changing the current page of the VNPlayer. This function is passed down to child components and can be called to update the current page being displayed (e.g., "title", "game", "settings", etc.).
+     * @param newPage {Page} The new page to switch to. This should be a string that corresponds to one of the defined pages in the Page type (e.g., <code>"title"</code>, <code>"game"</code>, <code>"settings"</code>). When this function is called, it will update the currentPage state variable, which will trigger a re-render and display the appropriate page component based on the new value. 
+     */
     const handleChangePage = (newPage: Page): void => setCurrentPage(newPage);
 
+    /**
+     * Handles continuing from a saved game state. If there is a saved state available (indicated by the presence of savedState), this function will update the current state with the saved state,
+     * reset the typewriter state to start typing immediately without skipping, and change the current page to the game view. This allows players to seamlessly continue their progress from a previously saved state when they click the "Continue" button on the title screen.
+     * If there is no saved state available, this function will be undefined, and the "Continue" button can be conditionally rendered or disabled based on the presence of a saved state.
+     */
     const handleContinue: (() => void) | undefined = savedState ? (): void => {
         setState(savedState);
         setTypewriterState({ isTyping: true, skipTyping: false });
         setCurrentPage("game");
     } : undefined;
 
+    /**
+     * Handles loading a saved game state. When a save file is loaded, this function updates the current state with the loaded state,
+     * resets the typewriter state to start typing immediately without skipping, and changes the current page to the game view. This allows players to resume their progress from a saved state seamlessly.
+     * @param loadedState {State} The game state that has been loaded from a save file. This should include all relevant information about the player's progress, such as the current scene, dialogue index,
+     * inventory, variables, and any other state variables defined in the State interface. The function will use this loaded state to update the current game state and transition back to the game view.
+     */
     const handleLoadSave = (loadedState: State): void => {
         setState(loadedState);
         setTypewriterState({ isTyping: true, skipTyping: false });
