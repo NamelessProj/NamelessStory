@@ -1,3 +1,4 @@
+import {memo} from "react";
 import styles from "./style.module.css";
 
 interface BackgroundImageProps {
@@ -5,7 +6,7 @@ interface BackgroundImageProps {
     id?: string;
 }
 
-const BackgroundImage = ({fileName, id}: BackgroundImageProps) => {
+const BackgroundImage = memo(({fileName, id}: BackgroundImageProps) => {
     return (
         <picture className={styles.bgImg}>
             <img
@@ -15,6 +16,6 @@ const BackgroundImage = ({fileName, id}: BackgroundImageProps) => {
             />
         </picture>
     );
-};
+});
 
 export default BackgroundImage;
