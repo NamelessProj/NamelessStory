@@ -89,10 +89,26 @@ const MARKUP_RULES: MarkupRule[] = [
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
+ * Escapes raw HTML characters so they display literally instead of being parsed.
+ * Must be called on the raw story text before getTextWithCharacters and parseMarkup.
+ * & must be escaped first to avoid double-escaping.
+ * @param text {string} The raw story text to escape
+ * @returns {string} The escaped text, safe for HTML parsing
+ */
+export const escapeHtml = (text: string): string => {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+/**
  * Converts custom markup tags in a story text string to safe HTML.
  * Runs each rule once in order; nesting different tag types is fully supported.
+ * @param text {string} The escaped story text with custom markup tags
+ * @returns {string} The text with all markup tags replaced by safe HTML
  */
-export function parseMarkup(text: string): string {
+export const parseMarkup = (text: string): string => {
     let result = text;
     for (const rule of MARKUP_RULES) {
         result = result.replace(rule.regex, rule.replace as Parameters<typeof String.prototype.replace>[1]);
