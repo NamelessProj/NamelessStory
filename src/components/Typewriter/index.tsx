@@ -3,7 +3,8 @@ import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {type RefObject, useEffect, useMemo, useRef, useState} from "react";
 import TypewriterUtils from "../../utils/typewriterUtils.ts";
-import {parseMarkup} from "../../utils/markupParser.ts";
+import {escapeHtml, parseMarkup} from "../../utils/markupParser.ts";
+import {htmlToReactNode} from "../../utils/htmlToReactNode.ts";
 import {useDataContext} from "../../hooks/useDataContext.ts";
 import {useTypewriterContext} from "../../hooks/useTypewriterContext.ts";
 
@@ -14,7 +15,7 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     const tokens: Token[] = useMemo(
         () => TypewriterUtils.tokenizeHtmlWithPauses(
             parseMarkup(TypewriterUtils.getTextWithCharacters(
-                text,
+                escapeHtml(text),
                 script.characters,
                 state.variables,
                 script.settings.defaultNameDisplay)),
@@ -26,6 +27,12 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     const precomputed = useMemo(
         () => TypewriterUtils.precomputeSteps(tokens, speed),
         [tokens, speed]
+    );
+
+    // Convert all HTML snapshots to React nodes once; O(1) per tick at render time
+    const nodeSnapshots = useMemo(
+        () => precomputed.htmlSnapshots.map(htmlToReactNode),
+        [precomputed]
     );
 
     const totalSteps: number = precomputed.htmlSnapshots.length - 1;
@@ -69,10 +76,9 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     }, [currentStep, totalSteps, precomputed, speed, onComplete]);
 
     return (
-        <div
-            className={className}
-            dangerouslySetInnerHTML={{ __html: precomputed.htmlSnapshots[currentStep] ?? "" }}
-        />
+        <div className={className}>
+            {nodeSnapshots[currentStep] ?? null}
+        </div>
     );
 });
 
