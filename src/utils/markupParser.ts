@@ -20,7 +20,7 @@ const isValidUrl   = (v: string): boolean => URL_RE.test(v.trim());
  *   [u]…[/u]                     → <u>
  *   [s]…[/s]                     → <s>
  *   [color=red|#rrggbb|rgb(…)]…[/color]  → <span style="color:…">
- *   [class="my-class"]…[/class]    → <span class="my-class">
+ *   [class=my-class]…[/class]    → <span class="my-class">
  *   [link href="https://…"]…[/link]      → <a target="_blank">
  *   [br]                         → <br/>
  */
