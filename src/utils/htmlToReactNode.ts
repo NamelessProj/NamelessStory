@@ -26,10 +26,10 @@ const parseAttrs = (attrStr: string): Record<string, string> => {
 const cssToObject = (css: string): Record<string, string> => {
     const obj: Record<string, string> = {};
     for (const decl of css.split(';')) {
-        const sep = decl.indexOf(':');
+        const sep: number = decl.indexOf(':');
         if (sep === -1) continue;
-        const prop = decl.slice(0, sep).trim();
-        const value = decl.slice(sep + 1).trim();
+        const prop: string = decl.slice(0, sep).trim();
+        const value: string = decl.slice(sep + 1).trim();
         if (!prop || !value) continue;
         // kebab-case → camelCase (e.g. font-size → fontSize)
         obj[prop.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())] = value;
@@ -90,18 +90,30 @@ export const htmlToReactNode = (html: string): ReactNode => {
     if (!html) return null;
 
     const stack: Frame[] = [{ tag: '__root__', props: {}, children: [] }];
-    const tagRe = /<\/?([a-zA-Z]+)([^>]*)>/g;
-    let lastIndex = 0;
-    let key = 0;
+    const tagRe: RegExp = /<\/?([a-zA-Z]+)([^>]*)>/g;
+    let lastIndex: number = 0;
+    let key: number = 0;
 
-    const top = () => stack[stack.length - 1];
+    /**
+     * Gets the current frame (the one we're adding children to). Always at least the root frame is present.
+     * @return {Frame} The current frame on top of the stack, which has the structure {@link Frame}
+     */
+    const top = (): Frame => stack[stack.length - 1];
 
-    const pushText = (raw: string) => {
-        const text = decodeEntities(raw);
+    /**
+     * Pushes a text node onto the current frame's children, after decoding HTML entities.
+     * @param raw {string} The raw text to push, which may contain HTML entities like &amp; that need decoding
+     */
+    const pushText = (raw: string): void => {
+        const text: string = decodeEntities(raw);
         if (text) top().children.push(text);
     };
 
-    const closeFrame = () => {
+    /**
+     * Closes the current frame by popping it from the stack and creating a React element from its tag, props, and children,
+     * then pushing that element onto the new top frame's children. If the stack only has the root frame, this does nothing.
+     */
+    const closeFrame = (): void => {
         if (stack.length <= 1) return;
         const { tag, props, children } = stack.pop()!;
         top().children.push(createElement(tag, { ...props, key: key++ }, ...children));
@@ -111,9 +123,9 @@ export const htmlToReactNode = (html: string): ReactNode => {
     while ((match = tagRe.exec(html)) !== null) {
         if (match.index > lastIndex) pushText(html.slice(lastIndex, match.index));
 
-        const fullTag  = match[0];
-        const tagName  = match[1].toLowerCase();
-        const attrStr  = match[2];
+        const fullTag: string = match[0];
+        const tagName: string = match[1].toLowerCase();
+        const attrStr: string = match[2];
         lastIndex = tagRe.lastIndex;
 
         if (!ALLOWED_TAGS.has(tagName)) continue;
