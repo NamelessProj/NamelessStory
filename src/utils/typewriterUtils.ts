@@ -90,68 +90,12 @@ export default class TypewriterUtils {
     }
 
     /**
-     * Builds an HTML string from a sequence of tokens up to a specified step, ensuring that all opened tags are properly closed.
-     * @param tokens {Token[]} The array of tokens to build the HTML from.
-     * @param currentStep {number} The current step up to which the HTML should be built, counting text characters and pauses.
-     * @returns {string} The resulting HTML string that represents the content up to the specified step, with all opened tags properly closed.
-     */
-    static buildHtmlUntilStep = (tokens: Token[], currentStep: number): string => {
-        let result: string = "";
-        let remainingSteps: number = currentStep;
-        const openTags: string[] = [];
-
-        tokenLoop:
-            for (const token of tokens) {
-                switch (token.type) {
-                    case "text": {
-                        if (remainingSteps <= 0) break tokenLoop;
-
-                        const slice: string = token.value.slice(0, remainingSteps);
-                        result += slice;
-                        remainingSteps -= slice.length;
-
-                        if (slice.length < token.value.length) break tokenLoop;
-                        break;
-                    }
-                    case "pause": {
-                        if (remainingSteps <= 0) break tokenLoop;
-                        remainingSteps -= 1;
-                        break;
-                    }
-                    case "openTag": {
-                        result += token.value;
-                        const tagName: string | null = this.getTagName(token.value);
-                        if (tagName) openTags.push(tagName);
-                        break;
-                    }
-                    case "selfClosingTag": {
-                        result += token.value;
-                        break;
-                    }
-                    case "closeTag": {
-                        result += token.value;
-                        openTags.pop();
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-
-        for (let i: number = openTags.length - 1; i >= 0; i--) {
-            result += `</${openTags[i]}>`;
-        }
-
-        return result;
-    }
-
-    /**
      * Counts the total number of steps represented by an array of tokens, where each text character counts as one step and each pause counts as one step.
      * @param tokens {Token[]} The array of tokens to count steps from.
      * @returns {number} The total number of steps represented by the tokens.
      */
     static countSteps = (tokens: Token[]): number => {
-        return tokens.reduce((total, token) => {
+        return tokens.reduce((total: number, token: Token) => {
             switch (token.type) {
                 case "text":
                     return total + token.value.length;
@@ -161,35 +105,6 @@ export default class TypewriterUtils {
                     return total;
             }
         }, 0);
-    }
-
-    /**
-     * Determines the appropriate delay for the current step in a typewriter effect based on the provided tokens, the current step, and a default speed. It accounts for both text characters and pause tokens to calculate the correct delay.
-     * @param tokens {Token[]} The array of tokens representing the text and pauses.
-     * @param currentStep {number} The current step in the typewriter effect, counting text characters and pauses.
-     * @param defaultSpeed {number} The default delay in milliseconds for each step when no pause tokens are encountered.
-     * @returns {number} The calculated delay in milliseconds for the current step, accounting for any pause tokens at that step.
-     */
-    static getDelayForStep = (tokens: Token[], currentStep: number, defaultSpeed: number): number => {
-        let traversed: number = 0;
-
-        for (const token of tokens) {
-            switch (token.type) {
-                case "text": {
-                    const nextTraversed: number = traversed + token.value.length;
-                    if (currentStep < nextTraversed) return defaultSpeed;
-                    traversed = nextTraversed;
-                    break;
-                }
-                case "pause": {
-                    if (currentStep === traversed) return token.duration;
-                    traversed += 1;
-                    break;
-                }
-            }
-        }
-
-        return defaultSpeed;
     }
 
     /**
@@ -206,18 +121,18 @@ export default class TypewriterUtils {
      * @return {{ htmlSnapshots: string[]; delays: number[] }} Object containing precomputed htmlSnapshots and delays arrays
      */
     static precomputeSteps = (tokens: Token[], speed: number): { htmlSnapshots: string[]; delays: number[] } => {
-        const total = TypewriterUtils.countSteps(tokens);
+        const total: number = TypewriterUtils.countSteps(tokens);
         const htmlSnapshots: string[] = new Array(total + 1);
         const delays: number[] = new Array(total).fill(speed);
 
-        let result = "";
+        let result: string = "";
         const openTags: string[] = [];
-        let step = 0;
+        let step: number = 0;
 
         const snapshot = (): string => {
             if (openTags.length === 0) return result;
-            let closeTags = "";
-            for (let i = openTags.length - 1; i >= 0; i--) closeTags += `</${openTags[i]}>`;
+            let closeTags: string = "";
+            for (let i: number = openTags.length - 1; i >= 0; i--) closeTags += `</${openTags[i]}>`;
             return result + closeTags;
         };
 
@@ -226,7 +141,7 @@ export default class TypewriterUtils {
         for (const token of tokens) {
             switch (token.type) {
                 case "text": {
-                    for (let ci = 0; ci < token.value.length; ci++) {
+                    for (let ci: number = 0; ci < token.value.length; ci++) {
                         delays[step] = speed;
                         result += token.value[ci];
                         step++;
@@ -242,7 +157,7 @@ export default class TypewriterUtils {
                 }
                 case "openTag": {
                     result += token.value;
-                    const tagName = TypewriterUtils.getTagName(token.value);
+                    const tagName: string | null = TypewriterUtils.getTagName(token.value);
                     if (tagName) openTags.push(tagName);
                     break;
                 }
@@ -279,7 +194,7 @@ export default class TypewriterUtils {
             if (prefix === "v!") {
                 if (vars) {
                     // If the variable name matches a character ID, use that character's color
-                    const color = char ? char.color : vars.color;
+                    const color: string | undefined = char ? char.color : vars.color;
                     if (color) {
                         return `<span class="variable-${id}" style="color: ${color}">${vars.value || id}</span>`;
                     }

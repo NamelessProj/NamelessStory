@@ -126,17 +126,3 @@ export const getNameToDisplay = (
     // Fallback: return the raw name value
     return name;
 }
-
-/**
- * Extracts the variable name from a string that matches the variable pattern (e.g., "{{variableName}}" or "v!{{variableName}}").
- * If the string doesn't match the pattern, it returns the original string.
- * @param variable {string} The string to extract the variable name from, which may be in the format "{{variableName}}" or "v!{{variableName}}".
- * @returns The extracted variable name without the pattern, or the original string if it doesn't match the variable pattern.
- */
-export const getVariableName = (variable: string): string => {
-    const match: RegExpMatchArray | null = variable.match(VARIABLE_REGEX_SINGLE);
-    if (match) {
-        return match[2]; // Return the variable name without the prefix
-    }
-    return variable; // If it doesn't match the pattern, return as is
-}

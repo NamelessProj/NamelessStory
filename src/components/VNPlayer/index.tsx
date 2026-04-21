@@ -29,7 +29,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [typewriterState, setTypewriterState] = useState<TypewriterState>(INITIAL_TYPEWRITER_STATE);
 
     useEffect(() => {
-        const loadStory = async () => {
+        const loadStory = async (): Promise<void> => {
             const url: string = `../story/${scriptFile}.json`;
             const res: Response = await fetch(url);
 

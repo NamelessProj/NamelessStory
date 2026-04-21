@@ -27,7 +27,7 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event): void => {
+        reader.onload = (event: ProgressEvent<FileReader>): void => {
             try {
                 const loadedState: State = parseSaveFile(event.target?.result as string);
                 handleLoadSave(loadedState);

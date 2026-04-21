@@ -109,7 +109,7 @@ export const escapeHtml = (text: string): string => {
  * @returns {string} The text with all markup tags replaced by safe HTML
  */
 export const parseMarkup = (text: string): string => {
-    let result = text;
+    let result: string = text;
     for (const rule of MARKUP_RULES) {
         result = result.replace(rule.regex, rule.replace as Parameters<typeof String.prototype.replace>[1]);
     }
