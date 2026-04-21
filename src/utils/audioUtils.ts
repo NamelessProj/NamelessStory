@@ -1,7 +1,7 @@
 /**
  * Resolves the path to an audio file in the public/audio directory
  * @param filename {string} The audio file name (e.g., <code>my_song.mp3</code>)
- * @returns The absolute path to the audio file
+ * @returns {string} The absolute path to the audio file
  */
 export const resolveAudioPath = (filename: string): string => {
     return `/audio/${filename}`;
@@ -17,7 +17,7 @@ export type BGMAction = {
  * Parses the bgmFile directive and returns action details
  * @param bgmFile {string?} The bgmFile value (e.g., <code>"continue"</code>, <code>"continue[song.mp3]"</code>, <code>"reset"</code>, <code>"song.mp3"</code>, or <code>undefined</code>/<code>"none"</code> for no music)
  * @param currentMusicName {string?} The name of the currently playing music (optional)
- * @returns An object describing the action to take and the file to use (if applicable)
+ * @returns {BGMAction} An object describing the action to take and the file to use (if applicable)
  */
 export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAction => {
     // "none" or undefined - no music
@@ -33,7 +33,7 @@ export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAc
     // "continue[filename.mp3]" - continue only if the current song matches, otherwise play new
     const continueMatch: RegExpMatchArray | null = bgmFile.match(/^continue\[(.+)\]$/);
     if (continueMatch) {
-        const targetFile = continueMatch[1];
+        const targetFile: string = continueMatch[1];
         if (currentMusicName && currentMusicName === targetFile) {
             return { action: "continue", file: targetFile };
         }
@@ -54,7 +54,7 @@ export const parseBGMFile = (bgmFile?: string, currentMusicName?: string): BGMAc
  * @param audioFile {string} The path to the audio file
  * @param volume {number?} Volume level (<code>0</code> to <code>1</code>, default is <code>0.5</code>)
  * @param loop {boolean?} Whether to loop the audio
- * @returns A configured HTMLAudioElement
+ * @returns {HTMLAudioElement} A configured HTMLAudioElement
  */
 export const createBGMPlayer = (audioFile: string, volume: number = 0.5, loop: boolean = true): HTMLAudioElement => {
     const audio = new Audio(audioFile);
