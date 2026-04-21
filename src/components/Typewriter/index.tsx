@@ -1,4 +1,4 @@
-import {memo} from "react";
+import {memo, type ReactNode} from "react";
 import {DEFAULT_PAUSE_MAP} from "../../utils/constants.ts";
 import type {Token, TypewriterProps} from "../../interfaces/interfaces.ts";
 import {type RefObject, useEffect, useMemo, useRef, useState} from "react";
@@ -24,13 +24,13 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     );
 
     // Single O(n) precomputation; O(1) per tick for HTML and delay lookups
-    const precomputed = useMemo(
+    const precomputed: {htmlSnapshots: string[], delays: number[]} = useMemo(
         () => TypewriterUtils.precomputeSteps(tokens, speed),
         [tokens, speed]
     );
 
     // Convert all HTML snapshots to React nodes once; O(1) per tick at render time
-    const nodeSnapshots = useMemo(
+    const nodeSnapshots: ReactNode[] = useMemo(
         () => precomputed.htmlSnapshots.map(htmlToReactNode),
         [precomputed]
     );
@@ -38,7 +38,7 @@ const Typewriter = memo(({text, speed = 50, pauseMap = DEFAULT_PAUSE_MAP, classN
     const totalSteps: number = precomputed.htmlSnapshots.length - 1;
 
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const completedRef: RefObject<boolean> = useRef(false);
+    const completedRef: RefObject<boolean> = useRef<boolean>(false);
 
     // Reset when text changes
     useEffect(() => {
