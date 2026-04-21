@@ -31,15 +31,15 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const lastTypingCompleteRef: RefObject<number> = useRef<number>(0);
 
     // Refs mirror live values so callbacks don't need them as deps and remain stable
-    const stateRef = useRef<State>(state);
-    const typewriterStateRef = useRef<TypewriterState>(typewriterState);
-    const isOverlayHiddenRef = useRef<boolean>(isOverlayHidden);
+    const stateRef: RefObject<State> = useRef<State>(state);
+    const typewriterStateRef: RefObject<TypewriterState> = useRef<TypewriterState>(typewriterState);
+    const isOverlayHiddenRef: RefObject<boolean> = useRef<boolean>(isOverlayHidden);
     useEffect(() => { stateRef.current = state; }, [state]);
     useEffect(() => { typewriterStateRef.current = typewriterState; }, [typewriterState]);
     useEffect(() => { isOverlayHiddenRef.current = isOverlayHidden; }, [isOverlayHidden]);
 
     // Web Worker for off-thread cookie serialization
-    const saveWorkerRef = useRef<Worker | null>(null);
+    const saveWorkerRef: RefObject<Worker | null> = useRef<Worker | null>(null);
     useEffect(() => {
         const worker = new Worker(new URL('../../../workers/saveWorker.ts', import.meta.url), { type: 'module' });
         worker.addEventListener('message', (e: MessageEvent<{serialized: string; cookieName: string}>) => {
@@ -76,12 +76,12 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
     // Reads stateRef.current so it doesn't depend on state and remains stable
     const handleCookieSave = useCallback((): void => {
-        const cookieName = getCookieName(script.settings.titlePage.title);
+        const cookieName: string = getCookieName(script.settings.titlePage.title);
         saveWorkerRef.current?.postMessage({ state: stateRef.current, cookieName });
     }, [script]);
 
     const handleBack = useCallback((): void => {
-        const s = stateRef.current;
+        const s: State = stateRef.current;
         if (s.history.length === 0) return;
         const prev: HistoryEntry = s.history[s.history.length - 1];
         const newHistory: HistoryEntry[] = s.history.slice(0, -1);
@@ -103,7 +103,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
      * It also sends the state to a Web Worker for off-thread cookie saving, ensuring that the player's progress is preserved both in a downloadable file and in a cookie for future sessions.
      */
     const handleExportSave = useCallback((): void => {
-        const s = stateRef.current;
+        const s: State = stateRef.current;
         const title: string = script.settings.titlePage.title;
         exportSaveFile(s, title);
         saveWorkerRef.current?.postMessage({ state: s, cookieName: getCookieName(title) });
@@ -125,8 +125,8 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
      * It also manages the typewriter state to control text display and ensures that the player's progress is saved to a cookie after advancing.
      */
     const handleAdvance = useCallback((): void => {
-        const s = stateRef.current;
-        const ts = typewriterStateRef.current;
+        const s: State = stateRef.current;
+        const ts: TypewriterState = typewriterStateRef.current;
 
         if (s.waitingOnUserInput) return;
         if (isOverlayHiddenRef.current) return;
@@ -185,7 +185,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
      * - If the value is a string without a colon, it will jump to the first dialogue of the specified scene.
      */
     const handleOptionSelect = useCallback((next: string): void => {
-        const s = stateRef.current;
+        const s: State = stateRef.current;
 
         if (next === END_STORY_TOKEN) {
             onChangePage?.("credits");
@@ -239,7 +239,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
      * @param color {string?} An optional color value that can be associated with the variable. This can be used for display purposes, such as showing the player's name in a specific color when they input it.
      */
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
-        const s = stateRef.current;
+        const s: State = stateRef.current;
         const updatedVariables = { ...s.variables, [variableName]: { value, color } };
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
