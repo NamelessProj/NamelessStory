@@ -43,7 +43,7 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
             </div>
             <button
                 className={styles.vnInputSubmit}
-                type="submit"
+                type="button"
                 onClick={handleSubmit}
             >
                 Confirm
