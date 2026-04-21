@@ -1,4 +1,5 @@
 import type {State} from "../interfaces/interfaces.ts";
+import {sanitizeName} from "./helpMethods.ts";
 
 /**
  * Exports the current state as a JSON file. The file name is generated from the story title, converted to lowercase, with spaces replaced by hyphens, and non-alphanumeric characters removed.
@@ -11,7 +12,7 @@ export const exportSaveFile = (state: State, storyTitle: string): void => {
     const blob = new Blob([saveData], {type: "application/json"});
     const url: string = URL.createObjectURL(blob);
     const a: HTMLAnchorElement = document.createElement("a");
-    const fileName: string = storyTitle.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-save.json";
+    const fileName: string = `${sanitizeName(storyTitle)}-save.json`;
     a.href = url;
     a.download = fileName;
     a.click();

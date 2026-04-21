@@ -23,6 +23,14 @@ interface VisualNovelProps {
     onChangePage?: (page: Page) => void;
 }
 
+/** Returned by resolveDialogueAdvance to describe the next state and whether to navigate to credits. */
+interface AdvanceResult {
+    /** Partial state fields to merge into the full state via spread. */
+    nextState: Partial<State>;
+    /** When true, the caller should navigate to the credits page. */
+    goToCredits: boolean;
+}
+
 const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const {script, state, setState} = useDataContext();
     const {typewriterState, setTypewriterState} = useTypewriterContext();
@@ -74,7 +82,40 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
     }, [historyLimit]);
 
-    // Reads stateRef.current so it doesn't depend on state and remains stable
+    /** Resets the typewriter to play the next dialogue from the beginning. */
+    const resetTypewriter = useCallback((): void => {
+        setTypewriterState({ isTyping: true, skipTyping: false });
+    }, [setTypewriterState]);
+
+    /**
+     * Resolves the next dialogue state after a linear advance (not an option select).
+     * Handles advancing within the current scene or jumping to the next one.
+     * @param s {State} The current state snapshot.
+     * @param history {HistoryEntry[]} The updated history array (already includes the current entry).
+     * @returns {AdvanceResult} The partial state to merge and a flag indicating credits navigation.
+     */
+    const resolveDialogueAdvance = useCallback((s: State, history: HistoryEntry[]): AdvanceResult => {
+        if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
+            const nextIndex: number = s.currentDialogueIndex + 1;
+            const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
+            return {
+                nextState: { history, currentDialogueIndex: nextIndex, waitingOnUserInput: nextDialogue?.input !== undefined },
+                goToCredits: false
+            };
+        }
+        const dialogue: Dialogue = script.story[s.currentScene].dialogues[s.currentDialogueIndex];
+        const next: string | undefined = dialogue.next;
+        if (next && next !== END_STORY_TOKEN) {
+            const firstDialogue: Dialogue = script.story[next].dialogues[0];
+            return {
+                nextState: { history, currentScene: next, currentDialogueIndex: 0, currentDialogueIndexMax: script.story[next].dialogues.length - 1, waitingOnUserInput: firstDialogue?.input !== undefined },
+                goToCredits: false
+            };
+        }
+        return { nextState: { history, waitingOnUserInput: false }, goToCredits: true };
+    }, [script]);
+
+    /** Reads <code>stateRef.current</code> so it doesn't depend on state and remains stable. */
     const handleCookieSave = useCallback((): void => {
         const cookieName: string = getCookieName(script.settings.titlePage.title);
         saveWorkerRef.current?.postMessage({ state: stateRef.current, cookieName });
@@ -95,19 +136,17 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             waitingOnOptionSelection: false,
             waitingOnUserInput: scene.dialogues[prev.dialogueIndex]?.input !== undefined
         });
-        setTypewriterState({isTyping: true, skipTyping: false});
-    }, [script, setState, setTypewriterState]);
+        resetTypewriter();
+    }, [script, setState, resetTypewriter]);
 
     /**
      * Handles saving the current game state to a file. When the player chooses to export their save, this function will take the current state, serialize it, and trigger a download of the save file.
      * It also sends the state to a Web Worker for off-thread cookie saving, ensuring that the player's progress is preserved both in a downloadable file and in a cookie for future sessions.
      */
     const handleExportSave = useCallback((): void => {
-        const s: State = stateRef.current;
-        const title: string = script.settings.titlePage.title;
-        exportSaveFile(s, title);
-        saveWorkerRef.current?.postMessage({ state: s, cookieName: getCookieName(title) });
-    }, [script]);
+        exportSaveFile(stateRef.current, script.settings.titlePage.title);
+        handleCookieSave();
+    }, [script, handleCookieSave]);
 
     /**
      * Handles the completion of the typewriter effect for dialogue text.
@@ -139,41 +178,16 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         if (Date.now() - lastTypingCompleteRef.current < ADVANCE_THRESHOLD_MS) return;
 
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
+        const { nextState, goToCredits }: AdvanceResult = resolveDialogueAdvance(s, newHistory);
 
-        if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
-            const nextIndex: number = s.currentDialogueIndex + 1;
-            const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
-            setState({
-                ...s,
-                history: newHistory,
-                currentDialogueIndex: nextIndex,
-                waitingOnUserInput: nextDialogue?.input !== undefined
-            });
-            setTypewriterState({isTyping: true, skipTyping: false});
+        if (goToCredits) {
+            onChangePage?.("credits");
         } else {
-            const currentDialogue: Dialogue = script.story[s.currentScene].dialogues[s.currentDialogueIndex];
-            if (currentDialogue.next) {
-                if (currentDialogue.next === END_STORY_TOKEN) {
-                    onChangePage?.("credits");
-                } else {
-                    const newScene: string = currentDialogue.next;
-                    const firstDialogue: Dialogue = script.story[newScene].dialogues[0];
-                    setState({
-                        ...s,
-                        history: newHistory,
-                        currentScene: newScene,
-                        currentDialogueIndex: 0,
-                        currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
-                        waitingOnUserInput: firstDialogue?.input !== undefined
-                    });
-                    setTypewriterState({isTyping: true, skipTyping: false});
-                }
-            } else {
-                onChangePage?.("credits");
-            }
+            setState({ ...s, ...nextState });
+            resetTypewriter();
         }
         handleCookieSave();
-    }, [script, onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave]);
+    }, [onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave, resetTypewriter, resolveDialogueAdvance]);
 
     /**
      * Handles the selection of an option in the dialogue. When the player selects an option, this function determines the next scene and dialogue index based on the option's "next" value, updates the game state accordingly, and saves the updated state to a cookie. This allows for branching narratives where player choices can lead to different scenes and dialogues, and ensures that the player's progress is preserved across sessions.
@@ -227,9 +241,9 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             waitingOnOptionSelection: false,
             waitingOnUserInput: targetDialogue?.input !== undefined,
         });
-        setTypewriterState({isTyping: true, skipTyping: false});
+        resetTypewriter();
         handleCookieSave();
-    }, [script, onChangePage, setState, setTypewriterState, pushHistory, handleCookieSave]);
+    }, [script, onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter]);
 
     /**
      * Handles user input for dialogues that require it. When the player submits input, this function updates the game state with the new variable values, advances to the next dialogue or scene as appropriate, and saves the updated state to a cookie.
@@ -242,39 +256,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         const s: State = stateRef.current;
         const updatedVariables = { ...s.variables, [variableName]: { value, color } };
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
+        const { nextState, goToCredits }: AdvanceResult = resolveDialogueAdvance(s, newHistory);
 
-        if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
-            const nextIndex: number = s.currentDialogueIndex + 1;
-            const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
-            setState({
-                ...s,
-                history: newHistory,
-                variables: updatedVariables,
-                currentDialogueIndex: nextIndex,
-                waitingOnUserInput: nextDialogue?.input !== undefined
-            });
-        } else {
-            const currentDialogue: Dialogue = script.story[s.currentScene].dialogues[s.currentDialogueIndex];
-            if (currentDialogue.next && currentDialogue.next !== END_STORY_TOKEN) {
-                const newScene: string = currentDialogue.next;
-                const firstDialogue: Dialogue = script.story[newScene]?.dialogues[0];
-                setState({
-                    ...s,
-                    history: newHistory,
-                    variables: updatedVariables,
-                    currentScene: newScene,
-                    currentDialogueIndex: 0,
-                    currentDialogueIndexMax: script.story[newScene].dialogues.length - 1,
-                    waitingOnUserInput: firstDialogue?.input !== undefined
-                });
-            } else {
-                setState({ ...s, history: newHistory, variables: updatedVariables, waitingOnUserInput: false });
-                onChangePage?.("credits");
-            }
-        }
-        setTypewriterState({isTyping: true, skipTyping: false});
+        setState({ ...s, ...nextState, variables: updatedVariables });
+        if (goToCredits) onChangePage?.("credits");
+        resetTypewriter();
         handleCookieSave();
-    }, [script, onChangePage, setState, setTypewriterState, pushHistory, handleCookieSave]);
+    }, [onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter, resolveDialogueAdvance]);
 
     // Stable — handleAdvance reads refs, no tick-sensitive deps here
     useEffect(() => {
@@ -289,9 +277,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         return (): void => { window.removeEventListener("keydown", handleKeyDown); };
     }, [handleAdvance]);
 
-    /**
-     * Handles the page change when the player clicks the "Back" button.
-     */
+    /** Handles the page change when the player clicks the "Return Home" button. */
     const handleSetPage = useCallback((page: Page) => onChangePage?.(page), [onChangePage]);
 
     /**
