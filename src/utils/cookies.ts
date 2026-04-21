@@ -30,13 +30,4 @@ export default class Cookies {
         }
         return null;
     }
-
-    /**
-     * Deletes a cookie with the specified name by setting its expiration date to a time in the past. This effectively removes the cookie from the user's browser.
-     * The cookie is deleted with the same <code>path</code> and <code>SameSite</code> attributes as when it was set to ensure it is properly removed.
-     * @param name {string} The name of the cookie to delete. This should be a string that identifies the cookie you want to remove, and it should match the name used when the cookie was set.
-     */
-    static delete(name: string): void {
-        this.set(name, '', -1);
-    }
 }
