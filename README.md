@@ -134,6 +134,8 @@ The `settings` block controls global options, the title screen, and the credits 
   "titlePage": {
     "title": "My Visual Novel",
     "background": "title_bg.png",
+    "logo": "my_logo.png",
+    "showTitle": false,
     "buttons": {
       "start": "Start Game",
       "continue": "Continue",
@@ -166,8 +168,44 @@ The `settings` block controls global options, the title screen, and the credits 
 | `defaultDialoguePosition` | :x: (No) | `"bottom"` (default), `"top"`, or `"center"` — where the dialogue box appears on screen |
 | `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
 | `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
+| `titlePage.logo` | :x: (No) | Logo/icon image filename (from `public/assets/`). Displayed above the buttons instead of (or alongside) the title text |
+| `titlePage.showTitle` | :x: (No) | When a `logo` is set, controls whether the title text is also shown beneath it. Defaults to `true` — set to `false` to hide the title when a logo is present |
 | `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
 | `creditsPage.scrollDurationInSeconds` | :x: (No) | How long the credits take to scroll (seconds) |
+
+#### Logo behaviour
+
+When `logo` is set, the image is displayed above the buttons in place of the plain text title. The `showTitle` field then controls whether the `<h1>` title is also rendered beneath the logo:
+
+| `logo` | `showTitle` | Result |
+|--------|-------------|--------|
+| not set | — | Title text is shown (default behaviour) |
+| set | omitted or `true` | Logo is shown, title text is also shown beneath it |
+| set | `false` | Logo is shown, title text is hidden |
+
+#### CSS variables (title page)
+
+The title page logo and buttons can be restyled from `public/custom.css` without touching any source file:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--title-logo-max-width` | `400px` | Maximum width of the logo image |
+| `--title-logo-max-height` | `200px` | Maximum height of the logo image |
+| `--title-text-color` | `#fff` | Title text color |
+| `--title-text-font-size` | `clamp(2rem, 5vw, 4rem)` | Title text size (scales with viewport) |
+| `--title-text-font-weight` | `700` | Title text weight |
+| `--title-text-letter-spacing` | `0.04em` | Title letter spacing |
+| `--title-text-shadow` | `0 2px 8px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)` | Title drop shadow |
+| `--title-btn-bg` | `rgba(100, 108, 255, 0.25)` | Button background |
+| `--title-btn-bg-hover` | `rgba(100, 108, 255, 0.5)` | Button background on hover |
+| `--title-btn-border` | `2px solid rgba(100, 108, 255, 0.5)` | Button border (shorthand) |
+| `--title-btn-border-color-hover` | `rgba(100, 108, 255, 0.9)` | Border color on hover |
+| `--title-btn-border-radius` | `6px` | Corner rounding |
+| `--title-btn-color` | `#fff` | Text color |
+| `--title-btn-font-size` | `1.1rem` | Text size |
+| `--title-btn-padding` | `0.6rem 2.5rem` | Inner padding |
+| `--title-btn-min-width` | `200px` | Minimum button width |
+| `--title-btn-gap` | `0.75rem` | Space between buttons |
 
 ### Characters
 

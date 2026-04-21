@@ -79,6 +79,26 @@
  * --vn-credit-group-h2-margin-top     Group title top margin    (default: 7rem)
  * --vn-credit-group-h2-margin-bottom  Group title bottom margin (default: 4rem)
  *
+ * ─── Title page ──────────────────────────────────────────────────────────────
+ *
+ * --title-logo-max-width       Logo maximum width             (default: 400px)
+ * --title-logo-max-height      Logo maximum height            (default: 200px)
+ * --title-text-color           Title text color               (default: #fff)
+ * --title-text-font-size       Title text size                (default: clamp(2rem, 5vw, 4rem))
+ * --title-text-font-weight     Title text weight              (default: 700)
+ * --title-text-letter-spacing  Title letter spacing           (default: 0.04em)
+ * --title-text-shadow          Title drop shadow              (default: 0 2px 8px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4))
+ * --title-btn-bg               Button background              (default: rgba(100,108,255,0.25))
+ * --title-btn-bg-hover         Button background on hover     (default: rgba(100,108,255,0.5))
+ * --title-btn-border           Button border shorthand        (default: 2px solid rgba(100,108,255,0.5))
+ * --title-btn-border-color-hover  Border color on hover       (default: rgba(100,108,255,0.9))
+ * --title-btn-border-radius    Button corner rounding         (default: 6px)
+ * --title-btn-color            Button text color              (default: #fff)
+ * --title-btn-font-size        Button text size               (default: 1.1rem)
+ * --title-btn-padding          Button inner padding           (default: 0.6rem 2.5rem)
+ * --title-btn-min-width        Button minimum width           (default: 200px)
+ * --title-btn-gap              Space between buttons          (default: 0.75rem)
+ *
  * ─── Background image ────────────────────────────────────────────────────────
  *
  * --vn-bg-position          Background image position          (default: center)

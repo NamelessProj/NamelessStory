@@ -45,7 +45,17 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
         <div className="vn-titlepage h-100 centered column">
             <BackgroundImage fileName={script.settings.titlePage.background} />
 
-            <h1>{script.settings.titlePage.title}</h1>
+            {script.settings.titlePage.logo && (
+                <img
+                    src={script.settings.titlePage.logo}
+                    alt={script.settings.titlePage.title}
+                    className="titlepage-logo"
+                />
+            )}
+
+            {(!script.settings.titlePage.logo || script.settings.titlePage.showTitle !== false) && (
+                <h1>{script.settings.titlePage.title}</h1>
+            )}
 
             <div className="titlepage-buttons-wrapper">
                 <PrimaryButton
