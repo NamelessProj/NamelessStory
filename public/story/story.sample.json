@@ -2,11 +2,17 @@
   "settings": {
     "startingScene": "start",
     "textSpeed": 50,
+    "defaultDialoguePosition": "bottom",
     "titlePage": {
       "title": "My Visual Novel",
       "background": "title_bg.png",
+      "logo": "logo.png",
+      "showTitle": true,
       "buttons": {
-        "start": "Start Game"
+        "start": "Start Game",
+        "continue": "Continue",
+        "load": "Load Save File",
+        "credits": "Credits"
       }
     },
     "creditsPage": {
@@ -47,29 +53,89 @@
         "wave": "bob_right.png",
         "idle": "bob_left.png"
       }
+    },
+    "playerName": {
+      "name": "",
+      "color": "green",
+      "sprite": {
+        "idle": "player.png"
+      }
     }
   },
   "story": {
     "start": {
       "background": "title_bg.png",
-      "bgmFile": "bgm_start.mp3",
+      "bgmFile": "music_01.mp3",
       "dialogues": [
         {
           "name": "",
-          "text": "Welcome to our visual novel! \\. I Love {{Char1}} \\. and {{C!Char2}}"
+          "text": "Welcome to [color=red]our[/color] [class=bloup lol]visual[/class] novel! \\. I Love [b]{{Char1}}[/b] \\. and {{C!Char2}}"
+        },
+        {
+          "name": "Char1",
+          "text": "So\\..\\..\\.. What's your name?",
+          "input": {
+            "value": "playerName"
+          },
+          "dialoguePosition": "top"
+        },
+        {
+          "name": "{{v!playerName}}",
+          "text": "I'm {{v!playerName}}, nice to meet you {{Char1}}!",
+          "dialoguePosition": "top",
+          "next": "scene01"
+        },
+        {
+          "name": "{{v!playerName}}",
+          "text": "What kind of food do you like, {{Char1}}?",
+          "input": {
+            "value": "food",
+            "color": "orange"
+          },
+          "dialoguePosition": "center",
+          "next": "scene01"
+        },
+        {
+          "name": "",
+          "text": "Do I really like {{v!food}} ?",
+          "options": [
+            {
+              "text": "Yes, you do!",
+              "next": "scene01"
+            },
+            {
+              "text": "No, you don't!",
+              "next": "3"
+            },
+            {
+              "text": "To the end",
+              "next": "scene01:1"
+            },
+            {
+              "text": "To the credits",
+              "next": "__end__"
+            }
+          ],
+          "next": "scene01"
         }
       ]
     },
     "scene01": {
       "background": "bg_scene01.png",
-      "bgmFile": "bgm_scene01.mp3",
+      "bgmFile": "music_02.mp3",
       "dialogues": [
         {
           "name": "Alice",
-          "text": "Hi there! I'm Alice.",
+          "text": "Hi there! I'm {{Char2}}. And I like {{v!food}} too!",
+          "dialoguePosition": "center",
           "sprite": {
             "name": "idle"
           }
+        },
+        {
+          "name": "",
+          "text": "\\..\\..\\.. THE END.",
+          "next": "__end__"
         }
       ]
     }
