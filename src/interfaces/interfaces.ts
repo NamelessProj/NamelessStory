@@ -60,6 +60,8 @@ export interface TitleButtons {
 export interface TitlePage {
     title: string,
     background: string,
+    logo?: string,
+    showTitle?: boolean,
     buttons?: TitleButtons
 }
 
