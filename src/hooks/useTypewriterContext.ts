@@ -7,7 +7,7 @@ import TypewriterContext, { type TypewriterContextValue } from "../context/Typew
  * @throws {Error} If the hook is used outside of a DataProvider, an error is thrown to indicate that the context is not available.
  */
 export const useTypewriterContext = (): TypewriterContextValue => {
-    const ctx = useContext(TypewriterContext);
+    const ctx: TypewriterContextValue | undefined = useContext(TypewriterContext);
     if (!ctx) throw new Error("useTypewriterContext must be used within a DataProvider");
     return ctx;
 };
