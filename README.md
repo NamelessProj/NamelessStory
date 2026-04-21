@@ -191,6 +191,11 @@ The title page logo and buttons can be restyled from `public/custom.css` without
 |----------|---------|-------------|
 | `--title-logo-max-width` | `400px` | Maximum width of the logo image |
 | `--title-logo-max-height` | `200px` | Maximum height of the logo image |
+| `--title-text-color` | `#fff` | Title text color |
+| `--title-text-font-size` | `clamp(2rem, 5vw, 4rem)` | Title text size (scales with viewport) |
+| `--title-text-font-weight` | `700` | Title text weight |
+| `--title-text-letter-spacing` | `0.04em` | Title letter spacing |
+| `--title-text-shadow` | `0 2px 8px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)` | Title drop shadow |
 | `--title-btn-bg` | `rgba(100, 108, 255, 0.25)` | Button background |
 | `--title-btn-bg-hover` | `rgba(100, 108, 255, 0.5)` | Button background on hover |
 | `--title-btn-border` | `2px solid rgba(100, 108, 255, 0.5)` | Button border (shorthand) |
