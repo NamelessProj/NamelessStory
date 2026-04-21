@@ -193,6 +193,15 @@ p {
   gap: 2rem;
 }
 
+.vn-titlepage h1 {
+  color: var(--title-text-color, #fff);
+  font-size: var(--title-text-font-size, clamp(2rem, 5vw, 4rem));
+  font-weight: var(--title-text-font-weight, 700);
+  letter-spacing: var(--title-text-letter-spacing, 0.04em);
+  text-shadow: var(--title-text-shadow, 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 0, 0, 0.4));
+  margin: 0;
+}
+
 .titlepage-logo {
   max-width: var(--title-logo-max-width, 400px);
   max-height: var(--title-logo-max-height, 200px);
