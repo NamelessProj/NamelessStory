@@ -8,7 +8,7 @@ interface UserOptionProps {
 
 const UserOption = memo(({text, onClick = undefined}: UserOptionProps) => {
     return (
-        <button className={styles.vnUserOption} onClick={onClick}>
+        <button type="button" className={styles.vnUserOption} onClick={onClick}>
             <span>{text}</span>
         </button>
     );
