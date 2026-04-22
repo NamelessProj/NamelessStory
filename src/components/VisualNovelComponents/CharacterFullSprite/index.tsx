@@ -34,14 +34,16 @@ const CharacterFullSprite = memo(({sprite, characterId: characterIdOverride}: Ch
     return (
         <div className={`${styles.characterSprite} ${positionClass}`}>
             {spriteUrl && (
-                <img
-                    src={`../assets/${spriteUrl}`}
-                    alt={character?.name || "Character"}
-                    style={{
-                        transform: sprite.mirror ? "scaleX(-1)" : "scaleX(1)",
-                        height: sprite.position?.y !== undefined ? `${sprite.position.y}px` : "auto"
-                    }}
-                />
+                <picture>
+                    <img
+                        src={`../assets/${spriteUrl}`}
+                        alt={character?.name || "Character"}
+                        style={{
+                            transform: sprite.mirror ? "scaleX(-1)" : "scaleX(1)",
+                            height: sprite.position?.y !== undefined ? `${sprite.position.y}px` : "auto"
+                        }}
+                    />
+                </picture>
             )}
         </div>
     );
