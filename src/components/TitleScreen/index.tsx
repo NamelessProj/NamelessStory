@@ -46,11 +46,12 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
             <BackgroundImage fileName={script.settings.titlePage.background} />
 
             {script.settings.titlePage.logo && (
-                <img
-                    src={script.settings.titlePage.logo}
-                    alt={script.settings.titlePage.title}
-                    className="titlepage-logo"
-                />
+                <picture className="titlepage-logo">
+                    <img
+                        src={script.settings.titlePage.logo}
+                        alt={script.settings.titlePage.title}
+                    />
+                </picture>
             )}
 
             {(!script.settings.titlePage.logo || script.settings.titlePage.showTitle !== false) && (

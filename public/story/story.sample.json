@@ -1,140 +1,278 @@
 {
   "settings": {
     "startingScene": "start",
-    "textSpeed": 50,
+    "textSpeed": 45,
+    "defaultNameDisplay": "short",
     "defaultDialoguePosition": "bottom",
     "titlePage": {
-      "title": "My Visual Novel",
+      "title": "The Feature Tour",
       "background": "title_bg.png",
       "logo": "logo.png",
       "showTitle": true,
       "buttons": {
-        "start": "Start Game",
-        "continue": "Continue",
-        "load": "Load Save File",
+        "start": "Begin Tour",
+        "continue": "Resume",
+        "load": "Load Save",
         "credits": "Credits"
       }
     },
     "creditsPage": {
-      "title": "Credits",
+      "title": "– Credits –",
       "background": "title_bg.png",
+      "scrollDurationInSeconds": 20,
       "creditGroups": [
         {
-          "groupName": "Development Team",
+          "groupName": "Story & Writing",
           "credits": [
-            { "name": "Alice", "role": "Lead Developer" },
-            { "name": "Bob", "role": "Artist" }
+            { "name": "You", "role": "Author" }
+          ]
+        },
+        {
+          "groupName": "Engine",
+          "credits": [
+            { "name": "NamelessStory", "role": "Visual Novel Engine" }
           ]
         },
         {
           "groupName": "Special Thanks",
           "credits": [
-            { "name": "Charlie" }
+            { "name": "The Player" }
           ]
         }
       ]
     }
   },
   "characters": {
-    "Char1": {
+    "Alice": {
       "name": "Alice",
-      "fullName": "Alice Smith",
-      "color": "red",
+      "fullName": "Alice Wonderland",
+      "color": "#e07ae0",
       "sprite": {
-        "wave": "alice_right.png",
-        "idle": "alice_left.png"
+        "idle": "alice_idle.png",
+        "wave": "alice_wave.png",
+        "happy": "alice_happy.png"
       }
     },
-    "Char2": {
+    "Bob": {
       "name": "Bob",
-      "fullName": "Bob Johnson",
-      "color": "blue",
+      "fullName": "Bob Builder",
+      "color": "#4a9cf5",
       "sprite": {
-        "wave": "bob_right.png",
-        "idle": "bob_left.png"
+        "idle": "bob_idle.png",
+        "thinking": "bob_thinking.png"
       }
     },
     "playerName": {
       "name": "",
-      "color": "green",
-      "sprite": {
-        "idle": "player.png"
-      }
+      "color": "#7fde6a"
     }
   },
   "story": {
     "start": {
-      "background": "title_bg.png",
+      "background": "bg_library.png",
       "bgmFile": "music_01.mp3",
       "dialogues": [
         {
           "name": "",
-          "text": "Welcome to [color=red]our[/color] [class=bloup lol]visual[/class] novel! \\. I Love [b]{{Char1}}[/b] \\. and {{C!Char2}}"
+          "text": "[i]Welcome to [b]The Feature Tour[/b].[/i][br]This story showcases [color=gold]every feature[/color] of the engine."
         },
         {
-          "name": "Char1",
-          "text": "So\\..\\..\\.. What's your name?",
+          "name": "",
+          "text": "Text can be [b]bold[/b], [i]italic[/i], [u]underlined[/u], or [s]struck through[/s].",
+          "dialoguePosition": "center"
+        },
+        {
+          "name": "",
+          "text": "Colors work too: [color=red]by name[/color], [color=#4a9cf5]by hex[/color], or [color=rgb(140,200,80)]by rgb[/color].",
+          "dialoguePosition": "center"
+        },
+        {
+          "name": "",
+          "text": "Pauses add drama\\.. like that one\\,\\, or shorter ones.",
+          "dialoguePosition": "center"
+        },
+        {
+          "name": "",
+          "text": "Line breaks allow multi-line text:[br]First line.[br]Second line.[br][br]And a paragraph gap.",
+          "next": "name_input"
+        }
+      ]
+    },
+    "name_input": {
+      "background": "bg_library.png",
+      "bgmFile": "continue",
+      "dialogues": [
+        {
+          "name": "Alice",
+          "text": "Oh! A visitor. I'm [b]{{C!Alice}}[/b]\\, and you are...?",
+          "sprite": {
+            "name": "wave",
+            "position": "right"
+          },
           "input": {
-            "value": "playerName"
+            "value": "playerName",
+            "color": "#7fde6a"
           },
           "dialoguePosition": "top"
         },
         {
           "name": "{{v!playerName}}",
-          "text": "I'm {{v!playerName}}, nice to meet you {{Char1}}!",
+          "text": "I'm [color=#7fde6a]{{v!playerName}}[/color]! Nice to meet you, {{Alice}}.",
           "dialoguePosition": "top",
-          "next": "scene01"
-        },
-        {
-          "name": "{{v!playerName}}",
-          "text": "What kind of food do you like, {{Char1}}?",
-          "input": {
-            "value": "food",
-            "color": "orange"
-          },
-          "dialoguePosition": "center",
-          "next": "scene01"
-        },
-        {
-          "name": "",
-          "text": "Do I really like {{v!food}} ?",
-          "options": [
-            {
-              "text": "Yes, you do!",
-              "next": "scene01"
-            },
-            {
-              "text": "No, you don't!",
-              "next": "3"
-            },
-            {
-              "text": "To the end",
-              "next": "scene01:1"
-            },
-            {
-              "text": "To the credits",
-              "next": "__end__"
-            }
-          ],
-          "next": "scene01"
+          "next": "meet_bob"
         }
       ]
     },
-    "scene01": {
-      "background": "bg_scene01.png",
+    "meet_bob": {
+      "background": "bg_park.png",
       "bgmFile": "music_02.mp3",
       "dialogues": [
         {
+          "name": "",
+          "text": "[i]A little later\\, in the park...[/i]",
+          "dialoguePosition": "center"
+        },
+        {
           "name": "Alice",
-          "text": "Hi there! I'm {{Char2}}. And I like {{v!food}} too!",
-          "dialoguePosition": "center",
+          "text": "{{v!playerName}}, meet my friend [b]{{C!Bob}}[/b]!",
           "sprite": {
-            "name": "idle"
+            "name": "happy",
+            "position": "left"
           }
         },
         {
+          "name": "Bob",
+          "text": "Hey! {{c!Alice}} talks about you a lot.",
+          "sprite": {
+            "name": "idle",
+            "position": "right",
+            "mirror": true
+          },
+          "nameDisplay": "full"
+        },
+        {
+          "name": "Alice",
+          "text": "So {{v!playerName}}, what shall we do today?",
+          "sprite": {
+            "name": "idle",
+            "position": "left"
+          },
+          "options": [
+            { "text": "Visit the library", "next": "library" },
+            { "text": "Go on an adventure", "next": "adventure" },
+            { "text": "Skip straight to credits", "next": "__end__" }
+          ]
+        }
+      ]
+    },
+    "library": {
+      "background": "bg_library.png",
+      "bgmFile": "continue[music_01.mp3]",
+      "dialogues": [
+        {
+          "name": "Bob",
+          "text": "The library! My favourite place.",
+          "sprite": {
+            "name": "thinking",
+            "position": "center"
+          }
+        },
+        {
+          "name": "Bob",
+          "text": "Did you know you can add [link href=\"https://github.com/NamelessProj/NamelessStory\"]clickable links[/link] to dialogue?",
+          "textSpeed": 30
+        },
+        {
           "name": "",
-          "text": "\\..\\..\\.. THE END.",
+          "text": "The light shifted as dusk crept in.",
+          "background": "bg_library_evening.png"
+        },
+        {
+          "name": "Alice",
+          "text": "I prefer [class=whisper]whispering[/class] in here.",
+          "sprite": {
+            "name": "idle",
+            "position": { "x": 200, "y": 0 }
+          },
+          "dialoguePosition": "top"
+        },
+        {
+          "name": "Alice",
+          "text": "Shall we head out?",
+          "options": [
+            { "text": "Go on the adventure after all", "next": "adventure" },
+            { "text": "Call it a day", "next": "ending" }
+          ]
+        }
+      ]
+    },
+    "adventure": {
+      "background": "bg_forest.png",
+      "bgmFile": "reset",
+      "bgmLoop": false,
+      "dialogues": [
+        {
+          "name": "",
+          "text": "[b][color=orange]Adventure awaits![/color][/b]",
+          "dialoguePosition": "center"
+        },
+        {
+          "name": "Alice",
+          "text": "The path splits ahead. Which way, {{v!playerName}}?",
+          "sprite": {
+            "name": "idle",
+            "position": "left"
+          },
+          "options": [
+            { "text": "Go left", "next": "adventure:3" },
+            { "text": "Go right", "next": "adventure:4" }
+          ]
+        },
+        {
+          "name": "",
+          "text": "You should never reach this line — options skip over it.",
+          "next": "ending"
+        },
+        {
+          "name": "Alice",
+          "text": "[color=green]Left[/color] it is! The safe road home.",
+          "sprite": {
+            "name": "happy",
+            "position": "left"
+          },
+          "next": "ending"
+        },
+        {
+          "name": "Alice",
+          "text": "[color=red]Right[/color]? Bold choice! Into the unknown.",
+          "sprite": {
+            "name": "wave",
+            "position": "right",
+            "mirror": true
+          },
+          "next": "ending"
+        }
+      ]
+    },
+    "ending": {
+      "background": "bg_park.png",
+      "bgmFile": "none",
+      "dialogues": [
+        {
+          "name": "",
+          "text": "[i]And so, [b]{{v!playerName}}[/b] spent a wonderful day with {{c!Alice}} and {{C!Bob}}.[/i]",
+          "dialoguePosition": "center"
+        },
+        {
+          "name": "",
+          "text": "The [s]old world[/s] felt [color=gold]new[/color]\\.. [b][i]full of possibility.[/i][/b]",
+          "dialoguePosition": "center",
+          "textSpeed": 60
+        },
+        {
+          "name": "",
+          "text": "[b]THE END[/b]",
+          "dialoguePosition": "center",
           "next": "__end__"
         }
       ]
