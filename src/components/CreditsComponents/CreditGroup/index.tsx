@@ -8,8 +8,8 @@ const CreditGroup = ({creditGroup}: { creditGroup: CreditGroupType }) => {
         <div className={`${styles.creditGroup} centered column`}>
             <h2>{creditGroup.groupName}</h2>
 
-            {creditGroup.credits.map((credit: Credit, i: number) => (
-                <CreditEl credit={credit} key={i} />
+            {creditGroup.credits.map((credit: Credit) => (
+                <CreditEl credit={credit} key={credit.name} />
             ))}
         </div>
     );
