@@ -4,6 +4,7 @@
     gap: 8px;
     color: white;
     position: relative;
+    pointer-events: auto;
 }
 
 .volumeIcon {
