@@ -20,3 +20,6 @@ export const END_STORY_TOKEN: string = "__end__";
 export const DEFAULT_HISTORY_LIMIT: number = 15;
 export const MIN_HISTORY_LIMIT: number = 0;
 export const MAX_HISTORY_LIMIT: number = 200;
+
+// Default total duration (ms) for scene/dialogue transitions
+export const DEFAULT_TRANSITION_DURATION_MS: number = 400;
