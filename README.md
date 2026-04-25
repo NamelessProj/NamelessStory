@@ -21,6 +21,7 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
    - [Player Text Input](#player-text-input)
    - [Character Sprites](#character-sprites)
    - [Dialogue Position](#dialogue-position)
+   - [Per-Dialogue Background Override](#per-dialogue-background-override)
    - [Background Music](#background-music)
    - [Scene and Dialogue Transitions](#scene-and-dialogue-transitions)
    - [Text Formatting and Variables](#text-formatting-and-variables)
@@ -434,6 +435,51 @@ The center panel has its own CSS variables you can override in `public/custom.cs
 | `--vn-dialogue-center-radius` | `8px` | Border radius of the centered panel |
 | `--vn-dialogue-center-padding` | `1.25rem 2rem` | Inner padding of the centered panel |
 | `--vn-dialogue-bg-top` | `linear-gradient(to bottom, rgba(0,0,0,0.9) 60%, transparent)` | Background gradient used when position is `"top"` |
+
+### Per-Dialogue Background Override
+
+You can swap the background image on any individual dialogue line without leaving the scene. This is useful for time-of-day changes, weather shifts, or revealing a new part of a location while keeping the same music and scene context.
+
+Add a `background` field directly on a dialogue line with the filename of the image you want to display:
+
+```json
+"library": {
+  "background": "bg_library.png",
+  "dialogues": [
+    {
+      "name": "Bob",
+      "text": "The library! My favourite place."
+    },
+    {
+      "name": "",
+      "text": "The light shifted as dusk crept in.",
+      "background": "bg_library_evening.png"
+    },
+    {
+      "name": "Alice",
+      "text": "I prefer whispering in here."
+    }
+  ]
+}
+```
+
+- The **first** dialogue uses the scene's `background` (`bg_library.png`).
+- The **second** dialogue overrides it with `bg_library_evening.png`.
+- The **third** dialogue has no `background` field, so it keeps showing `bg_library_evening.png` — the override persists until the scene ends or another override is set.
+
+> [!NOTE]
+> The override only applies while that dialogue and any following dialogues (without their own override) are shown. When the player moves to a **new scene**, the scene's own `background` takes over again.
+
+> [!TIP]
+> Combine this with a `"transition": "fade-to-black"` on the same dialogue for a smooth background swap:
+> ```json
+> {
+>   "name": "",
+>   "text": "Hours passed...",
+>   "background": "bg_library_night.png",
+>   "transition": "fade-to-black"
+> }
+> ```
 
 ### Background Music
 
