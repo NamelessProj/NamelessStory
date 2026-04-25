@@ -370,11 +370,27 @@ Use the `sprite` field in a dialogue to display a character portrait.
 | `position` | :x: (No) | `"left"`, `"center"`, or `"right"` (default: center) |
 | `mirror` | :x: (No) | Flip the sprite horizontally. Default: `false` |
 
-**Custom position:** Instead of a preset string, `position` can be an object:
+**Custom position:** Instead of a preset string, `position` can be an object to fine-tune exactly where the sprite appears:
+
 ```json
-"position": { "x": 100, "y": 200 }
+"position": { "x": 100, "y": 600 }
 ```
-Where `x` is a pixel offset from center and `y` is the height.
+
+| Field | Description |
+|-------|-------------|
+| `x` | Horizontal offset **in pixels from the center** of the screen. Positive values move the sprite right, negative values move it left. `0` is perfectly centered. |
+| `y` | Height of the sprite in pixels. Controls how tall the sprite is rendered. Omit to use the image's natural size. |
+
+Both fields are optional — you can use only `x`, only `y`, or both together:
+
+```json
+{ "name": "Alice", "text": "I'm slightly to the right.", "sprite": { "name": "idle", "position": { "x": 200 } } }
+{ "name": "Bob",   "text": "I'm tall and centered.",     "sprite": { "name": "idle", "position": { "y": 700 } } }
+{ "name": "Alice", "text": "Fine-tuned.",                "sprite": { "name": "happy", "position": { "x": -150, "y": 600 } } }
+```
+
+> [!TIP]
+> Use the preset strings (`"left"`, `"center"`, `"right"`) for most cases. Reach for `x` / `y` only when you need a precise placement — for example, two characters standing side by side at custom positions.
 
 **Sprites persist** within a scene until you specify a different one (or the scene changes). To hide a sprite, advance to a dialogue without a `sprite` field or change scenes.
 
