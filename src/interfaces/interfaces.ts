@@ -92,7 +92,7 @@ export interface CreditGroupType {
 export interface CreditsPageType {
     title: string,
     background: string,
-    scrollDurationInSeconds?: number,
+    scrollSpeedInPixelsPerSecond?: number,
     creditGroups: CreditGroupType[]
 }
 
