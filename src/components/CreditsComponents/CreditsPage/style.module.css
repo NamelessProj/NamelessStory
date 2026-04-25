@@ -18,6 +18,10 @@
     height: fit-content;
     min-height: 100%;
     padding-block: var(--vn-credits-padding-block, 7rem);
-    animation: slideBottomToTop var(--credits-scroll-time) linear forwards;
+    transform: translateY(100%);
     justify-content: flex-start;
+}
+
+.creditsPage.animating {
+    animation: slideBottomToTop var(--credits-scroll-time) linear forwards;
 }
