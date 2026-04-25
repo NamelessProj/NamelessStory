@@ -1,12 +1,25 @@
 import {useCallback, useState, useRef, useEffect, type RefObject} from "react";
-import type {Dialogue, HistoryEntry, Page, SceneType, State, TypewriterState} from "../../../interfaces/interfaces.ts";
+import type {
+    Dialogue,
+    DialogueTransition,
+    HistoryEntry,
+    Page,
+    SceneTransition,
+    SceneType,
+    State,
+    TransitionInfo,
+    TransitionPhase,
+    TypewriterState
+} from "../../../interfaces/interfaces.ts";
 import Scene from "../Scene";
 import VNTopOverlay from "../VNTopOverlay";
 import VNBottomOverlay from "../VNBottomOverlay";
+import TransitionOverlay from "../TransitionOverlay";
 import { useBGM } from "../../../hooks/useBGM";
 import {
     ADVANCE_THRESHOLD_MS,
     DEFAULT_HISTORY_LIMIT,
+    DEFAULT_TRANSITION_DURATION_MS,
     END_STORY_TOKEN,
     MAX_HISTORY_LIMIT,
     MIN_HISTORY_LIMIT
@@ -31,12 +44,16 @@ interface AdvanceResult {
     goToCredits: boolean;
 }
 
+const IDLE_TRANSITION: TransitionInfo = { phase: "idle", type: "none", target: "scene" };
+
 const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     const {script, state, setState} = useDataContext();
     const {typewriterState, setTypewriterState} = useTypewriterContext();
     const [isOverlayHidden, setIsOverlayHidden] = useState<boolean>(false);
+    const [transitionInfo, setTransitionInfo] = useState<TransitionInfo>(IDLE_TRANSITION);
 
     const lastTypingCompleteRef: RefObject<number> = useRef<number>(0);
+    const transitionPhaseRef = useRef<TransitionPhase>("idle");
 
     // Refs mirror live values so callbacks don't need them as deps and remain stable
     const stateRef: RefObject<State> = useRef<State>(state);
@@ -45,6 +62,13 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     useEffect(() => { stateRef.current = state; }, [state]);
     useEffect(() => { typewriterStateRef.current = typewriterState; }, [typewriterState]);
     useEffect(() => { isOverlayHiddenRef.current = isOverlayHidden; }, [isOverlayHidden]);
+
+    const transitionDuration: number = script.settings.transitionDuration ?? DEFAULT_TRANSITION_DURATION_MS;
+
+    // Sync the CSS variable so animation durations match the JS timer
+    useEffect(() => {
+        document.documentElement.style.setProperty("--vn-transition-duration", `${transitionDuration / 2}ms`);
+    }, [transitionDuration]);
 
     // Web Worker for off-thread cookie serialization
     const saveWorkerRef: RefObject<Worker | null> = useRef<Worker | null>(null);
@@ -90,9 +114,6 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     /**
      * Resolves the next dialogue state after a linear advance (not an option select).
      * Handles advancing within the current scene or jumping to the next one.
-     * @param s {State} The current state snapshot.
-     * @param history {HistoryEntry[]} The updated history array (already includes the current entry).
-     * @returns {AdvanceResult} The partial state to merge and a flag indicating credits navigation.
      */
     const resolveDialogueAdvance = useCallback((s: State, history: HistoryEntry[]): AdvanceResult => {
         if (s.currentDialogueIndex < s.currentDialogueIndexMax) {
@@ -121,7 +142,43 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         saveWorkerRef.current?.postMessage({ state: stateRef.current, cookieName });
     }, [script]);
 
+    /**
+     * Runs a transition animation then executes action at the midpoint (when content swaps).
+     * Blocks any further input for the full duration of the transition.
+     * @param type - The transition style to play.
+     * @param target - Whether this is a scene or dialogue transition.
+     * @param action - The state update to run at the midpoint.
+     * @param duration - Total transition duration in ms (split equally into out + in phases).
+     */
+    const runTransition = useCallback((
+        type: SceneTransition | DialogueTransition,
+        target: "scene" | "dialogue",
+        action: () => void,
+        duration: number
+    ): void => {
+        if (type === "none") {
+            action();
+            return;
+        }
+
+        const half: number = duration / 2;
+        transitionPhaseRef.current = "out";
+        setTransitionInfo({ phase: "out", type, target });
+
+        setTimeout(() => {
+            action();
+            transitionPhaseRef.current = "in";
+            setTransitionInfo({ phase: "in", type, target });
+
+            setTimeout(() => {
+                transitionPhaseRef.current = "idle";
+                setTransitionInfo(IDLE_TRANSITION);
+            }, half);
+        }, half);
+    }, []);
+
     const handleBack = useCallback((): void => {
+        if (transitionPhaseRef.current !== "idle") return;
         const s: State = stateRef.current;
         if (s.history.length === 0) return;
         const prev: HistoryEntry = s.history[s.history.length - 1];
@@ -139,35 +196,22 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         resetTypewriter();
     }, [script, setState, resetTypewriter]);
 
-    /**
-     * Handles saving the current game state to a file. When the player chooses to export their save, this function will take the current state, serialize it, and trigger a download of the save file.
-     * It also sends the state to a Web Worker for off-thread cookie saving, ensuring that the player's progress is preserved both in a downloadable file and in a cookie for future sessions.
-     */
     const handleExportSave = useCallback((): void => {
         exportSaveFile(stateRef.current, script.settings.titlePage.title);
         handleCookieSave();
     }, [script, handleCookieSave]);
 
-    /**
-     * Handles the completion of the typewriter effect for dialogue text.
-     * When the typewriter effect finishes displaying the current dialogue text, this function is called to update the typewriter state, indicating that typing is complete and resetting the skipTyping flag.
-     * This allows the game to know when it can allow the player to advance to the next dialogue or scene, and ensures that any logic related to typing completion (such as enabling input or options) can be triggered appropriately.
-     */
     const handleTypingComplete = useCallback((): void => {
         lastTypingCompleteRef.current = Date.now();
         setTypewriterState({isTyping: false, skipTyping: false});
     }, [setTypewriterState]);
 
-    /**
-     * Handles advancing the dialogue when the player clicks or presses a key.
-     * This function checks various conditions to determine whether advancing is allowed (e.g., not waiting on user input, not skipping typing, etc.) and then updates the game state to move to the next dialogue or scene as appropriate.
-     * It also manages the typewriter state to control text display and ensures that the player's progress is saved to a cookie after advancing.
-     */
     const handleAdvance = useCallback((): void => {
         const s: State = stateRef.current;
         const ts: TypewriterState = typewriterStateRef.current;
 
         if (s.waitingOnUserInput) return;
+        if (transitionPhaseRef.current !== "idle") return;
         if (isOverlayHiddenRef.current) return;
 
         if (ts.isTyping) {
@@ -180,37 +224,54 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
         const { nextState, goToCredits }: AdvanceResult = resolveDialogueAdvance(s, newHistory);
 
+        const isSceneChange: boolean = !goToCredits
+            && nextState.currentScene !== undefined
+            && nextState.currentScene !== s.currentScene;
+
+        let transType: SceneTransition | DialogueTransition;
+        let transTarget: "scene" | "dialogue";
+
         if (goToCredits) {
-            onChangePage?.("credits");
+            transTarget = "scene";
+            const currentDialogue: Dialogue = script.story[s.currentScene]?.dialogues[s.currentDialogueIndex];
+            transType = currentDialogue?.transition ?? script.settings.defaultSceneTransition ?? "none";
+        } else if (isSceneChange) {
+            transTarget = "scene";
+            transType = script.story[nextState.currentScene!]?.transition ?? script.settings.defaultSceneTransition ?? "none";
         } else {
-            setState({ ...s, ...nextState });
-            resetTypewriter();
+            transTarget = "dialogue";
+            const nextIndex: number = nextState.currentDialogueIndex ?? s.currentDialogueIndex;
+            const nextDialogue: Dialogue = script.story[s.currentScene]?.dialogues[nextIndex];
+            transType = nextDialogue?.transition ?? script.settings.defaultDialogueTransition ?? "none";
         }
-        handleCookieSave();
-    }, [onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave, resetTypewriter, resolveDialogueAdvance]);
 
-    /**
-     * Handles the selection of an option in the dialogue. When the player selects an option, this function determines the next scene and dialogue index based on the option's "next" value, updates the game state accordingly, and saves the updated state to a cookie. This allows for branching narratives where player choices can lead to different scenes and dialogues, and ensures that the player's progress is preserved across sessions.
-     * @param next {string} The "next" value associated with the selected option. This value can take several forms:
-     * - If the value is <code>\_\_end\_\_</code>, the game will navigate to the credits page.
-     * - If the value is an empty string, it will advance to the next dialogue in the current scene.
-     * - If the value is a number (as a string), it will jump to that dialogue index within the current scene.
-     * - If the value contains a colon (e.g., <code>"sceneName:3"</code>), it will jump to the specified scene and dialogue index.
-     * - If the value is a string without a colon, it will jump to the first dialogue of the specified scene.
-     */
+        runTransition(transType, transTarget, () => {
+            if (goToCredits) {
+                onChangePage?.("credits");
+            } else {
+                setState({ ...s, ...nextState });
+                resetTypewriter();
+            }
+            handleCookieSave();
+        }, transitionDuration);
+    }, [onChangePage, pushHistory, setState, setTypewriterState, handleCookieSave, resetTypewriter, resolveDialogueAdvance, runTransition, script, transitionDuration]);
+
     const handleOptionSelect = useCallback((next: string): void => {
+        if (transitionPhaseRef.current !== "idle") return;
         const s: State = stateRef.current;
-
-        if (next === END_STORY_TOKEN) {
-            onChangePage?.("credits");
-            return;
-        }
 
         const currentSceneId: string = s.currentScene;
         let newScene: string = s.currentScene;
         let tempIndex: number = 0;
         let newMaxIndex: number = s.currentDialogueIndexMax;
         const radix: number = 10;
+
+        if (next === END_STORY_TOKEN) {
+            const currentDialogue: Dialogue = script.story[s.currentScene]?.dialogues[s.currentDialogueIndex];
+            const transType: SceneTransition = currentDialogue?.transition ?? script.settings.defaultSceneTransition ?? "none";
+            runTransition(transType, "scene", () => onChangePage?.("credits"), transitionDuration);
+            return;
+        }
 
         if (next === "") {
             tempIndex = s.currentDialogueIndex + 1;
@@ -232,37 +293,67 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         const targetDialogue: Dialogue = script.story[newScene]?.dialogues[newDialogueIndex];
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
-        setState({
-            ...s,
-            history: newHistory,
-            currentScene: newScene,
-            currentDialogueIndex: newDialogueIndex,
-            currentDialogueIndexMax: newMaxIndex,
-            waitingOnOptionSelection: false,
-            waitingOnUserInput: targetDialogue?.input !== undefined,
-        });
-        resetTypewriter();
-        handleCookieSave();
-    }, [script, onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter]);
+        let transType: SceneTransition | DialogueTransition;
+        let transTarget: "scene" | "dialogue";
 
-    /**
-     * Handles user input for dialogues that require it. When the player submits input, this function updates the game state with the new variable values, advances to the next dialogue or scene as appropriate, and saves the updated state to a cookie.
-     * This allows for dynamic storytelling where player choices can influence the narrative and be preserved across sessions.
-     * @param value {string} The value of the user input. This is typically the text that the player has entered in response to a prompt in the dialogue.
-     * @param variableName {string} The name of the variable that should be updated with the user's input. This variable can then be used in the script to influence future dialogues, options, or conditions based on the player's input.
-     * @param color {string?} An optional color value that can be associated with the variable. This can be used for display purposes, such as showing the player's name in a specific color when they input it.
-     */
+        if (currentSceneId !== newScene) {
+            transTarget = "scene";
+            transType = script.story[newScene]?.transition ?? script.settings.defaultSceneTransition ?? "none";
+        } else {
+            transTarget = "dialogue";
+            transType = targetDialogue?.transition ?? script.settings.defaultDialogueTransition ?? "none";
+        }
+
+        runTransition(transType, transTarget, () => {
+            setState({
+                ...s,
+                history: newHistory,
+                currentScene: newScene,
+                currentDialogueIndex: newDialogueIndex,
+                currentDialogueIndexMax: newMaxIndex,
+                waitingOnOptionSelection: false,
+                waitingOnUserInput: targetDialogue?.input !== undefined,
+            });
+            resetTypewriter();
+            handleCookieSave();
+        }, transitionDuration);
+    }, [script, onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter, runTransition, transitionDuration]);
+
     const handleInput = useCallback((value: string, variableName: string, color?: string): void => {
+        if (transitionPhaseRef.current !== "idle") return;
         const s: State = stateRef.current;
         const updatedVariables = { ...s.variables, [variableName]: { value, color } };
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
         const { nextState, goToCredits }: AdvanceResult = resolveDialogueAdvance(s, newHistory);
 
-        setState({ ...s, ...nextState, variables: updatedVariables });
-        if (goToCredits) onChangePage?.("credits");
-        resetTypewriter();
-        handleCookieSave();
-    }, [onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter, resolveDialogueAdvance]);
+        const isSceneChange: boolean = !goToCredits
+            && nextState.currentScene !== undefined
+            && nextState.currentScene !== s.currentScene;
+
+        let transType: SceneTransition | DialogueTransition;
+        let transTarget: "scene" | "dialogue";
+
+        if (goToCredits) {
+            transTarget = "scene";
+            const currentDialogue: Dialogue = script.story[s.currentScene]?.dialogues[s.currentDialogueIndex];
+            transType = currentDialogue?.transition ?? script.settings.defaultSceneTransition ?? "none";
+        } else if (isSceneChange) {
+            transTarget = "scene";
+            transType = script.story[nextState.currentScene!]?.transition ?? script.settings.defaultSceneTransition ?? "none";
+        } else {
+            transTarget = "dialogue";
+            const nextIndex: number = nextState.currentDialogueIndex ?? s.currentDialogueIndex;
+            const nextDialogue: Dialogue = script.story[s.currentScene]?.dialogues[nextIndex];
+            transType = nextDialogue?.transition ?? script.settings.defaultDialogueTransition ?? "none";
+        }
+
+        runTransition(transType, transTarget, () => {
+            setState({ ...s, ...nextState, variables: updatedVariables });
+            if (goToCredits) onChangePage?.("credits");
+            resetTypewriter();
+            handleCookieSave();
+        }, transitionDuration);
+    }, [onChangePage, setState, pushHistory, handleCookieSave, resetTypewriter, resolveDialogueAdvance, runTransition, script, transitionDuration]);
 
     // Stable — handleAdvance reads refs, no tick-sensitive deps here
     useEffect(() => {
@@ -280,10 +371,6 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     /** Handles the page change when the player clicks the "Return Home" button. */
     const handleSetPage = useCallback((page: Page) => onChangePage?.(page), [onChangePage]);
 
-    /**
-     * Handles clicks on the main game wrapper. If the overlay is currently hidden, this function will set it to be visible again.
-     * This allows players to click anywhere on the game area to bring back the UI overlay if they have hidden it, ensuring that they can always access important information and controls when needed.
-     */
     const handleClick = useCallback((): void => {
         if (isOverlayHiddenRef.current) setIsOverlayHidden(false);
     }, []);
@@ -300,11 +387,14 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
 
             <Scene
                 isOverlayHidden={isOverlayHidden}
+                transitionInfo={transitionInfo}
                 onAdvance={handleAdvance}
                 onTypingComplete={handleTypingComplete}
                 onHandleOptionSelect={handleOptionSelect}
                 onHandleInput={handleInput}
             />
+
+            <TransitionOverlay phase={transitionInfo.phase} type={transitionInfo.type} />
 
             <VNBottomOverlay
                 exportSaveFunc={handleExportSave}
