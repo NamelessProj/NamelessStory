@@ -26,22 +26,30 @@ const CharacterFullSprite = memo(({sprite, characterId: characterIdOverride}: Ch
     const spriteUrl: string = character?.sprite?.[spriteName] || character?.sprite?.["idle"] || "";
 
     const positionClass: string = useMemo(() => {
+        if (sprite.position?.x !== undefined) return styles.spriteCenter;
         if (sprite.position?.name === "left") return styles.spriteLeft;
         if (sprite.position?.name === "right") return styles.spriteRight;
         return styles.spriteCenter;
-    }, [sprite.position?.name]);
+    }, [sprite.position]);
+
+    const positionStyle = useMemo(() => {
+        const x: number | undefined = sprite.position?.x;
+        const y: number | undefined = sprite.position?.y;
+        if (x === undefined && y === undefined) return undefined;
+        return {
+            ...(x !== undefined && { left: `calc(50% + ${x}px)` }),
+            ...(y !== undefined && { height: `${y}px` }),
+        };
+    }, [sprite.position?.x, sprite.position?.y]);
 
     return (
-        <div className={`${styles.characterSprite} ${positionClass}`}>
+        <div className={`${styles.characterSprite} ${positionClass}${sprite.position?.y !== undefined ? ` ${styles.customHeight}` : ''}`} style={positionStyle}>
             {spriteUrl && (
                 <picture>
                     <img
                         src={`../assets/${spriteUrl}`}
                         alt={character?.name || "Character"}
-                        style={{
-                            transform: sprite.mirror ? "scaleX(-1)" : "scaleX(1)",
-                            height: sprite.position?.y !== undefined ? `${sprite.position.y}px` : "auto"
-                        }}
+                        style={{ transform: sprite.mirror ? "scaleX(-1)" : "scaleX(1)" }}
                     />
                 </picture>
             )}
