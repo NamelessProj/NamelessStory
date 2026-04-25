@@ -4,6 +4,9 @@
     "textSpeed": 45,
     "defaultNameDisplay": "short",
     "defaultDialoguePosition": "bottom",
+    "defaultSceneTransition": "fade",
+    "defaultDialogueTransition": "none",
+    "transitionDuration": 400,
     "titlePage": {
       "title": "The Feature Tour",
       "background": "title_bg.png",
@@ -79,7 +82,8 @@
         {
           "name": "",
           "text": "Text can be [b]bold[/b], [i]italic[/i], [u]underlined[/u], or [s]struck through[/s].",
-          "dialoguePosition": "center"
+          "dialoguePosition": "center",
+          "transition": "fade"
         },
         {
           "name": "",
@@ -126,6 +130,7 @@
     "meet_bob": {
       "background": "bg_park.png",
       "bgmFile": "music_02.mp3",
+      "transition": "slide-left",
       "dialogues": [
         {
           "name": "",
@@ -209,6 +214,7 @@
     "adventure": {
       "background": "bg_forest.png",
       "bgmFile": "reset",
+      "transition": "fade-to-black",
       "bgmLoop": false,
       "dialogues": [
         {
