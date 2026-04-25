@@ -22,7 +22,7 @@
     "creditsPage": {
       "title": "– Credits –",
       "background": "title_bg.png",
-      "scrollDurationInSeconds": 20,
+      "scrollSpeedInPixelsPerSecond": 50,
       "creditGroups": [
         {
           "groupName": "Story & Writing",

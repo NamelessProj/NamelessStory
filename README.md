@@ -148,7 +148,7 @@ The `settings` block controls global options, the title screen, and the credits 
   "creditsPage": {
     "title": "Credits",
     "background": "title_bg.png",
-    "scrollDurationInSeconds": 30,
+    "scrollSpeedInPixelsPerSecond": 100,
     "creditGroups": [
       {
         "groupName": "Story & Writing",
@@ -175,7 +175,7 @@ The `settings` block controls global options, the title screen, and the credits 
 | `titlePage.logo` | :x: (No) | Logo/icon image filename (from `public/assets/`). Displayed above the buttons instead of (or alongside) the title text |
 | `titlePage.showTitle` | :x: (No) | When a `logo` is set, controls whether the title text is also shown beneath it. Defaults to `true` — set to `false` to hide the title when a logo is present |
 | `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
-| `creditsPage.scrollDurationInSeconds` | :x: (No) | How long the credits take to scroll (seconds) |
+| `creditsPage.scrollSpeedInPixelsPerSecond` | :x: (No) | How fast the credits scroll in pixels per second. The engine measures the rendered content and calculates the duration automatically. Default: `100`. Higher values scroll faster. |
 
 #### Logo behaviour
 
