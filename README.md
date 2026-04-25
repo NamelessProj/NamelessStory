@@ -22,6 +22,7 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
    - [Character Sprites](#character-sprites)
    - [Dialogue Position](#dialogue-position)
    - [Background Music](#background-music)
+   - [Scene and Dialogue Transitions](#scene-and-dialogue-transitions)
    - [Text Formatting and Variables](#text-formatting-and-variables)
      - [Pauses](#pauses)
      - [Variables in Text](#variables-in-text)
@@ -166,6 +167,9 @@ The `settings` block controls global options, the title screen, and the credits 
 | `textSpeed` | :x: (No) | Typing animation speed. Lower = faster. Default: `50` |
 | `defaultNameDisplay` | :x: (No) | `"short"` (default) or `"full"` — which character name to show |
 | `defaultDialoguePosition` | :x: (No) | `"bottom"` (default), `"top"`, or `"center"` — where the dialogue box appears on screen |
+| `defaultSceneTransition` | :x: (No) | Default transition when entering a new scene. Default: `"none"` (see [Transitions](#scene-and-dialogue-transitions)) |
+| `defaultDialogueTransition` | :x: (No) | Default transition between dialogues within the same scene. Default: `"none"` |
+| `transitionDuration` | :x: (No) | Total duration of any transition in milliseconds. Default: `400` |
 | `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
 | `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
 | `titlePage.logo` | :x: (No) | Logo/icon image filename (from `public/assets/`). Displayed above the buttons instead of (or alongside) the title text |
@@ -279,6 +283,7 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 | `background` | :heavy_check_mark: (Yes) | Background image filename |
 | `bgmFile` | :x: (No) | Music file or music command (see [Background Music](#background-music)) |
 | `bgmLoop` | :x: (No) | Whether music loops. Default: `true` |
+| `transition` | :x: (No) | Transition played when **entering** this scene (see [Transitions](#scene-and-dialogue-transitions)) |
 | `dialogues` | :heavy_check_mark: (Yes) | Array of dialogue objects |
 
 **Dialogue fields:**
@@ -295,6 +300,7 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 | `input` | :x: (No) | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
 | `sprite` | :x: (No) | Show a character sprite (see [Character Sprites](#character-sprites)) |
 | `dialoguePosition` | :x: (No) | `"bottom"`, `"top"`, or `"center"` — override the dialogue box position for this line only (see [Dialogue Position](#dialogue-position)) |
+| `transition` | :x: (No) | Transition played when **entering** this dialogue line (see [Transitions](#scene-and-dialogue-transitions)) |
 
 ### Player Choices (Options)
 
@@ -449,6 +455,107 @@ Control music with the `bgmFile` field on a scene.
 | *(omit the field)* | No music |
 
 The player can adjust or mute the volume from the top overlay bar during the game.
+
+### Scene and Dialogue Transitions
+
+Transitions are visual effects that play when the story moves from one dialogue to the next, or when jumping to a new scene. You can set a global default in `settings` and override it per scene or per dialogue.
+
+#### Global defaults (settings)
+
+```json
+"settings": {
+  "defaultSceneTransition": "fade",
+  "defaultDialogueTransition": "none",
+  "transitionDuration": 400
+}
+```
+
+`transitionDuration` is the **total** duration of the animation in milliseconds (the engine splits it equally into an out-phase and an in-phase). The default is `400` ms.
+
+#### Per-scene override
+
+Add `transition` directly on a scene to override the default for that specific scene change:
+
+```json
+"forest": {
+  "background": "bg_forest.png",
+  "transition": "slide-left",
+  "dialogues": [...]
+}
+```
+
+The transition plays when the player **enters** that scene.
+
+#### Per-dialogue override
+
+Add `transition` on any dialogue line to override the default for that specific step:
+
+```json
+{
+  "name": "",
+  "text": "A long silence fell over the room...",
+  "transition": "fade-to-black"
+}
+```
+
+The transition plays when the player **advances to** that line (not when they leave it).
+
+#### Available transitions
+
+**Dialogue transitions** (`transition` on a dialogue line):
+
+| Value | Effect |
+|-------|--------|
+| `"none"` | No animation — instant change (default) |
+| `"fade"` | The dialogue text fades out, the new text fades in |
+| `"fade-to-black"` | The screen fades to black, then fades back in with the new text |
+| `"fade-to-white"` | The screen fades to white, then fades back in with the new text |
+
+**Scene transitions** (`transition` on a scene):
+
+| Value | Effect |
+|-------|--------|
+| `"none"` | No animation — instant change (default) |
+| `"fade"` | The scene fades out, the new scene fades in |
+| `"fade-to-black"` | The screen fades to black, then the new scene fades in |
+| `"fade-to-white"` | The screen fades to white, then the new scene fades in |
+| `"slide-left"` | The new scene slides in from the left (old scene exits to the right) |
+| `"slide-right"` | The new scene slides in from the right (old scene exits to the left) |
+| `"slide-top"` | The new scene slides in from the top (old scene exits downward) |
+| `"slide-bottom"` | The new scene slides in from the bottom (old scene exits upward) |
+
+> [!NOTE]
+> Slide transitions only apply to scene changes. If you set a slide on a dialogue `transition` field it will have no visible effect — use `"fade"` or a color fade for dialogue-level animations.
+
+#### Priority order
+
+When the engine decides which transition to play, it uses the first value found in this order:
+
+1. The `transition` field on the **destination dialogue** (highest priority)
+2. The `transition` field on the **destination scene** (when changing scenes)
+3. `settings.defaultDialogueTransition` or `settings.defaultSceneTransition` (global fallback)
+4. `"none"` — if nothing is set anywhere
+
+#### Disabling transitions for a specific line
+
+Set `"transition": "none"` on any dialogue or scene to force no animation, even when a default is configured globally:
+
+```json
+{
+  "name": "Alice",
+  "text": "This line appears instantly.",
+  "transition": "none"
+}
+```
+
+#### CSS variable
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--vn-transition-duration` | `200ms` | Duration of each half of the transition. Set automatically from `transitionDuration` in settings — change it there, not here. |
+
+> [!TIP]
+> A `transitionDuration` of `600` gives a cinematic feel; `200` keeps things snappy. The default `400` is a comfortable middle ground.
 
 ### Text Formatting and Variables
 
@@ -741,7 +848,7 @@ Every visual property is exposed as a CSS custom property. Create a file at `pub
 }
 ```
 
-The full list of available variables is documented inside `public/custom.css`.
+The full list of available variables is documented inside `public/custom.css`. Transition speed is controlled by `transitionDuration` in your story settings (see [Transitions](#scene-and-dialogue-transitions)).
 
 ### By editing the module CSS files (full control)
 
