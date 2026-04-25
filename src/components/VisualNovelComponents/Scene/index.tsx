@@ -81,7 +81,7 @@ const Scene = memo(({
 
     return (
         <div id="vn-scene" className={`${styles.vnScene} ${animClass}`} onClick={handleClick}>
-            <BackgroundImage fileName={currentScene.background} id="vn-background" />
+            <BackgroundImage fileName={currentDialogue.background ?? currentScene.background} id="vn-background" />
 
             {spriteToShow && (
                 <CharacterFullSprite
