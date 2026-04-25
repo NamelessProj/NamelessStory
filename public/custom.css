@@ -103,6 +103,12 @@
  *
  * --vn-bg-position          Background image position          (default: center)
  *
+ * ─── Transitions ─────────────────────────────────────────────────────────────
+ *
+ * --vn-transition-duration  Duration of each half of a transition (out or in phase) (default: 200ms)
+ *                           Set automatically from `transitionDuration` in your story settings.
+ *                           Change it there rather than here so the JS timing and CSS stay in sync.
+ *
  * ─────────────────────────────────────────────────────────────────────────────
  *
  * Example — dark purple theme:
