@@ -4,7 +4,7 @@ import CharacterFullSprite from "../CharacterFullSprite";
 import DialogueBox from "../Dialogue";
 import OptionsGroup from "../OptionsGroup";
 import UserInputBox from "../UserInput";
-import type {CharacterType, Dialogue, DialoguePosition, SceneType, Sprite} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, Dialogue, DialoguePosition, SceneType, Sprite, TransitionInfo} from "../../../interfaces/interfaces.ts";
 import {resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
@@ -12,14 +12,27 @@ import styles from './style.module.css';
 
 interface SceneProps {
     isOverlayHidden: boolean;
+    transitionInfo: TransitionInfo;
     onAdvance: () => void;
     onTypingComplete: () => void;
     onHandleOptionSelect: (nextScene: string) => void;
     onHandleInput: (value: string, variableName: string, color?: string) => void;
 }
 
+const sceneAnimClass = (info: TransitionInfo, s: typeof styles): string => {
+    const {phase, type, target} = info;
+    if (target !== "scene" || phase === "idle") return "";
+    if (type === "fade")         return phase === "out" ? s.sceneFadeOut  : s.sceneFadeIn;
+    if (type === "slide-left")   return phase === "out" ? s.slideLeftOut  : s.slideLeftIn;
+    if (type === "slide-right")  return phase === "out" ? s.slideRightOut : s.slideRightIn;
+    if (type === "slide-top")    return phase === "out" ? s.slideTopOut   : s.slideTopIn;
+    if (type === "slide-bottom") return phase === "out" ? s.slideBottomOut: s.slideBottomIn;
+    return "";
+};
+
 const Scene = memo(({
     isOverlayHidden,
+    transitionInfo,
     onAdvance,
     onTypingComplete,
     onHandleOptionSelect,
@@ -44,23 +57,30 @@ const Scene = memo(({
         [currentDialogue, script.settings.defaultDialoguePosition]
     );
 
+    const animClass: string = useMemo(
+        () => sceneAnimClass(transitionInfo, styles),
+        [transitionInfo]
+    );
+
+    const dialogueTransitionPhase = useMemo(() => {
+        const {phase, type, target} = transitionInfo;
+        if (target === "dialogue" && type === "fade") return phase;
+        return "idle" as const;
+    }, [transitionInfo]);
+
     if (!currentScene || !currentDialogue) return null;
 
     const shouldShowDialogue: boolean = currentDialogue.name !== "" || currentDialogue.text !== "";
     const shouldShowOptions: boolean = !!(currentDialogue.options && currentDialogue.options.length > 0);
     const shouldShowInput: boolean = currentDialogue.input !== undefined;
 
-    /**
-     * Handles advancing the dialogue when the player clicks on the scene.
-     * This function checks if options or input are currently being displayed, and if not, it calls the onAdvance function passed in as a prop to move to the next dialogue or scene.
-     */
     const handleClick = (): void => {
         if (shouldShowOptions || shouldShowInput) return;
         onAdvance();
     };
 
     return (
-        <div id="vn-scene" className={styles.vnScene} onClick={handleClick}>
+        <div id="vn-scene" className={`${styles.vnScene} ${animClass}`} onClick={handleClick}>
             <BackgroundImage fileName={currentScene.background} id="vn-background" />
 
             {spriteToShow && (
@@ -80,6 +100,7 @@ const Scene = memo(({
                     position={dialoguePosition}
                     onTypingComplete={onTypingComplete}
                     isOverlayHidden={isOverlayHidden}
+                    dialogueTransitionPhase={dialogueTransitionPhase}
                 />
             )}
 
