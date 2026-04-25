@@ -1,6 +1,6 @@
 import {memo, useMemo} from "react";
 import Typewriter from "../../Typewriter";
-import type {CharacterType, DialoguePosition, NameDisplay} from "../../../interfaces/interfaces.ts";
+import type {CharacterType, DialoguePosition, NameDisplay, TransitionPhase} from "../../../interfaces/interfaces.ts";
 import {getNameToDisplay, resolveCharacterFromName} from "../../../utils/nameUtils.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 
@@ -14,6 +14,7 @@ interface DialogueProps {
     position: DialoguePosition;
     onTypingComplete?: () => void;
     isOverlayHidden?: boolean;
+    dialogueTransitionPhase?: TransitionPhase;
 }
 
 const positionClass: Record<DialoguePosition, string> = {
@@ -30,6 +31,7 @@ const DialogueBox = memo(({
     position,
     onTypingComplete,
     isOverlayHidden,
+    dialogueTransitionPhase,
 }: DialogueProps) => {
     const {script, state} = useDataContext();
 
@@ -45,9 +47,15 @@ const DialogueBox = memo(({
 
     const nameColor: string = resolved ? resolved.character.color : state.defaultNameColor;
 
+    const innerAnimClass: string = useMemo(() => {
+        if (dialogueTransitionPhase === "out") return styles.dialogueFadeOut;
+        if (dialogueTransitionPhase === "in")  return styles.dialogueFadeIn;
+        return "";
+    }, [dialogueTransitionPhase]);
+
     return (
         <div className={`${styles.dialogueContainer} ${positionClass[position]} ${isOverlayHidden ? styles.hidden : ''}`}>
-            <div className={styles.dialogueInner}>
+            <div className={`${styles.dialogueInner} ${innerAnimClass}`}>
                 {nameToDisplay && nameToDisplay !== "" && (
                     <div className={styles.dialogueName} style={{color: nameColor}}>
                         {nameToDisplay}
