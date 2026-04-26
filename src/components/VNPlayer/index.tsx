@@ -4,8 +4,8 @@ import {useEffect, useMemo, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
 import DataProvider from "../../context/DataProvider.tsx";
-import Cookies from "../../utils/cookies.ts";
 import {getCookieName} from "../../utils/helpMethods.ts";
+import {loadState} from "../../utils/saveStorage.ts";
 
 const INITIAL_TYPEWRITER_STATE: TypewriterState = { isTyping: true, skipTyping: false };
 
@@ -60,7 +60,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
             setScript(data);
 
             const cookieName: string = getCookieName(data.settings.titlePage.title);
-            const cookieData: string | null = Cookies.get(cookieName);
+            const cookieData: string | null = loadState(cookieName);
             if (cookieData) {
                 try {
                     setSavedState(parseSaveFile(cookieData, data.story));

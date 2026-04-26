@@ -26,8 +26,8 @@ import {
 } from "../../../utils/constants.ts";
 import {useDataContext} from "../../../hooks/useDataContext.ts";
 import {useTypewriterContext} from "../../../hooks/useTypewriterContext.ts";
-import Cookies from "../../../utils/cookies.ts";
 import {getCookieName} from "../../../utils/helpMethods.ts";
+import {saveState} from "../../../utils/saveStorage.ts";
 import {exportSaveFile} from "../../../utils/saveFile.ts";
 
 import styles from './style.module.css';
@@ -75,7 +75,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
     useEffect(() => {
         const worker = new Worker(new URL('../../../workers/saveWorker.ts', import.meta.url), { type: 'module' });
         worker.addEventListener('message', (e: MessageEvent<{serialized: string; cookieName: string}>) => {
-            Cookies.set(e.data.cookieName, e.data.serialized);
+            saveState(e.data.cookieName, e.data.serialized);
         });
         saveWorkerRef.current = worker;
         return () => {
