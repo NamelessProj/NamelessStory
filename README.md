@@ -394,6 +394,42 @@ Both fields are optional — you can use only `x`, only `y`, or both together:
 
 **Sprites persist** within a scene until you specify a different one (or the scene changes). To hide a sprite, advance to a dialogue without a `sprite` field or change scenes.
 
+#### Portrait in dialogue box
+
+Set `inDialogueBox: true` on a sprite to display a square portrait of the character **inside the dialogue bar** instead of as a full-screen sprite. Use `position` to choose which side of the dialogue bar it appears on.
+
+```json
+{
+  "name": "Alice",
+  "text": "Nice to meet you!",
+  "sprite": {
+    "name": "happy",
+    "inDialogueBox": true,
+    "position": "left"
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `inDialogueBox` | :heavy_check_mark: (Yes) | Set to `true` to show the portrait inside the dialogue bar |
+| `position` | :x: (No) | `"left"` or `"right"` — which side of the bar the portrait appears on (default: `"left"`) |
+| `mirror` | :x: (No) | Flip the portrait horizontally. Default: `false` |
+
+> [!NOTE]
+> When `inDialogueBox` is `true`, the full-screen sprite is hidden. Only the portrait box inside the dialogue bar is shown.
+
+The portrait box is always square and crops the image to fill it (`object-fit: cover`, focused on the top-centre of the image by default — ideal for face-focused sprites). You can customise the portrait's appearance with CSS variables in `custom.css`:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--vn-portrait-size` | `130px` | Width and height of the square portrait box |
+| `--vn-portrait-border` | `2px solid rgba(255,255,255,0.3)` | Border around the portrait |
+| `--vn-portrait-bg` | `rgba(0,0,0,0.4)` | Background visible behind transparent areas |
+| `--vn-portrait-gap` | `1.25rem` | Space between the portrait and the dialogue text |
+| `--vn-portrait-outer-padding` | `0.5rem 2rem 2rem` | Padding around the portrait + text row |
+| `--vn-portrait-object-position` | `top center` | Focus point for cropping the portrait image |
+
 ### Dialogue Position
 
 By default, the dialogue box sits at the bottom of the screen, but you can place it at the **top** or in the **center** — either for the entire story or on a per-line basis.
