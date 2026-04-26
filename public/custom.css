@@ -66,6 +66,15 @@
  * --vn-sprite-bottom        Sprite distance from screen bottom  (default: 10%)
  * --vn-sprite-side-offset   Left/right sprite offset from edge  (default: 10%)
  *
+ * ─── Portrait in dialogue box ────────────────────────────────────────────────
+ *
+ * --vn-portrait-size            Square size of the portrait box    (default: 130px)
+ * --vn-portrait-border          Border around the portrait box     (default: 2px solid rgba(255,255,255,0.3))
+ * --vn-portrait-bg              Background behind the portrait     (default: rgba(0,0,0,0.4))
+ * --vn-portrait-gap             Gap between portrait and text      (default: 1.25rem)
+ * --vn-portrait-outer-padding   Padding of the portrait+text row   (default: 0.5rem 2rem 2rem)
+ * --vn-portrait-object-position Where to focus the portrait image  (default: top center)
+ *
  * ─── Volume slider ───────────────────────────────────────────────────────────
  *
  * --vn-volume-slider-width  Width of the slider track          (default: 100px)

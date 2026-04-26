@@ -83,7 +83,7 @@ const Scene = memo(({
         <div id="vn-scene" className={`${styles.vnScene} ${animClass}`} onClick={handleClick}>
             <BackgroundImage fileName={currentDialogue.background ?? currentScene.background} id="vn-background" />
 
-            {spriteToShow && (
+            {spriteToShow && !spriteToShow.inDialogueBox && (
                 <CharacterFullSprite
                     sprite={spriteToShow}
                     currentDialogueIndex={state.currentDialogueIndex}
@@ -101,6 +101,8 @@ const Scene = memo(({
                     onTypingComplete={onTypingComplete}
                     isOverlayHidden={isOverlayHidden}
                     dialogueTransitionPhase={dialogueTransitionPhase}
+                    portraitSprite={spriteToShow?.inDialogueBox ? spriteToShow : undefined}
+                    portraitCharacterId={spriteToShow?.inDialogueBox ? resolvedSpeaker?.characterId : undefined}
                 />
             )}
 
