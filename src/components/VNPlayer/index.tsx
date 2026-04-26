@@ -1,4 +1,5 @@
 import type {Dialogue, Page, SceneType, State, TypewriterState, VNStory} from "../../interfaces/interfaces.ts";
+import {parseSaveFile} from "../../utils/saveFile.ts";
 import {useEffect, useMemo, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
@@ -62,10 +63,9 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
             const cookieData: string | null = Cookies.get(cookieName);
             if (cookieData) {
                 try {
-                    const parsed = JSON.parse(cookieData) as State;
-                    setSavedState(parsed);
+                    setSavedState(parseSaveFile(cookieData, data.story));
                 } catch {
-                    // Ignore malformed cookie data
+                    // Ignore stale or malformed cookie saves
                 }
             }
         };

@@ -107,6 +107,12 @@
  * --title-btn-padding          Button inner padding           (default: 0.6rem 2.5rem)
  * --title-btn-min-width        Button minimum width           (default: 200px)
  * --title-btn-gap              Space between buttons          (default: 0.75rem)
+ * --title-save-error-color      Error message text color       (default: #ff6b6b)
+ * --title-save-error-bg         Error message background       (default: rgba(0,0,0,0.55))
+ * --title-save-error-border     Error message border           (default: 1px solid rgba(255,107,107,0.5))
+ * --title-save-error-border-radius  Error message corner rounding  (default: 6px)
+ * --title-save-error-padding    Error message inner padding    (default: 0.5rem 1.25rem)
+ * --title-save-error-font-size  Error message text size        (default: 0.95rem)
  *
  * ─── Background image ────────────────────────────────────────────────────────
  *
