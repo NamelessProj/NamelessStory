@@ -285,11 +285,12 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             newScene = next;
         }
 
-        if (currentSceneId !== newScene) {
-            newMaxIndex = script.story[newScene].dialogues.length - 1;
+        if (!script.story[newScene]) {
+            newScene = Object.keys(script.story)[0];
         }
 
-        const newDialogueIndex: number = newMaxIndex >= tempIndex ? tempIndex : 0;
+        newMaxIndex = script.story[newScene].dialogues.length - 1;
+        const newDialogueIndex: number = (tempIndex >= 0 && tempIndex <= newMaxIndex) ? tempIndex : 0;
         const targetDialogue: Dialogue = script.story[newScene]?.dialogues[newDialogueIndex];
         const newHistory: HistoryEntry[] = pushHistory(s.history, s.currentScene, s.currentDialogueIndex);
 
