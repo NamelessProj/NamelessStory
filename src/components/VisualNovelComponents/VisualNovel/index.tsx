@@ -120,7 +120,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             const nextIndex: number = s.currentDialogueIndex + 1;
             const nextDialogue: Dialogue = script.story[s.currentScene].dialogues[nextIndex];
             return {
-                nextState: { history, currentDialogueIndex: nextIndex, waitingOnUserInput: nextDialogue?.input !== undefined },
+                nextState: { history, currentDialogueIndex: nextIndex, waitingOnUserInput: nextDialogue?.input !== undefined, waitingOnOptionSelection: (nextDialogue?.options?.length ?? 0) > 0 },
                 goToCredits: false
             };
         }
@@ -129,11 +129,11 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
         if (next && next !== END_STORY_TOKEN) {
             const firstDialogue: Dialogue = script.story[next].dialogues[0];
             return {
-                nextState: { history, currentScene: next, currentDialogueIndex: 0, currentDialogueIndexMax: script.story[next].dialogues.length - 1, waitingOnUserInput: firstDialogue?.input !== undefined },
+                nextState: { history, currentScene: next, currentDialogueIndex: 0, currentDialogueIndexMax: script.story[next].dialogues.length - 1, waitingOnUserInput: firstDialogue?.input !== undefined, waitingOnOptionSelection: (firstDialogue?.options?.length ?? 0) > 0 },
                 goToCredits: false
             };
         }
-        return { nextState: { history, waitingOnUserInput: false }, goToCredits: true };
+        return { nextState: { history, waitingOnUserInput: false, waitingOnOptionSelection: false }, goToCredits: true };
     }, [script]);
 
     /** Reads <code>stateRef.current</code> so it doesn't depend on state and remains stable. */
@@ -190,7 +190,7 @@ const VisualNovel = ({onChangePage}: VisualNovelProps) => {
             currentDialogueIndex: prev.dialogueIndex,
             currentDialogueIndexMax: scene.dialogues.length - 1,
             history: newHistory,
-            waitingOnOptionSelection: false,
+            waitingOnOptionSelection: (scene.dialogues[prev.dialogueIndex]?.options?.length ?? 0) > 0,
             waitingOnUserInput: scene.dialogues[prev.dialogueIndex]?.input !== undefined
         });
         resetTypewriter();

@@ -53,7 +53,8 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
                 currentDialogueIndexMax: startScene.dialogues.length - 1,
                 textSpeed: data.settings.textSpeed || 50,
                 defaultNameColor: data.settings.defaultNameColor || "#000000",
-                waitingOnUserInput: startDialogue?.input !== undefined
+                waitingOnUserInput: startDialogue?.input !== undefined,
+                waitingOnOptionSelection: (startDialogue?.options?.length ?? 0) > 0
             }));
             setScript(data);
 
