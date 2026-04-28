@@ -16,11 +16,7 @@ export interface TransitionInfo {
     target: "scene" | "dialogue";
 }
 
-export interface SpritePosition {
-    name?: "right"|"left"|"center",
-    x?: number,
-    y?: number
-}
+export type SpritePosition = "right" | "left" | "center" | { x?: number, y?: number };
 
 export interface Sprite {
     name: string,
