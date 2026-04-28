@@ -26,24 +26,27 @@ const CharacterFullSprite = memo(({sprite, characterId: characterIdOverride}: Ch
     const spriteUrl: string = character?.sprite?.[spriteName] || character?.sprite?.["idle"] || "";
 
     const positionClass: string = useMemo(() => {
-        if (sprite.position?.x !== undefined) return styles.spriteCenter;
-        if (sprite.position?.name === "left") return styles.spriteLeft;
-        if (sprite.position?.name === "right") return styles.spriteRight;
+        const pos = sprite.position;
+        if (pos === "left") return styles.spriteLeft;
+        if (pos === "right") return styles.spriteRight;
         return styles.spriteCenter;
     }, [sprite.position]);
 
     const positionStyle = useMemo(() => {
-        const x: number | undefined = sprite.position?.x;
-        const y: number | undefined = sprite.position?.y;
+        const pos = sprite.position;
+        if (typeof pos !== "object" || pos === null) return undefined;
+        const { x, y } = pos;
         if (x === undefined && y === undefined) return undefined;
         return {
             ...(x !== undefined && { left: `calc(50% + ${x}px)` }),
             ...(y !== undefined && { height: `${y}px` }),
         };
-    }, [sprite.position?.x, sprite.position?.y]);
+    }, [sprite.position]);
+
+    const hasCustomHeight = typeof sprite.position === "object" && sprite.position !== null && sprite.position.y !== undefined;
 
     return (
-        <div className={`${styles.characterSprite} ${positionClass}${sprite.position?.y !== undefined ? ` ${styles.customHeight}` : ''}`} style={positionStyle}>
+        <div className={`${styles.characterSprite} ${positionClass}${hasCustomHeight ? ` ${styles.customHeight}` : ''}`} style={positionStyle}>
             {spriteUrl && (
                 <picture>
                     <img
