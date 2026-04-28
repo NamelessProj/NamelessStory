@@ -6,11 +6,13 @@ import PageToDisplay from "../PageToDisplay";
 import DataProvider from "../../context/DataProvider.tsx";
 import {getCookieName} from "../../utils/helpMethods.ts";
 import {loadState} from "../../utils/saveStorage.ts";
+import {VNStorySchema, formatStoryErrors} from "../../utils/storySchema.ts";
 
 const INITIAL_TYPEWRITER_STATE: TypewriterState = { isTyping: true, skipTyping: false };
 
 const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [script, setScript] = useState<VNStory | null>(null);
+    const [loadErrors, setLoadErrors] = useState<string[] | null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
     const [savedState, setSavedState] = useState<State | null>(null);
     const [state, setState] = useState<State>({
@@ -45,7 +47,13 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
                 throw new Error(`Expected JSON response but got ${contentType}: ${body.slice(0, 80)}`);
             }
 
-            const data: VNStory = await res.json();
+            const raw: unknown = await res.json();
+            const result = VNStorySchema.safeParse(raw);
+            if (!result.success) {
+                setLoadErrors(formatStoryErrors(result.error));
+                return;
+            }
+            const data: VNStory = result.data as VNStory;
             const startScene: SceneType = data.story[data.settings.startingScene];
             const startDialogue: Dialogue = startScene?.dialogues[0];
             setState(prev => ({
@@ -72,6 +80,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
 
         loadStory().catch(err => {
             console.error("Error loading story script:", err);
+            setLoadErrors([err instanceof Error ? err.message : String(err)]);
         });
     }, [scriptFile]);
 
@@ -116,7 +125,14 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
 
     return (
         <>
-            {!script ? (
+            {loadErrors ? (
+                <div id="vn-player" className="vn-body h-100 centered" style={{ flexDirection: "column", gap: "1rem", padding: "2rem" }}>
+                    <h2 style={{ color: "#ff6b6b", margin: 0 }}>Story failed to load</h2>
+                    <ul style={{ textAlign: "left", color: "#ffcdd2", fontFamily: "monospace", fontSize: "0.85rem", maxWidth: "700px", lineHeight: 1.8 }}>
+                        {loadErrors.map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                </div>
+            ) : !script ? (
                 <div id="vn-player" className="vn-body h-100 centered">
                     <Spinner />
                 </div>
