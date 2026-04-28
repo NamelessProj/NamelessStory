@@ -32,6 +32,7 @@ const OptionSchema = z.object({
 const VariableTypeSchema = z.object({
     value: z.string(),
     color: z.string().optional(),
+    placeholder: z.string().optional(),
 });
 
 const DialogueSchema = z.object({
