@@ -67,11 +67,7 @@ const DialogueBox = memo(({
     }, [portraitSprite, portraitCharacterId, script.characters, resolved]);
 
     const portraitSide: "left" | "right" = useMemo(() => {
-        const pos = portraitSprite?.position;
-        if (!pos) return "left";
-        // Support both object {name: "right"} and plain string "right" from JSON
-        const posName = pos.name ?? (pos as unknown as string);
-        return posName === "right" ? "right" : "left";
+        return portraitSprite?.position === "right" ? "right" : "left";
     }, [portraitSprite?.position]);
 
     const hasPortrait = !!(portraitSprite && portraitUrl);
