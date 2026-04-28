@@ -38,7 +38,7 @@ const UserInputBox = ({variable, setVariable}: UserInputBoxProps) => {
                     value={input}
                     onChange={(e): void => setInput(e.target.value)}
                     autoFocus={true}
-                    placeholder="Type your response here..."
+                    placeholder={variable.placeholder ?? "Type your response here..."}
                 />
             </div>
             <button

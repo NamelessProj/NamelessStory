@@ -210,6 +210,18 @@ p {
   object-fit: contain;
 }
 
+.titlepage-save-error {
+  color: var(--title-save-error-color, #ff6b6b);
+  background: var(--title-save-error-bg, rgba(0, 0, 0, 0.55));
+  border: var(--title-save-error-border, 1px solid rgba(255, 107, 107, 0.5));
+  border-radius: var(--title-save-error-border-radius, 6px);
+  padding: var(--title-save-error-padding, 0.5rem 1.25rem);
+  font-size: var(--title-save-error-font-size, 0.95rem);
+  max-width: 420px;
+  text-align: center;
+  margin: 0;
+}
+
 .titlepage-buttons-wrapper {
   display: flex;
   flex-direction: column;

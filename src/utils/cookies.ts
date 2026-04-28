@@ -30,4 +30,13 @@ export default class Cookies {
         }
         return null;
     }
+
+    /**
+     * Deletes a cookie by setting its expiry date to the past.
+     * @param name {string} The name of the cookie to delete.
+     */
+    static remove(name: string): void {
+        if (typeof document === 'undefined') return;
+        document.cookie = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+    }
 }

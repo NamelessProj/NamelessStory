@@ -5,3 +5,36 @@
     cursor: pointer;
     overflow: hidden;
 }
+
+/* ── Scene transitions ────────────────────────────────────────────────────── */
+
+.sceneFadeOut { animation: sceneFadeOut var(--vn-transition-duration, 200ms) ease    forwards; }
+.sceneFadeIn  { animation: sceneFadeIn  var(--vn-transition-duration, 200ms) ease    forwards; }
+
+.slideLeftOut   { animation: slideLeftOut   var(--vn-transition-duration, 200ms) ease-in  forwards; }
+.slideLeftIn    { animation: slideLeftIn    var(--vn-transition-duration, 200ms) ease-out forwards; }
+.slideRightOut  { animation: slideRightOut  var(--vn-transition-duration, 200ms) ease-in  forwards; }
+.slideRightIn   { animation: slideRightIn   var(--vn-transition-duration, 200ms) ease-out forwards; }
+.slideTopOut    { animation: slideTopOut    var(--vn-transition-duration, 200ms) ease-in  forwards; }
+.slideTopIn     { animation: slideTopIn     var(--vn-transition-duration, 200ms) ease-out forwards; }
+.slideBottomOut { animation: slideBottomOut var(--vn-transition-duration, 200ms) ease-in  forwards; }
+.slideBottomIn  { animation: slideBottomIn  var(--vn-transition-duration, 200ms) ease-out forwards; }
+
+@keyframes sceneFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes sceneFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+
+/* slide-left: new scene enters from the left, old scene exits to the right */
+@keyframes slideLeftOut   { from { transform: translateX(0);     } to { transform: translateX(100%);  } }
+@keyframes slideLeftIn    { from { transform: translateX(-100%); } to { transform: translateX(0);     } }
+
+/* slide-right: new scene enters from the right, old scene exits to the left */
+@keyframes slideRightOut  { from { transform: translateX(0);    } to { transform: translateX(-100%); } }
+@keyframes slideRightIn   { from { transform: translateX(100%); } to { transform: translateX(0);     } }
+
+/* slide-top: new scene enters from the top, old scene exits to the bottom */
+@keyframes slideTopOut    { from { transform: translateY(0);     } to { transform: translateY(100%);  } }
+@keyframes slideTopIn     { from { transform: translateY(-100%); } to { transform: translateY(0);     } }
+
+/* slide-bottom: new scene enters from the bottom, old scene exits to the top */
+@keyframes slideBottomOut { from { transform: translateY(0);    } to { transform: translateY(-100%); } }
+@keyframes slideBottomIn  { from { transform: translateY(100%); } to { transform: translateY(0);     } }

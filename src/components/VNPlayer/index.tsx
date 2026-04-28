@@ -1,15 +1,18 @@
 import type {Dialogue, Page, SceneType, State, TypewriterState, VNStory} from "../../interfaces/interfaces.ts";
+import {parseSaveFile} from "../../utils/saveFile.ts";
 import {useEffect, useMemo, useState} from "react";
 import Spinner from "../Spinner";
 import PageToDisplay from "../PageToDisplay";
 import DataProvider from "../../context/DataProvider.tsx";
-import Cookies from "../../utils/cookies.ts";
 import {getCookieName} from "../../utils/helpMethods.ts";
+import {loadState} from "../../utils/saveStorage.ts";
+import {VNStorySchema, formatStoryErrors} from "../../utils/storySchema.ts";
 
 const INITIAL_TYPEWRITER_STATE: TypewriterState = { isTyping: true, skipTyping: false };
 
 const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [script, setScript] = useState<VNStory | null>(null);
+    const [loadErrors, setLoadErrors] = useState<string[] | null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
     const [savedState, setSavedState] = useState<State | null>(null);
     const [state, setState] = useState<State>({
@@ -44,7 +47,13 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
                 throw new Error(`Expected JSON response but got ${contentType}: ${body.slice(0, 80)}`);
             }
 
-            const data: VNStory = await res.json();
+            const raw: unknown = await res.json();
+            const result = VNStorySchema.safeParse(raw);
+            if (!result.success) {
+                setLoadErrors(formatStoryErrors(result.error));
+                return;
+            }
+            const data: VNStory = result.data as VNStory;
             const startScene: SceneType = data.story[data.settings.startingScene];
             const startDialogue: Dialogue = startScene?.dialogues[0];
             setState(prev => ({
@@ -53,24 +62,25 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
                 currentDialogueIndexMax: startScene.dialogues.length - 1,
                 textSpeed: data.settings.textSpeed || 50,
                 defaultNameColor: data.settings.defaultNameColor || "#000000",
-                waitingOnUserInput: startDialogue?.input !== undefined
+                waitingOnUserInput: startDialogue?.input !== undefined,
+                waitingOnOptionSelection: (startDialogue?.options?.length ?? 0) > 0
             }));
             setScript(data);
 
             const cookieName: string = getCookieName(data.settings.titlePage.title);
-            const cookieData: string | null = Cookies.get(cookieName);
+            const cookieData: string | null = loadState(cookieName);
             if (cookieData) {
                 try {
-                    const parsed = JSON.parse(cookieData) as State;
-                    setSavedState(parsed);
+                    setSavedState(parseSaveFile(cookieData, data.story));
                 } catch {
-                    // Ignore malformed cookie data
+                    // Ignore stale or malformed cookie saves
                 }
             }
         };
 
         loadStory().catch(err => {
             console.error("Error loading story script:", err);
+            setLoadErrors([err instanceof Error ? err.message : String(err)]);
         });
     }, [scriptFile]);
 
@@ -115,7 +125,14 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
 
     return (
         <>
-            {!script ? (
+            {loadErrors ? (
+                <div id="vn-player" className="vn-body h-100 centered" style={{ flexDirection: "column", gap: "1rem", padding: "2rem" }}>
+                    <h2 style={{ color: "#ff6b6b", margin: 0 }}>Story failed to load</h2>
+                    <ul style={{ textAlign: "left", color: "#ffcdd2", fontFamily: "monospace", fontSize: "0.85rem", maxWidth: "700px", lineHeight: 1.8 }}>
+                        {loadErrors.map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                </div>
+            ) : !script ? (
                 <div id="vn-player" className="vn-body h-100 centered">
                     <Spinner />
                 </div>

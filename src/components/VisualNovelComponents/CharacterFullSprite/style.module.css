@@ -22,3 +22,8 @@
     max-width: 30%;
     object-fit: contain;
 }
+
+.customHeight img {
+    height: 100%;
+    max-height: none;
+}

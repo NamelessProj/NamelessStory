@@ -1,4 +1,4 @@
-import {type ChangeEvent, useRef} from "react";
+import {type ChangeEvent, useRef, useState} from "react";
 import type {State, TitleButtons} from "../../interfaces/interfaces.ts";
 import PrimaryButton from "../PrimaryButton";
 import BackgroundImage from "../BackgroundImage";
@@ -17,6 +17,7 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
     const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
     const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     /**
      * Handles the file input change event when a user selects a save file. It reads the file, parses it, and calls the handleLoadSave callback with the loaded state.
@@ -29,10 +30,11 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
         const reader = new FileReader();
         reader.onload = (event: ProgressEvent<FileReader>): void => {
             try {
-                const loadedState: State = parseSaveFile(event.target?.result as string);
+                const loadedState: State = parseSaveFile(event.target?.result as string, script.story);
+                setSaveError(null);
                 handleLoadSave(loadedState);
-            } catch {
-                console.error("Failed to load save file: invalid or corrupted file.");
+            } catch (err) {
+                setSaveError(err instanceof Error ? err.message : "Failed to load save file.");
             }
         };
         reader.readAsText(file);
@@ -56,6 +58,10 @@ const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave
 
             {(!script.settings.titlePage.logo || script.settings.titlePage.showTitle !== false) && (
                 <h1>{script.settings.titlePage.title}</h1>
+            )}
+
+            {saveError && (
+                <p className="titlepage-save-error">{saveError}</p>
             )}
 
             <div className="titlepage-buttons-wrapper">

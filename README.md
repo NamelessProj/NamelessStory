@@ -21,7 +21,9 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
    - [Player Text Input](#player-text-input)
    - [Character Sprites](#character-sprites)
    - [Dialogue Position](#dialogue-position)
+   - [Per-Dialogue Background Override](#per-dialogue-background-override)
    - [Background Music](#background-music)
+   - [Scene and Dialogue Transitions](#scene-and-dialogue-transitions)
    - [Text Formatting and Variables](#text-formatting-and-variables)
      - [Pauses](#pauses)
      - [Variables in Text](#variables-in-text)
@@ -111,6 +113,9 @@ Your story lives in a single JSON file inside `public/story/`. Start by copying 
 > [!IMPORTANT]
 > DO NOT put spaces in the name of your file! This could lead to unexpected errors. Here's what you could use instead of spaces: `.`, `-`, `_`.
 
+> [!NOTE]
+> When the engine loads your story, it automatically validates the entire file before anything runs. If there are structural errors — missing required fields, wrong value types, invalid enum values, or `next` targets pointing to scenes that don't exist — the engine will display a clear list of every problem instead of silently breaking mid-game. Fix the reported errors and reload.
+
 A story file has three top-level sections:
 
 ```json
@@ -147,7 +152,7 @@ The `settings` block controls global options, the title screen, and the credits 
   "creditsPage": {
     "title": "Credits",
     "background": "title_bg.png",
-    "scrollDurationInSeconds": 30,
+    "scrollSpeedInPixelsPerSecond": 100,
     "creditGroups": [
       {
         "groupName": "Story & Writing",
@@ -166,12 +171,15 @@ The `settings` block controls global options, the title screen, and the credits 
 | `textSpeed` | :x: (No) | Typing animation speed. Lower = faster. Default: `50` |
 | `defaultNameDisplay` | :x: (No) | `"short"` (default) or `"full"` — which character name to show |
 | `defaultDialoguePosition` | :x: (No) | `"bottom"` (default), `"top"`, or `"center"` — where the dialogue box appears on screen |
+| `defaultSceneTransition` | :x: (No) | Default transition when entering a new scene. Default: `"none"` (see [Transitions](#scene-and-dialogue-transitions)) |
+| `defaultDialogueTransition` | :x: (No) | Default transition between dialogues within the same scene. Default: `"none"` |
+| `transitionDuration` | :x: (No) | Total duration of any transition in milliseconds. Default: `400` |
 | `titlePage.title` | :heavy_check_mark: (Yes) | Your game's title |
 | `titlePage.background` | :heavy_check_mark: (Yes) | Background image filename (from `public/assets/`) |
 | `titlePage.logo` | :x: (No) | Logo/icon image filename (from `public/assets/`). Displayed above the buttons instead of (or alongside) the title text |
 | `titlePage.showTitle` | :x: (No) | When a `logo` is set, controls whether the title text is also shown beneath it. Defaults to `true` — set to `false` to hide the title when a logo is present |
 | `titlePage.buttons` | :x: (No) | Custom button labels. You can custom just 1 or 2 if you want also. |
-| `creditsPage.scrollDurationInSeconds` | :x: (No) | How long the credits take to scroll (seconds) |
+| `creditsPage.scrollSpeedInPixelsPerSecond` | :x: (No) | How fast the credits scroll in pixels per second. The engine measures the rendered content and calculates the duration automatically. Default: `100`. Higher values scroll faster. |
 
 #### Logo behaviour
 
@@ -279,6 +287,7 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 | `background` | :heavy_check_mark: (Yes) | Background image filename |
 | `bgmFile` | :x: (No) | Music file or music command (see [Background Music](#background-music)) |
 | `bgmLoop` | :x: (No) | Whether music loops. Default: `true` |
+| `transition` | :x: (No) | Transition played when **entering** this scene (see [Transitions](#scene-and-dialogue-transitions)) |
 | `dialogues` | :heavy_check_mark: (Yes) | Array of dialogue objects |
 
 **Dialogue fields:**
@@ -295,6 +304,7 @@ The `story` block contains your scenes, each with a list of dialogues that play 
 | `input` | :x: (No) | Prompt the player to type something (see [Player Text Input](#player-text-input)) |
 | `sprite` | :x: (No) | Show a character sprite (see [Character Sprites](#character-sprites)) |
 | `dialoguePosition` | :x: (No) | `"bottom"`, `"top"`, or `"center"` — override the dialogue box position for this line only (see [Dialogue Position](#dialogue-position)) |
+| `transition` | :x: (No) | Transition played when **entering** this dialogue line (see [Transitions](#scene-and-dialogue-transitions)) |
 
 ### Player Choices (Options)
 
@@ -339,7 +349,22 @@ Use `input` to prompt the player to type something (like their name). The value 
 }
 ```
 
-The `value` field is the character ID where the input will be stored. Make sure that ID exists in `characters` with an empty `name`. The player cannot proceed without typing something.
+| Field | Required | Description |
+|-------|----------|-------------|
+| `value` | :heavy_check_mark: (Yes) | The character ID where the typed text will be stored. Must exist in `characters` with an empty `name`. |
+| `color` | :x: (No) | Hex color applied to the stored name wherever it appears in dialogue. |
+| `placeholder` | :x: (No) | Hint text shown inside the input box before the player types anything. Defaults to `"Type your response here..."`. |
+
+The player cannot proceed without typing something.
+
+To use a custom placeholder:
+
+```json
+"input": {
+  "value": "playerName",
+  "placeholder": "Enter your name..."
+}
+```
 
 ### Character Sprites
 
@@ -363,13 +388,65 @@ Use the `sprite` field in a dialogue to display a character portrait.
 | `position` | :x: (No) | `"left"`, `"center"`, or `"right"` (default: center) |
 | `mirror` | :x: (No) | Flip the sprite horizontally. Default: `false` |
 
-**Custom position:** Instead of a preset string, `position` can be an object:
+**Custom position:** Instead of a preset string, `position` can be an object to fine-tune exactly where the sprite appears:
+
 ```json
-"position": { "x": 100, "y": 200 }
+"position": { "x": 100, "y": 600 }
 ```
-Where `x` is a pixel offset from center and `y` is the height.
+
+| Field | Description |
+|-------|-------------|
+| `x` | Horizontal offset **in pixels from the center** of the screen. Positive values move the sprite right, negative values move it left. `0` is perfectly centered. |
+| `y` | Height of the sprite in pixels. Controls how tall the sprite is rendered. Omit to use the image's natural size. |
+
+Both fields are optional — you can use only `x`, only `y`, or both together:
+
+```json
+{ "name": "Alice", "text": "I'm slightly to the right.", "sprite": { "name": "idle", "position": { "x": 200 } } }
+{ "name": "Bob",   "text": "I'm tall and centered.",     "sprite": { "name": "idle", "position": { "y": 700 } } }
+{ "name": "Alice", "text": "Fine-tuned.",                "sprite": { "name": "happy", "position": { "x": -150, "y": 600 } } }
+```
+
+> [!TIP]
+> Use the preset strings (`"left"`, `"center"`, `"right"`) for most cases. Reach for `x` / `y` only when you need a precise placement — for example, two characters standing side by side at custom positions.
 
 **Sprites persist** within a scene until you specify a different one (or the scene changes). To hide a sprite, advance to a dialogue without a `sprite` field or change scenes.
+
+#### Portrait in dialogue box
+
+Set `inDialogueBox: true` on a sprite to display a square portrait of the character **inside the dialogue bar** instead of as a full-screen sprite. Use `position` to choose which side of the dialogue bar it appears on.
+
+```json
+{
+  "name": "Alice",
+  "text": "Nice to meet you!",
+  "sprite": {
+    "name": "happy",
+    "inDialogueBox": true,
+    "position": "left"
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `inDialogueBox` | :heavy_check_mark: (Yes) | Set to `true` to show the portrait inside the dialogue bar |
+| `position` | :x: (No) | `"left"` or `"right"` — which side of the bar the portrait appears on (default: `"left"`) |
+| `mirror` | :x: (No) | Flip the portrait horizontally. Default: `false` |
+
+> [!NOTE]
+> When `inDialogueBox` is `true`, the full-screen sprite is hidden. Only the portrait box inside the dialogue bar is shown.
+
+The portrait box is always square and crops the image to fill it (`object-fit: cover`, focused on the top-centre of the image by default — ideal for face-focused sprites). You can customise the portrait's appearance with CSS variables in `custom.css`:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--vn-portrait-size` | `130px` | Width and height of the square portrait box |
+| `--vn-portrait-border` | `2px solid rgba(255,255,255,0.3)` | Border around the portrait |
+| `--vn-portrait-bg` | `rgba(0,0,0,0.4)` | Background visible behind transparent areas |
+| `--vn-portrait-gap` | `1.25rem` | Space between the portrait and the dialogue text |
+| `--vn-portrait-outer-padding` | `0.5rem 2rem 2rem` | Padding around the portrait + text row |
+| `--vn-portrait-object-position` | `top center` | Focus point for cropping the portrait image |
 
 ### Dialogue Position
 
@@ -429,6 +506,51 @@ The center panel has its own CSS variables you can override in `public/custom.cs
 | `--vn-dialogue-center-padding` | `1.25rem 2rem` | Inner padding of the centered panel |
 | `--vn-dialogue-bg-top` | `linear-gradient(to bottom, rgba(0,0,0,0.9) 60%, transparent)` | Background gradient used when position is `"top"` |
 
+### Per-Dialogue Background Override
+
+You can swap the background image on any individual dialogue line without leaving the scene. This is useful for time-of-day changes, weather shifts, or revealing a new part of a location while keeping the same music and scene context.
+
+Add a `background` field directly on a dialogue line with the filename of the image you want to display:
+
+```json
+"library": {
+  "background": "bg_library.png",
+  "dialogues": [
+    {
+      "name": "Bob",
+      "text": "The library! My favourite place."
+    },
+    {
+      "name": "",
+      "text": "The light shifted as dusk crept in.",
+      "background": "bg_library_evening.png"
+    },
+    {
+      "name": "Alice",
+      "text": "I prefer whispering in here."
+    }
+  ]
+}
+```
+
+- The **first** dialogue uses the scene's `background` (`bg_library.png`).
+- The **second** dialogue overrides it with `bg_library_evening.png`.
+- The **third** dialogue has no `background` field, so it keeps showing `bg_library_evening.png` — the override persists until the scene ends or another override is set.
+
+> [!NOTE]
+> The override only applies while that dialogue and any following dialogues (without their own override) are shown. When the player moves to a **new scene**, the scene's own `background` takes over again.
+
+> [!TIP]
+> Combine this with a `"transition": "fade-to-black"` on the same dialogue for a smooth background swap:
+> ```json
+> {
+>   "name": "",
+>   "text": "Hours passed...",
+>   "background": "bg_library_night.png",
+>   "transition": "fade-to-black"
+> }
+> ```
+
 ### Background Music
 
 Control music with the `bgmFile` field on a scene.
@@ -449,6 +571,107 @@ Control music with the `bgmFile` field on a scene.
 | *(omit the field)* | No music |
 
 The player can adjust or mute the volume from the top overlay bar during the game.
+
+### Scene and Dialogue Transitions
+
+Transitions are visual effects that play when the story moves from one dialogue to the next, or when jumping to a new scene. You can set a global default in `settings` and override it per scene or per dialogue.
+
+#### Global defaults (settings)
+
+```json
+"settings": {
+  "defaultSceneTransition": "fade",
+  "defaultDialogueTransition": "none",
+  "transitionDuration": 400
+}
+```
+
+`transitionDuration` is the **total** duration of the animation in milliseconds (the engine splits it equally into an out-phase and an in-phase). The default is `400` ms.
+
+#### Per-scene override
+
+Add `transition` directly on a scene to override the default for that specific scene change:
+
+```json
+"forest": {
+  "background": "bg_forest.png",
+  "transition": "slide-left",
+  "dialogues": [...]
+}
+```
+
+The transition plays when the player **enters** that scene.
+
+#### Per-dialogue override
+
+Add `transition` on any dialogue line to override the default for that specific step:
+
+```json
+{
+  "name": "",
+  "text": "A long silence fell over the room...",
+  "transition": "fade-to-black"
+}
+```
+
+The transition plays when the player **advances to** that line (not when they leave it).
+
+#### Available transitions
+
+**Dialogue transitions** (`transition` on a dialogue line):
+
+| Value | Effect |
+|-------|--------|
+| `"none"` | No animation — instant change (default) |
+| `"fade"` | The dialogue text fades out, the new text fades in |
+| `"fade-to-black"` | The screen fades to black, then fades back in with the new text |
+| `"fade-to-white"` | The screen fades to white, then fades back in with the new text |
+
+**Scene transitions** (`transition` on a scene):
+
+| Value | Effect |
+|-------|--------|
+| `"none"` | No animation — instant change (default) |
+| `"fade"` | The scene fades out, the new scene fades in |
+| `"fade-to-black"` | The screen fades to black, then the new scene fades in |
+| `"fade-to-white"` | The screen fades to white, then the new scene fades in |
+| `"slide-left"` | The new scene slides in from the left (old scene exits to the right) |
+| `"slide-right"` | The new scene slides in from the right (old scene exits to the left) |
+| `"slide-top"` | The new scene slides in from the top (old scene exits downward) |
+| `"slide-bottom"` | The new scene slides in from the bottom (old scene exits upward) |
+
+> [!NOTE]
+> Slide transitions only apply to scene changes. If you set a slide on a dialogue `transition` field it will have no visible effect — use `"fade"` or a color fade for dialogue-level animations.
+
+#### Priority order
+
+When the engine decides which transition to play, it uses the first value found in this order:
+
+1. The `transition` field on the **destination dialogue** (highest priority)
+2. The `transition` field on the **destination scene** (when changing scenes)
+3. `settings.defaultDialogueTransition` or `settings.defaultSceneTransition` (global fallback)
+4. `"none"` — if nothing is set anywhere
+
+#### Disabling transitions for a specific line
+
+Set `"transition": "none"` on any dialogue or scene to force no animation, even when a default is configured globally:
+
+```json
+{
+  "name": "Alice",
+  "text": "This line appears instantly.",
+  "transition": "none"
+}
+```
+
+#### CSS variable
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--vn-transition-duration` | `200ms` | Duration of each half of the transition. Set automatically from `transitionDuration` in settings — change it there, not here. |
+
+> [!TIP]
+> A `transitionDuration` of `600` gives a cinematic feel; `200` keeps things snappy. The default `400` is a comfortable middle ground.
 
 ### Text Formatting and Variables
 
@@ -741,7 +964,7 @@ Every visual property is exposed as a CSS custom property. Create a file at `pub
 }
 ```
 
-The full list of available variables is documented inside `public/custom.css`.
+The full list of available variables is documented inside `public/custom.css`. Transition speed is controlled by `transitionDuration` in your story settings (see [Transitions](#scene-and-dialogue-transitions)).
 
 ### By editing the module CSS files (full control)
 

@@ -27,6 +27,7 @@
     display: flex;
     align-items: flex-end;
     background: var(--vn-dialogue-bg, linear-gradient(to top, rgba(0, 0, 0, 0.9) 60%, transparent));
+    padding-bottom: 20px;
 }
 
 /* ── Top ──────────────────────────────────────────────────────────────── */
@@ -35,6 +36,7 @@
     display: flex;
     align-items: flex-start;
     background: var(--vn-dialogue-bg-top, linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 60%, transparent));
+    padding-top: 50px;
 }
 
 /* ── Center ───────────────────────────────────────────────────────────── */
@@ -51,6 +53,12 @@
     pointer-events: auto;
     width: 100%;
 }
+
+.dialogueInner.dialogueFadeOut { animation: dialogueFadeOut var(--vn-transition-duration, 200ms) ease forwards; }
+.dialogueInner.dialogueFadeIn  { animation: dialogueFadeIn  var(--vn-transition-duration, 200ms) ease forwards; }
+
+@keyframes dialogueFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialogueFadeIn  { from { opacity: 0; } to { opacity: 1; } }
 
 .positionCenter .dialogueInner {
     width: auto;
@@ -92,4 +100,53 @@
     color: var(--vn-text-color, #fff);
     margin: 0;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Portrait in dialogue box ───────────────────────────────────────────── */
+.dialogueWithPortrait {
+    display: flex;
+    align-items: center;
+    max-width: var(--vn-dialogue-max-width, 1000px);
+    margin: 0 auto;
+    gap: var(--vn-portrait-gap, 1.25rem);
+    padding: var(--vn-portrait-outer-padding, 0.5rem 2rem 2rem);
+}
+
+.portraitOnRight {
+    flex-direction: row-reverse;
+}
+
+.dialoguePortrait {
+    flex-shrink: 0;
+    width: var(--vn-portrait-size, 130px);
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border: var(--vn-portrait-border, 2px solid rgba(255, 255, 255, 0.3));
+    background: var(--vn-portrait-bg, rgba(0, 0, 0, 0.4));
+}
+
+.dialoguePortrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--vn-portrait-object-position, top center);
+    display: block;
+}
+
+.dialogueContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.dialogueContent .dialogueName {
+    padding: 0;
+    margin-bottom: 0.75rem;
+}
+
+.dialogueContent .dialogueBox {
+    padding: 0;
+    min-height: var(--vn-dialogue-min-height, 60px);
+    max-width: unset;
+    margin: 0;
+    width: 100%;
 }

@@ -4,11 +4,19 @@ export type NameDisplay = "short" | "full";
 
 export type DialoguePosition = "bottom" | "top" | "center";
 
-export interface SpritePosition {
-    name?: "right"|"left"|"center",
-    x?: number,
-    y?: number
+export type DialogueTransition = "none" | "fade" | "fade-to-black" | "fade-to-white";
+
+export type SceneTransition = "none" | "fade" | "fade-to-black" | "fade-to-white" | "slide-left" | "slide-right" | "slide-top" | "slide-bottom";
+
+export type TransitionPhase = "idle" | "out" | "in";
+
+export interface TransitionInfo {
+    phase: TransitionPhase;
+    type: SceneTransition | DialogueTransition;
+    target: "scene" | "dialogue";
 }
+
+export type SpritePosition = "right" | "left" | "center" | { x?: number, y?: number };
 
 export interface Sprite {
     name: string,
@@ -32,14 +40,16 @@ export interface Dialogue {
     options?: Option[],
     sprite?: Sprite,
     next?: string,
-    dialoguePosition?: DialoguePosition
+    dialoguePosition?: DialoguePosition,
+    transition?: DialogueTransition,
 }
 
 export interface SceneType {
     background: string,
     bgmFile?: string,
     bgmLoop?: boolean,
-    dialogues: Dialogue[]
+    dialogues: Dialogue[],
+    transition?: SceneTransition,
 }
 
 export interface CharacterType {
@@ -78,7 +88,7 @@ export interface CreditGroupType {
 export interface CreditsPageType {
     title: string,
     background: string,
-    scrollDurationInSeconds?: number,
+    scrollSpeedInPixelsPerSecond?: number,
     creditGroups: CreditGroupType[]
 }
 
@@ -89,6 +99,9 @@ export interface Settings {
     defaultNameDisplay?: NameDisplay,
     defaultDialoguePosition?: DialoguePosition,
     historyLimit?: number,
+    defaultSceneTransition?: SceneTransition,
+    defaultDialogueTransition?: DialogueTransition,
+    transitionDuration?: number,
     titlePage: TitlePage,
     creditsPage: CreditsPageType
 }
@@ -103,7 +116,8 @@ export interface VNStory {
 
 export type VariableType = {
     value: string,
-    color?: string
+    color?: string,
+    placeholder?: string,
 }
 
 export interface HistoryEntry {

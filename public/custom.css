@@ -66,6 +66,15 @@
  * --vn-sprite-bottom        Sprite distance from screen bottom  (default: 10%)
  * --vn-sprite-side-offset   Left/right sprite offset from edge  (default: 10%)
  *
+ * ─── Portrait in dialogue box ────────────────────────────────────────────────
+ *
+ * --vn-portrait-size            Square size of the portrait box    (default: 130px)
+ * --vn-portrait-border          Border around the portrait box     (default: 2px solid rgba(255,255,255,0.3))
+ * --vn-portrait-bg              Background behind the portrait     (default: rgba(0,0,0,0.4))
+ * --vn-portrait-gap             Gap between portrait and text      (default: 1.25rem)
+ * --vn-portrait-outer-padding   Padding of the portrait+text row   (default: 0.5rem 2rem 2rem)
+ * --vn-portrait-object-position Where to focus the portrait image  (default: top center)
+ *
  * ─── Volume slider ───────────────────────────────────────────────────────────
  *
  * --vn-volume-slider-width  Width of the slider track          (default: 100px)
@@ -98,10 +107,22 @@
  * --title-btn-padding          Button inner padding           (default: 0.6rem 2.5rem)
  * --title-btn-min-width        Button minimum width           (default: 200px)
  * --title-btn-gap              Space between buttons          (default: 0.75rem)
+ * --title-save-error-color      Error message text color       (default: #ff6b6b)
+ * --title-save-error-bg         Error message background       (default: rgba(0,0,0,0.55))
+ * --title-save-error-border     Error message border           (default: 1px solid rgba(255,107,107,0.5))
+ * --title-save-error-border-radius  Error message corner rounding  (default: 6px)
+ * --title-save-error-padding    Error message inner padding    (default: 0.5rem 1.25rem)
+ * --title-save-error-font-size  Error message text size        (default: 0.95rem)
  *
  * ─── Background image ────────────────────────────────────────────────────────
  *
  * --vn-bg-position          Background image position          (default: center)
+ *
+ * ─── Transitions ─────────────────────────────────────────────────────────────
+ *
+ * --vn-transition-duration  Duration of each half of a transition (out or in phase) (default: 200ms)
+ *                           Set automatically from `transitionDuration` in your story settings.
+ *                           Change it there rather than here so the JS timing and CSS stay in sync.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  *
