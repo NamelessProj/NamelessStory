@@ -349,7 +349,22 @@ Use `input` to prompt the player to type something (like their name). The value 
 }
 ```
 
-The `value` field is the character ID where the input will be stored. Make sure that ID exists in `characters` with an empty `name`. The player cannot proceed without typing something.
+| Field | Required | Description |
+|-------|----------|-------------|
+| `value` | :heavy_check_mark: (Yes) | The character ID where the typed text will be stored. Must exist in `characters` with an empty `name`. |
+| `color` | :x: (No) | Hex color applied to the stored name wherever it appears in dialogue. |
+| `placeholder` | :x: (No) | Hint text shown inside the input box before the player types anything. Defaults to `"Type your response here..."`. |
+
+The player cannot proceed without typing something.
+
+To use a custom placeholder:
+
+```json
+"input": {
+  "value": "playerName",
+  "placeholder": "Enter your name..."
+}
+```
 
 ### Character Sprites
 
