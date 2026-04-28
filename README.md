@@ -113,6 +113,9 @@ Your story lives in a single JSON file inside `public/story/`. Start by copying 
 > [!IMPORTANT]
 > DO NOT put spaces in the name of your file! This could lead to unexpected errors. Here's what you could use instead of spaces: `.`, `-`, `_`.
 
+> [!NOTE]
+> When the engine loads your story, it automatically validates the entire file before anything runs. If there are structural errors — missing required fields, wrong value types, invalid enum values, or `next` targets pointing to scenes that don't exist — the engine will display a clear list of every problem instead of silently breaking mid-game. Fix the reported errors and reload.
+
 A story file has three top-level sections:
 
 ```json
