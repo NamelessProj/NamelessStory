@@ -116,7 +116,8 @@ export interface VNStory {
 
 export type VariableType = {
     value: string,
-    color?: string
+    color?: string,
+    placeholder?: string,
 }
 
 export interface HistoryEntry {
