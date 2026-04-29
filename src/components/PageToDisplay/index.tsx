@@ -8,12 +8,13 @@ interface PageToDisplayProps {
     handleChangePage: (newPage: Page) => void;
     handleContinue?: () => void;
     handleLoadSave: (state: State) => void;
+    savedStateError?: string | null;
 }
 
-const PageToDisplay = ({page, handleChangePage, handleContinue, handleLoadSave}: PageToDisplayProps) => {
+const PageToDisplay = ({page, handleChangePage, handleContinue, handleLoadSave, savedStateError}: PageToDisplayProps) => {
     switch (page) {
         case "title":
-            return <TitleScreen handleStart={() => handleChangePage("game")} handleCredits={() => handleChangePage("credits")} handleContinue={handleContinue} handleLoadSave={handleLoadSave} />
+            return <TitleScreen handleStart={() => handleChangePage("game")} handleCredits={() => handleChangePage("credits")} handleContinue={handleContinue} handleLoadSave={handleLoadSave} savedStateError={savedStateError} />
         case "credits":
             return <CreditsPage handleChangeRoom={handleChangePage} />
         case "game":
