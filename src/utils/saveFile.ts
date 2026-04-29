@@ -1,5 +1,6 @@
 import type {SceneType, State} from "../interfaces/interfaces.ts";
 import {sanitizeName} from "./helpMethods.ts";
+import {StateSchema, formatSaveErrors} from "./saveSchema.ts";
 
 /**
  * Exports the current state as a JSON file. The file name is generated from the story title, converted to lowercase, with spaces replaced by hyphens, and non-alphanumeric characters removed.
@@ -23,20 +24,30 @@ export const exportSaveFile = (state: State, storyTitle: string): void => {
  * Parses a JSON string from a save file and returns a State object. It validates that the required properties (currentScene and currentDialogueIndex) are present and of the correct type.
  * If the validation fails, it throws an error indicating that the save file is invalid. The currentMusic property is set to null in the returned state to ensure that any audio objects are not included in the parsed state.
  * @param json {string} - The JSON string read from a save file, which should represent the game state at the time of saving. This string is expected to be in the format produced by the exportSaveFile function, containing all relevant state information needed to restore the game to its previous state.
+ * @param story {Record<string, SceneType>} The story object containing all scenes and dialogues of the visual novel. This is used to validate that the currentScene and currentDialogueIndex in the save file correspond to valid entries in the story, ensuring that the save file is compatible with the current version of the story being played.
  * @return {State} A State object representing the parsed game state from the save file. This object should include all necessary properties to restore the game, such as currentScene, currentDialogueIndex, inventory, variables, and any other state variables defined in the State interface. The currentMusic property will be set to null in the returned state.
  * @throws {Error} If the JSON string does not contain the required properties or if they are of the wrong type, an error is thrown indicating that the save file is invalid. This ensures that only properly formatted save files can be loaded into the game, preventing potential issues with corrupted or malformed data.
  */
 export const parseSaveFile = (json: string, story: Record<string, SceneType>): State => {
-    const parsed: Partial<State> = JSON.parse(json) as Partial<State>;
-    if (typeof parsed.currentScene !== "string" || typeof parsed.currentDialogueIndex !== "number") {
-        throw new Error("Invalid save file: missing required fields.");
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(json);
+    } catch {
+        throw new Error("Invalid save file: not valid JSON.");
     }
-    const scene: SceneType | undefined = story[parsed.currentScene];
+
+    const result = StateSchema.safeParse(parsed);
+    if (!result.success) {
+        throw new Error(`Invalid save file: ${formatSaveErrors(result.error)}`);
+    }
+
+    const state = result.data;
+    const scene: SceneType | undefined = story[state.currentScene];
     if (!scene) {
-        throw new Error(`This save is from an older version of the story. Scene "${parsed.currentScene}" no longer exists.`);
+        throw new Error(`This save is from an older version of the story. Scene "${state.currentScene}" no longer exists.`);
     }
-    if (parsed.currentDialogueIndex < 0 || parsed.currentDialogueIndex >= scene.dialogues.length) {
-        throw new Error(`This save is from an older version of the story. Dialogue ${parsed.currentDialogueIndex} no longer exists in scene "${parsed.currentScene}".`);
+    if (state.currentDialogueIndex >= scene.dialogues.length) {
+        throw new Error(`This save is from an older version of the story. Dialogue ${state.currentDialogueIndex} no longer exists in scene "${state.currentScene}".`);
     }
-    return parsed as State;
+    return state;
 }

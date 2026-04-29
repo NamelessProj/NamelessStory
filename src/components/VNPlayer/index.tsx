@@ -15,6 +15,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
     const [loadErrors, setLoadErrors] = useState<string[] | null>(null);
     const [currentPage, setCurrentPage] = useState<Page>("title");
     const [savedState, setSavedState] = useState<State | null>(null);
+    const [savedStateError, setSavedStateError] = useState<string | null>(null);
     const [state, setState] = useState<State>({
         currentScene: "start",
         currentDialogueIndex: 0,
@@ -72,8 +73,8 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
             if (cookieData) {
                 try {
                     setSavedState(parseSaveFile(cookieData, data.story));
-                } catch {
-                    // Ignore stale or malformed cookie saves
+                } catch (err) {
+                    setSavedStateError(err instanceof Error ? err.message : "Failed to load save.");
                 }
             }
         };
@@ -139,7 +140,7 @@ const VNPlayer = ({scriptFile}: { scriptFile: string }) => {
             ) : (
                 <DataProvider value={dataContextValue} typewriterValue={typewriterContextValue}>
                     <div id="vn-player" className="vn-body">
-                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} handleLoadSave={handleLoadSave} />
+                        <PageToDisplay page={currentPage} handleChangePage={handleChangePage} handleContinue={handleContinue} handleLoadSave={handleLoadSave} savedStateError={savedStateError} />
                     </div>
                 </DataProvider>
             )}

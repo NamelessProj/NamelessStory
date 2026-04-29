@@ -11,13 +11,14 @@ interface TitleScreenProps {
     handleCredits: () => void;
     handleContinue?: () => void;
     handleLoadSave: (state: State) => void;
+    savedStateError?: string | null;
 }
 
-const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave}: TitleScreenProps) => {
+const TitleScreen = ({handleStart, handleCredits, handleContinue, handleLoadSave, savedStateError}: TitleScreenProps) => {
     const {script} = useDataContext();
     const buttons: TitleButtons|undefined = script.settings.titlePage.buttons;
     const fileInputRef: RefObject<HTMLInputElement | null> = useRef<HTMLInputElement>(null);
-    const [saveError, setSaveError] = useState<string | null>(null);
+    const [saveError, setSaveError] = useState<string | null>(savedStateError ?? null);
 
     /**
      * Handles the file input change event when a user selects a save file. It reads the file, parses it, and calls the handleLoadSave callback with the loaded state.
