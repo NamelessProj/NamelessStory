@@ -1,0 +1,49 @@
+{
+  "settings": {
+    "startingScene": "intro",
+    "titlePage": {
+      "title": "Test Story"
+    }
+  },
+  "characters": {
+    "alice": {
+      "fullName": "Alice"
+    },
+    "narrator": {
+      "name": "",
+      "color": "#ffffff"
+    }
+  },
+  "story": {
+    "intro": {
+      "dialogues": [
+        {
+          "name": "Alice",
+          "options": [
+            {
+              "text": "Go to the forest"
+            },
+            {
+              "next": "ending"
+            }
+          ]
+        },
+        {
+          "name": "narrator",
+          "text": "The story ends here.",
+          "next": "__end__"
+        }
+      ]
+    },
+    "ending": {
+      "background": "bg_ending.png",
+      "dialogues": [
+        {
+          "name": "Alice",
+          "text": "Goodbye.",
+          "next": "__end__"
+        }
+      ]
+    }
+  }
+}
