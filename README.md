@@ -1052,7 +1052,7 @@ The `public/story/tests/` folder contains three JSON files designed to verify th
 > These files are intended for contributors and curious users who want to explore how the validation system works. Story creators do not need them.
 
 > [!IMPORTANT]
-> The `tests/` folder is **automatically removed from production builds**. When you run `npm run build`, the engine deletes `dist/story/tests/` after the bundle is written, so the files never reach your deployed site. You do not need to do anything — just leave the folder where it is.
+> The `tests/` folder is **automatically removed from production builds**. When you run `npm run build`, the engine deletes `dist/story/tests/` after the bundle is written, so the files never reach your deployed site. You do not need to do anything, just leave the folder where it is.
 
 ### How the validation works
 
