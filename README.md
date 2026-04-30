@@ -957,6 +957,7 @@ Every visual property is exposed as a CSS custom property. Create a file at `pub
 ```css
 /* public/custom.css */
 :root {
+    --vn-font-family: 'Georgia', serif;           /* custom font for the whole engine */
     --vn-dialogue-bg: rgba(20, 5, 40, 0.9);
     --vn-dialogue-border: 2px solid rgba(180, 100, 255, 0.4);
     --vn-text-color: #f0d0ff;

@@ -7,6 +7,10 @@
  *
  * Usage: set variables on :root to apply them globally.
  *
+ * ─── Typography ──────────────────────────────────────────────────────────────
+ *
+ * --vn-font-family          Font stack for the entire engine       (default: system-ui, Avenir, Helvetica, Arial, sans-serif)
+ *
  * ─── Dialogue box (bottom / top positions) ───────────────────────────────────
  *
  * --vn-dialogue-bg          Background gradient (bottom position)  (default: dark-to-transparent gradient)
