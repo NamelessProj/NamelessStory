@@ -35,8 +35,9 @@ Want to make a visual novel but don't know how to code? NamelessStory is an open
 8. [Saving and Loading](#saving-and-loading)
 9. [Deploying Online for Free (GitHub + Vercel)](#deploying-online-for-free-github--vercel)
 10. [Contributing](#contributing)
-11. [Disclaimer](#disclaimer)
-12. [License](#license)
+11. [Schema Validation Test Files](#schema-validation-test-files)
+12. [Disclaimer](#disclaimer)
+13. [License](#license)
 
 ## What is NamelessStory?
 
@@ -96,7 +97,11 @@ NamelessStory/
 │   ├── assets/               ← Background images & character sprites
 │   ├── audio/                ← Background music files
 │   └── story/                ← Your story JSON files
-│       └── story.sample.json ← Start here as a template
+│       ├── story.sample.json ← Start here as a template
+│       └── tests/            ← Validation test files (for contributors)
+│           ├── invalid_syntax.json
+│           ├── missing_field.json
+│           └── wrong_type.json
 │
 └── src/
     └── App.tsx               ← Point this to your story file
@@ -1038,6 +1043,118 @@ If you ever want to build the site yourself (e.g., to deploy elsewhere):
 npm run build
 ```
 This creates a `dist/` folder with all the static files. Upload that folder to any static hosting service (GitHub Pages, Netlify, Cloudflare Pages, etc.).
+
+## Schema Validation Test Files
+
+The `public/story/tests/` folder contains three JSON files designed to verify that the engine's story parser and Zod schema validation work correctly. Each file deliberately breaks the schema in a different way, so you can confirm that the engine catches every class of error and reports it clearly.
+
+> [!NOTE]
+> These files are intended for contributors and curious users who want to explore how the validation system works. Story creators do not need them.
+
+> [!IMPORTANT]
+> The `tests/` folder is **automatically removed from production builds**. When you run `npm run build`, the engine deletes `dist/story/tests/` after the bundle is written, so the files never reach your deployed site. You do not need to do anything — just leave the folder where it is.
+
+### How the validation works
+
+When the engine loads a story file, it runs two checks in sequence:
+
+1. **JSON parsing** — the raw text must be valid JSON. If even one character is wrong (a missing comma, an unquoted key, a mismatched bracket), the engine stops immediately and reports a syntax error before doing anything else.
+2. **Schema validation (Zod)** — once the JSON is parsed successfully, the engine checks every field against the story schema: required fields must be present, values must have the correct type, enums must use one of the allowed strings, arrays must not be empty, and all `next` targets must point to scenes that actually exist in the file. Every violation is collected and reported together, so you can fix them all at once.
+
+### The three test files
+
+#### `tests/invalid_syntax.json`
+
+This file contains intentional **JSON syntax errors**. The JSON parser will refuse to read it at all, so Zod validation never runs.
+
+Errors included:
+- Missing comma between two top-level fields
+- Unquoted object key (`textSpeed` instead of `"textSpeed"`)
+- Trailing comma inside an array
+- Missing colon after a character ID
+- Bare unquoted string used as a value (`__end__` instead of `"__end__"`)
+- Missing closing `}` for the root object
+
+**Expected engine behaviour:** An immediate JSON parse error is shown. No story fields are validated.
+
+#### `tests/missing_field.json`
+
+This file is **valid JSON**, but it is missing several required fields that the schema demands.
+
+Fields intentionally omitted:
+- `settings.creditsPage` — the entire credits page block is absent
+- `settings.titlePage.background` — required image filename
+- `characters.alice.name` and `characters.alice.color` — both required on every character
+- `dialogues[0].text` — required on every dialogue line
+- `options[0].next` — required on every choice option
+- `options[1].text` — required on every choice option
+- `story.intro.background` — required on every scene
+
+**Expected engine behaviour:** The file parses as JSON without error, then Zod reports a list of every missing required field.
+
+#### `tests/wrong_type.json`
+
+This file is **valid JSON with all fields present**, but many values have the wrong type or an invalid value for their field.
+
+Type violations included:
+
+| Field | Expected | Provided |
+|-------|----------|----------|
+| `settings.startingScene` | `string` | `42` (number) |
+| `settings.textSpeed` | positive number | `"fast"` (string) |
+| `settings.historyLimit` | positive integer | `10.7` (float) |
+| `settings.defaultNameDisplay` | `"short"` or `"full"` | `"nickname"` (invalid enum) |
+| `settings.defaultDialoguePosition` | `"bottom"`, `"top"`, or `"center"` | `"left"` (invalid enum) |
+| `settings.transitionDuration` | non-negative number | `-500` (negative) |
+| `settings.titlePage.title` | non-empty string | `true` (boolean) |
+| `settings.titlePage.background` | non-empty string | `""` (empty string) |
+| `settings.titlePage.showTitle` | boolean | `"yes"` (string) |
+| `settings.creditsPage.scrollSpeedInPixelsPerSecond` | positive number | `-20` (negative) |
+| `settings.creditsPage.creditGroups` | non-empty array | `[]` (empty array) |
+| `characters.alice.name` | string | `123` (number) |
+| `characters.alice.color` | string | `false` (boolean) |
+| `characters.alice.sprite` | object (key → filename) | `[...]` (array) |
+| `story.intro.background` | string | `[...]` (array) |
+| `story.intro.bgmLoop` | boolean | `"true"` (string) |
+| `story.intro.transition` | valid transition enum | `"zoom"` (invalid enum) |
+| `story.intro.dialogues` | array | `{...}` (object) |
+| `dialogues[0].text` | string | `9999` (number) |
+| `dialogues[0].textSpeed` | positive number | `-10` (negative) |
+| `dialogues[0].dialoguePosition` | `"bottom"`, `"top"`, or `"center"` | `"middle"` (invalid enum) |
+| `options[0].text` | non-empty string | `""` (empty string) |
+| `options[0].next` | string | `true` (boolean) |
+| `sprite.name` | non-empty string | `""` (empty string) |
+| `sprite.position` | string or `{x, y}` object | `42` (number) |
+| `sprite.inDialogueBox` | boolean | `"no"` (string) |
+| `input.value` | string | `0` (number) |
+
+**Expected engine behaviour:** The file parses as JSON without error, then Zod reports every type violation in a single list.
+
+### How to try them yourself
+
+1. Open `src/App.tsx` and temporarily change the `scriptFile` prop to point to one of the test files:
+
+   ```tsx
+   // src/App.tsx
+   <VNPlayer scriptFile="tests/invalid_syntax" />
+   // or
+   <VNPlayer scriptFile="tests/missing_field" />
+   // or
+   <VNPlayer scriptFile="tests/wrong_type" />
+   ```
+
+2. Start the development server if it is not already running:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open `http://localhost:5173` in your browser. Instead of the title screen, the engine will display the validation errors it found.
+
+4. When you are done, restore `scriptFile` to your actual story file.
+
+> [!TIP]
+> Try fixing one of the errors in a test file, save it, and reload, the engine will re-validate and the fixed error will disappear from the list. This is a good way to understand exactly what each error message means.
 
 ## Contributing
 
