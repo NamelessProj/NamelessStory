@@ -1,11 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
+
+// Removes paths from the dist folder after build — keeps dev files out of production.
+const excludeFromBuild = (paths: string[]) => {
+  return {
+    name: 'exclude-from-build',
+    closeBundle: async () => {
+      for (const p of paths) {
+        await rm(resolve('dist', p), { recursive: true, force: true });
+      }
+    }
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    excludeFromBuild(['story/tests']),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
