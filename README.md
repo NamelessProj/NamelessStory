@@ -1058,8 +1058,8 @@ The `public/story/tests/` folder contains three JSON files designed to verify th
 
 When the engine loads a story file, it runs two checks in sequence:
 
-1. **JSON parsing** — the raw text must be valid JSON. If even one character is wrong (a missing comma, an unquoted key, a mismatched bracket), the engine stops immediately and reports a syntax error before doing anything else.
-2. **Schema validation (Zod)** — once the JSON is parsed successfully, the engine checks every field against the story schema: required fields must be present, values must have the correct type, enums must use one of the allowed strings, arrays must not be empty, and all `next` targets must point to scenes that actually exist in the file. Every violation is collected and reported together, so you can fix them all at once.
+1. **JSON parsing**: the raw text must be valid JSON. If even one character is wrong (a missing comma, an unquoted key, a mismatched bracket), the engine stops immediately and reports a syntax error before doing anything else.
+2. **Schema validation (Zod)**: once the JSON is parsed successfully, the engine checks every field against the story schema: required fields must be present, values must have the correct type, enums must use one of the allowed strings, arrays must not be empty, and all `next` targets must point to scenes that actually exist in the file. Every violation is collected and reported together, so you can fix them all at once.
 
 ### The three test files
 
