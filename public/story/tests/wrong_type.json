@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "startingScene": 42,
+    "textSpeed": "fast",
+    "historyLimit": 10.7,
+    "defaultNameDisplay": "nickname",
+    "defaultDialoguePosition": "left",
+    "transitionDuration": -500,
+    "titlePage": {
+      "title": true,
+      "background": "",
+      "showTitle": "yes"
+    },
+    "creditsPage": {
+      "title": "Credits",
+      "background": "bg_credits.png",
+      "scrollSpeedInPixelsPerSecond": -20,
+      "creditGroups": []
+    }
+  },
+  "characters": {
+    "alice": {
+      "name": 123,
+      "color": false,
+      "sprite": ["idle.png", "happy.png"]
+    }
+  },
+  "story": {
+    "intro": {
+      "background": ["bg_intro.png"],
+      "bgmLoop": "true",
+      "transition": "zoom",
+      "dialogues": {
+        "0": {
+          "name": "alice",
+          "text": 9999,
+          "textSpeed": -10,
+          "dialoguePosition": "middle",
+          "options": [
+            {
+              "text": "",
+              "next": true
+            }
+          ],
+          "sprite": {
+            "name": "",
+            "position": 42,
+            "inDialogueBox": "no"
+          },
+          "input": {
+            "value": 0
+          }
+        }
+      }
+    }
+  }
+}

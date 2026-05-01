@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "startingScene": "intro",
+    "titlePage": {
+      "title": "Test Story",
+      "background": "bg_title.png"
+    }
+    "creditsPage": {
+      "title": "Credits",
+      "background": "bg_credits.png",
+      "creditGroups": [
+        {
+          "groupName": "Team",
+          "credits": [
+            { "name": "Someone", "role": "Developer", }
+          ]
+        }
+      ]
+    },
+    textSpeed: 30,
+    "defaultDialoguePosition": "bottom",
+  },
+  "characters": {
+    "narrator" {
+      "name": "",
+      "color": "#ffffff"
+    }
+  },
+  "story": {
+    "intro": {
+      "background": "bg_intro.png",
+      "dialogues": [
+        {
+          "name": "",
+          "text": "Welcome.",
+          "next": __end__
+        }
+      ]
+    }
+  }
