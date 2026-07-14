@@ -63,13 +63,14 @@ You need **Node.js** installed on your machine. Download it at [nodejs.org](http
 
 **1. Get the project**
 
-If you have Git:
-```bash
-git clone https://github.com/NamelessProj/NamelessStory.git
-cd NamelessStory
-```
+On the [NamelessStory GitHub page](https://github.com/NamelessProj/NamelessStory), click the green **`< > Code`** button near the top of the file list. From there you can either:
 
-Or download the ZIP from GitHub and unzip it, then open a terminal in that folder.
+- Copy the URL and clone it if you have Git:
+  ```bash
+  git clone https://github.com/NamelessProj/NamelessStory.git
+  cd NamelessStory
+  ```
+- Or choose **"Download ZIP"** from that same menu, then unzip it and open a terminal in that folder.
 
 **2. Install dependencies**
 ```bash
@@ -85,6 +86,9 @@ npm run dev
 Open your browser and go to `http://localhost:5173`. You'll see the sample story running.
 
 **Stop the server** with `Ctrl + C` in the terminal.
+
+> [!IMPORTANT]
+> Steps 1 and 2 (getting the project and running `npm install`) are only needed once. But **step 3 must be repeated every time you come back to work on your story**. The dev server does not stay running between sessions. Each time you sit down to write or test your story, open a terminal in the project folder and run `npm run dev` again, then stop it with `Ctrl + C` when you're done.
 
 ## Project Structure
 
